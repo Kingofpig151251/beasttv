@@ -4,9 +4,10 @@
    - 圖片、音效：cache-first（檔名不變、內容少變）
    - /api/*：唔攔，永遠直上網絡（題庫唯一真相源在雲端）
 */
-const CACHE = "beast-v10";
+const CACHE = "beast-v11";
 const SHELL = [
   "/", "/edit", "/credits",
+  "/styles.css", "/app.js",
   "/manifest.json",
   "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/favicon.ico",
   "/art/team/turtle.webp", "/art/team/fox.webp", "/art/team/whale.webp", "/art/team/octopus.webp",
