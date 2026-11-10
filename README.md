@@ -211,28 +211,54 @@ cd tests && python3 edge.py                      # 46 項邊界（暫停、退�
 
 ## 檔案
 
+三個前端檔，無 build step、無打包：結構、樣式、行為各自一份。修改時只讀對應檔案即可，不必通讀全部。
+
 ```
-index.html                 主持台（單檔，含 SVG 圖示）
-art/team/*.webp            八個隊伍圖示（256×256 透明底，同一批生成圖裁出）
-sfx/dingdong.mp3           判定「對」：門鐘叮噹
-sfx/whoosh.mp3             判定「跳過」：子彈飛過
-sfx/snare.mp3（同時用於犯規判定與冠軍揭曉重擊）
-sfx/countdown.mp3          倒數 3／2／1＋開始（真實賽車起步錄音）
-sfx/whistle.mp3            時間到：球證哨單響
-sfx/settle.mp3             結算卡：銅管 fanfare（2.9s）
-sfx/champion.mp3           冠軍揭曉：Celebration loop（16.7s）
-sfx/tick.mp3               結果頁每行揭曉的一下短音；亦疊在最後 10 秒的心跳上
-sfx/hb3.mp3                最後 10 秒的心跳（真人 61 BPM 錄音，升調 5× ＋ 6dB 對齊喇叭，0.31s）
-sfx/tap.mp3                通用按鍵音（介面 chrome 用）
-sfx/drums.mp3              冠軍前 build-up 的密集鼓聲（可加速）
-sfx/snare.mp3              鼓停、冠軍揭曉的一下重擊
-edit.html                  設定頁（標題／副標題／題目，一個 textarea + 自動儲存）
-api/_app.py                Vercel 後端（FastAPI + Postgres，只有題庫 GET／PUT）
-api/[...path].py / index.py  路由入口
-vercel.json                 rewrites、function 設定
-tests/mock_sync_server.py  本地 mock 後端（開發用）
-samples/hk-icebreaker.json 首次 seed 題庫
+index.html    15KB   全部畫面結構（含內嵌 SVG 圖示）＋兩段極短 inline script（js class、SW 註冊）
+styles.css    56KB   全部樣式；窄屏／矮屏／橫向靠 @media 覆寫
+app.js        71KB   全部行為；以 /* ==== 段名 ==== */ 分段
+sw.js                Service Worker（CACHE 版號改動即換快取）
+edit.html           設定頁（標題／副標題／題目，一個 textarea + 自動儲存）
+credits.html        版權與素材鳴謝（唯一維護點）
+api/_app.py         Vercel 後端（FastAPI + Postgres）
+api/[...path].py    路由入口
+vercel.json         rewrites、function 設定
+tests/smoke.py      24 項主流程（需先開 preview :8899）
+tests/edge.py       65 項邊界（版面溢出、鍵位、落閘、i18n）
+tests/lint.sh       sloplint 全部前端檔
+art/team/*.webp     八個隊伍圖示
+samples/            seed 題庫
 ```
+
+### app.js 段落（亦是載入依賴順序，勿調換）
+
+```
+語言      EN 字典、T()、translateTree()、setLang()        ← 字典最長，改文案只需看第一段
+狀態      cfg、store、lines、G、BANK
+動物      ANIMALS：名稱／圖示／顏色三者綁定
+品牌後端  renderBrand()、apiGet()／apiPut()
+主頁設定  renderHome()、renderSetup()、六步流程
+遊戲流程  startGame()、enterReady()、倒數、renderPlay()
+音效      SFX_SRC、loadSfx()、sfx()、bgm()
+判定      judge()、act()、undoJudge()、DIAG
+落閘結算  slamGate()、settleAdjust()
+結果冠軍  endGame()、startReveal()、彩帶
+事件鍵盤  綁定、KEY_DEF、第六步鍵位
+啟動      boot()
+```
+
+定位方法：`grep -n "^/\* ===" app.js` 直接得出上面這份目錄。
+
+### 音效（`sfx/`，12 個，304KB）
+
+```
+tap / dingdong / whoosh / tick / foul / settle   AI 生成（Stable Audio 3 Small-SFX、本機 CPU）
+whistle / countdown / drums / snare              CC0
+champion（Celebration 16.7s loop）               CC BY 4.0（需署名）
+hb3（最後 10 秒心跳，升調 5× ＋ 6dB）            CC BY 3.0（需署名）
+```
+
+音樂與心跳維持真人素材，其餘為 AI 生成；授權逐項列在 `credits.html`。
 
 ## 部署
 
