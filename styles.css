@@ -4,18 +4,20 @@
 
   :root{
     color-scheme:light;
-    /* ground */
-    --bg:#F2F2F7; --surface:#FFFFFF; --surface-2:#E9E9EE; --fill:rgba(118,118,128,.12);
-    --fill-2:rgba(118,118,128,.20); --fill-3:rgba(118,118,128,.10); --spot:rgba(0,113,227,.10); --sheet-veil:rgba(0,0,0,.42); --vs-shadow:rgba(0,0,0,.18);
-    /* ink */
-    --ink:#000000; --ink-2:rgba(60,60,67,.72); --ink-3:rgba(60,60,67,.40);
-    --sep:rgba(60,60,67,.18);
-    /* system colours */
-    --blue:#0071E3; --blue-press:#005FBF;
-    --blue-fill:var(--blue); --blue-fill-press:var(--blue-press); --green:#34C759; --red:#FF3B30; --amber:#FF9F0A;
-    --on-accent:#FFFFFF; --focus-ring:rgba(0,113,227,.85);
-    --flash-ok:rgba(52,199,89,.16); --toast-bg:rgba(28,28,30,.92);
-    --toast-ink:#FFFFFF; --flash-bad:rgba(255,59,48,.15); 
+    /* ground · 暖灰 ramp（酒吧夜裡的鎢絲燈，唔用 iOS 冷灰） */
+    --bg:#F7F4EE; --surface:#FFFFFF; --surface-2:#EFE9DF; --fill:rgba(90,80,66,.10);
+    --fill-2:rgba(90,80,66,.18); --fill-3:rgba(90,80,66,.07); --spot:rgba(180,71,31,.10); --sheet-veil:rgba(28,22,16,.45); --vs-shadow:rgba(60,44,26,.20);
+    /* ink · 固體色，唔用 alpha 疊（alpha 疊出嚟嘅灰預測唔到對比） */
+    --ink:#1F1B16; --ink-2:#554C42; --ink-3:#6E6459;
+    --sep:rgba(31,27,22,.16);
+    /* accent · 鎢絲燈暖橙：白字 5.44:1、當文字 5.44:1、當圖形 5.44:1 */
+    --accent:#B4471F; --accent-press:#963517;
+    --accent-fill:var(--accent); --accent-fill-press:var(--accent-press);
+    /* semantic · 全部 ≥5:1（原本 2.0–3.6） */
+    --green:#12703A; --red:#A01B12; --amber:#9A4A08;
+    --on-accent:#FFFFFF; --focus-ring:rgba(180,71,31,.9);
+    --flash-ok:rgba(18,112,58,.14); --toast-bg:rgba(30,24,18,.94);
+    --toast-ink:#FFFFFF; --flash-bad:rgba(160,27,18,.14); 
     /* spacing · 4px grid（control 4–12／相關項 8／組間 16–24／區段 32–48） */
     --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
     /* geometry */
@@ -137,7 +139,7 @@
   .lang-toggle:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring)}
   .my-bank{margin:var(--s3) 0 0; font-size:13px; color:var(--ink-2); display:flex; align-items:center; gap:8px; justify-content:center}
   .my-bank b{font-weight:600; color:var(--ink)}
-  .my-bank button{font:inherit; font-size:12.5px; color:var(--blue); background:none; border:0; padding:2px 0; min-height:0}
+  .my-bank button{font:inherit; font-size:12.5px; color:var(--accent); background:none; border:0; padding:2px 0; min-height:0}
   .landing-credit{font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums;
     display:inline-flex; align-items:center; gap:var(--s1); white-space:nowrap}
   .credit-link{font:inherit; font-size:13px; color:var(--ink-2); background:none; border:0; padding:2px 0;
@@ -173,7 +175,7 @@
   .dots{display:flex; justify-content:center; gap:8px}
   .dots i{width:9px; height:9px; border-radius:50%; background:var(--sep);
     transition:background-color .3s var(--ease), transform .3s var(--ease)}
-  .dots i.on{background:var(--blue)}
+  .dots i.on{background:var(--accent)}
   .dots i.cur{transform:scale(1.6)}
 
   .stage{position:relative; flex:1; min-height:0; margin:8px 0}
@@ -214,10 +216,10 @@
     display:grid; place-items:center; line-height:1;
     background:color-mix(in oklab, var(--tc) 16%, transparent);
     box-shadow:inset 0 0 0 2px color-mix(in oklab, var(--tc) 62%, transparent)}
-  .animal-mark{display:block; font-size:26px; color:var(--tc)}
+  .animal-mark{display:block; font-size:26px; color:var(--tc-ink)}
   .animal-mark svg{display:block; width:1em; height:1em}
   .animal-edit{position:absolute; right:-2px; bottom:-2px; width:20px; height:20px; padding:4px;
-    border-radius:50%; background:var(--tc); fill:none; stroke:var(--on-accent); stroke-width:2.4;
+    border-radius:50%; background:var(--tc); fill:none; stroke:var(--ink); stroke-width:2.4;
     stroke-linejoin:round}
   .animal-btn:active{background:color-mix(in oklab, var(--tc) 28%, transparent)}
 
@@ -238,8 +240,8 @@
   .sheet-btn{flex:1 1 0; min-height:50px; border:0; border-radius:var(--r-lg); font:inherit;
     font-size:17px; font-weight:600; background:var(--fill); color:var(--ink); cursor:pointer}
   .sheet-btn:active{background:var(--fill-2)}
-  .sheet-btn.primary{background:var(--blue-fill); color:var(--on-accent)}
-  .sheet-btn.primary:active{background:var(--blue-fill-press)}
+  .sheet-btn.primary{background:var(--accent-fill); color:var(--on-accent)}
+  .sheet-btn.primary:active{background:var(--accent-fill-press)}
   .sheet-btn.danger{background:color-mix(in oklab, var(--red) 16%, transparent); color:var(--red)}
   .sheet-btn.danger:active{background:color-mix(in oklab, var(--red) 26%, transparent)}
   .sheet-card{width:min(560px,100%); background:var(--surface); border-radius:var(--r-xl);
@@ -252,12 +254,12 @@
     box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 34%, transparent)}
   .animal-opt.on{box-shadow:inset 0 0 0 2.5px var(--tc)}
   .animal-opt.on::after{content:"✓"; position:absolute; top:6px; right:9px; font-size:13px;
-    font-weight:700; color:var(--tc)}
+    font-weight:700; color:var(--tc-ink)}
   .animal-opt.taken{background:var(--fill); cursor:not-allowed;
     box-shadow:inset 0 0 0 1px var(--sep)}
   .animal-opt.taken .opt-mark,.animal-opt.taken .opt-name{opacity:.42}
   .mark-img{display:block; width:1em; height:1em; object-fit:contain; margin:0 auto}
-  .animal-opt .opt-mark{font-size:26px; line-height:1; color:var(--tc)}
+  .animal-opt .opt-mark{font-size:26px; line-height:1; color:var(--tc-ink)}
   .animal-opt .opt-mark svg,.animal-opt .opt-mark .mark-img{display:block; width:1em; height:1em}
   .animal-opt .opt-name{font-size:13px; font-weight:600; color:var(--ink)}
   .sheet-cancel{min-height:48px; border-radius:var(--r-md); background:var(--fill); color:var(--ink);
@@ -270,8 +272,8 @@
   .launch{position:fixed; inset:0; z-index:80; pointer-events:none; overflow:hidden}
   .curtain{position:absolute; left:0; right:0; height:50.4%;
     transition:transform .46s cubic-bezier(.62,0,.38,1)}
-  .curtain.top{top:0; background:var(--blue-fill)}
-  .curtain.bot{bottom:0; background:var(--blue-fill)}
+  .curtain.top{top:0; background:var(--accent-fill)}
+  .curtain.bot{bottom:0; background:var(--accent-fill)}
   .js .curtain.top{transform:translateY(-100%)}
   .js .curtain.bot{transform:translateY(100%)}
   .js .launch.closed{pointer-events:auto}
@@ -322,13 +324,13 @@
   .round-btn.sm::after{content:""; position:absolute; inset:-10px; border-radius:50%}   /* 44px 觸控區，視覺仍 24px */
   .round-btn.sm:active{background:var(--sep)}
   .round-btn.sm:disabled{background:var(--fill-3); color:var(--ink-3)}
-  .round-btn:disabled{background:var(--fill-3); color:var(--ink-3); cursor:not-allowed; transform:none}
+  .round-btn:disabled{background:var(--fill-3); color:var(--ink-3); opacity:1; cursor:not-allowed; transform:none}
 
   /* 秒數 chips（第三步） */
   .chips{display:flex; gap:12px; flex-wrap:wrap; justify-content:center}
   .chips button{min-height:48px; padding:0 var(--s5); border-radius:var(--pill); background:var(--fill);
     color:var(--ink); font-size:17px; font-weight:600; font-variant-numeric:tabular-nums}
-  .chips button[aria-pressed="true"]{background:var(--blue); color:var(--on-accent)}
+  .chips button[aria-pressed="true"]{background:var(--accent); color:var(--on-accent)}
 
   /* inputs */
   input,textarea,select{font-family:inherit; font-size:17px; color:var(--ink);
@@ -343,9 +345,9 @@
     border:0; border-radius:var(--r-md); padding:var(--s3) var(--s5); min-height:44px; cursor:pointer;
     transition:background-color var(--dur) var(--ease), transform var(--dur) var(--ease), opacity var(--dur)}
   button:active{transform:scale(.97)}
-  button:disabled{opacity:.35; cursor:not-allowed; transform:none}
-  .btn-primary{background:var(--blue-fill); color:var(--on-accent); font-weight:600}
-  .btn-primary:active{background:var(--blue-fill-press)}
+  button:disabled{opacity:.5; cursor:not-allowed; transform:none}   /* 35% 連「呢個係咩鍵」都睇唔到 */
+  .btn-primary{background:var(--accent-fill); color:var(--on-accent); font-weight:600}
+  .btn-primary:active{background:var(--accent-fill-press)}
   .btn-big{width:100%; padding:var(--s4) var(--s5); font-size:19px; font-weight:600}
 
 
@@ -375,7 +377,7 @@
   .turn-chip{display:inline-flex; align-items:center; gap:var(--s2); height:44px; padding:0 var(--s4) 0 var(--s2);
     border-radius:var(--pill); background:color-mix(in oklab, var(--tc,var(--ink-2)) 14%, transparent);
     color:var(--ink); max-width:46vw}
-  .turn-mark{display:grid; place-items:center; font-size:22px; color:var(--tc); flex:0 0 auto}
+  .turn-mark{display:grid; place-items:center; font-size:22px; color:var(--tc-ink); flex:0 0 auto}
   .turn-mark svg,.turn-mark .mark-img{display:block; width:1em; height:1em}
   .turn-name{font-size:16px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .icon-btn .i-back{display:none}
@@ -386,7 +388,7 @@
     border:0; border-radius:50%; background:transparent; color:var(--ink)}
   .ring svg{position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg)}
   .ring-track{fill:none; stroke:var(--fill-2); stroke-width:3}
-  .ring-prog{fill:none; stroke:var(--blue); stroke-width:3; stroke-linecap:round;
+  .ring-prog{fill:none; stroke:var(--accent); stroke-width:3; stroke-linecap:round;
     stroke-dasharray:100.5; stroke-dashoffset:0; transition:stroke-dashoffset .25s linear}
   .ring.warn .ring-prog{stroke:var(--amber)}
   .ring.dead .ring-prog{stroke:var(--red)}
@@ -456,8 +458,8 @@
     box-shadow:inset 0 0 0 1px var(--sep)}
   .undo-btn:not(.off):active{background:var(--fill-2)}
   .undo-btn:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring)}
-  .undo-btn.fresh{background:color-mix(in oklab, var(--blue) 7%, var(--fill)); color:var(--blue);
-    box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--blue) 32%, transparent)}
+  .undo-btn.fresh{background:color-mix(in oklab, var(--accent) 7%, var(--fill)); color:var(--accent);
+    box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--accent) 32%, transparent)}
   /* 回報：同 × 一樣 44px 圓形，但細一級圖示 */
   .icon-btn.report{color:var(--ink-2)}
   .icon-btn.report svg{width:20px; height:20px}
@@ -477,8 +479,8 @@
   .flash-hud.bad-pass .key-pass:active{background:color-mix(in oklab, var(--red) 22%, var(--fill))}
   .flash-hud.no-skip .key-pass{display:none}
   .flash-hud.no-skip{grid-template-columns:1fr 1fr}
-  .flash-hud .key-ok{justify-self:end; background:var(--blue-fill); color:var(--on-accent)}
-  .flash-hud .key-ok:active{background:var(--blue-fill-press)}
+  .flash-hud .key-ok{justify-self:end; background:var(--accent-fill); color:var(--on-accent)}
+  .flash-hud .key-ok:active{background:var(--accent-fill-press)}
 
 
   /* ---------- ready ---------- */
@@ -487,7 +489,7 @@
   .readyCard{width:100%; height:100%; display:flex; flex-direction:column; align-items:center;
     justify-content:center; text-align:center; padding:clamp(24px,6vh,56px) clamp(20px,4vw,48px); gap:var(--s2)}
   .readyRound{font-size:15px; color:var(--ink-2); letter-spacing:.02em}
-  .readyMark{font-size:clamp(54px,10vh,104px); line-height:1; color:var(--tc); margin-bottom:var(--s2)}
+  .readyMark{font-size:clamp(54px,10vh,104px); line-height:1; color:var(--tc-ink); margin-bottom:var(--s2)}
   .readyMark svg,.readyMark .mark-img{display:block; width:1em; height:1em; margin:0 auto}
   .readyTeam{font-family:var(--font-display); font-weight:700; font-size:clamp(52px,13vh,140px);
     letter-spacing:-.03em; line-height:1.02; margin:var(--s2) 0 var(--s4)}
@@ -502,14 +504,14 @@
     background:var(--fill); box-shadow:inset 0 0 0 1px var(--sep)}
   .readyScores .score-tile.cur{background:color-mix(in oklab, var(--tc) 18%, var(--surface));
     box-shadow:inset 0 0 0 2.5px var(--tc)}
-  .readyScores .pill-mark{display:block; width:22px; height:22px; font-size:22px; color:var(--tc)}
+  .readyScores .pill-mark{display:block; width:22px; height:22px; font-size:22px; color:var(--tc-ink)}
   .readyScores .pill-mark svg,.readyScores .pill-mark .mark-img{display:block; width:1em; height:1em}
   .readyScores .score-name{font-size:13px; font-weight:600; color:var(--ink);
     max-width:12ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .readyScores b{font-family:var(--font-display); font-size:17px; font-weight:600; color:var(--ink);
     font-variant-numeric:tabular-nums}
   .readyCard button{margin-top:clamp(24px,4vh,32px); min-height:56px; padding:0 40px;
-    background:var(--blue-fill); color:var(--on-accent); font-size:19px; font-weight:600; border-radius:var(--r-lg)}
+    background:var(--accent-fill); color:var(--on-accent); font-size:19px; font-weight:600; border-radius:var(--r-lg)}
   /* 「準備好」唔再顯示 → ：鍵位可自訂，方向符號會誤導（同 HUD 三粒鍵一致） */
   /* ---------- 倒數（獨立過場動畫） ---------- */
   .countdown{position:fixed; inset:0; z-index:70; display:none; place-items:center;
@@ -517,13 +519,13 @@
   .countdown.on{display:grid}
   .countdown::before{content:""; position:absolute; inset:0; pointer-events:none;
     background:radial-gradient(58% 58% at 50% 50%,
-      color-mix(in oklab, var(--tc, var(--blue)) 15%, transparent), transparent 72%)}
+      color-mix(in oklab, var(--tc, var(--accent)) 15%, transparent), transparent 72%)}
   .cd-inner{position:relative; display:grid; place-items:center; gap:clamp(12px,1.8vh,16px)}
   .cd-dial{position:relative; display:grid; place-items:center;
     width:clamp(216px,33vh,312px); height:clamp(216px,33vh,312px)}
   .cd-dial svg{position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg)}
-  .cd-track{fill:none; stroke-width:4; stroke:color-mix(in oklab, var(--tc, var(--blue)) 16%, transparent)}
-  .cd-prog{fill:none; stroke-width:4; stroke-linecap:round; stroke:var(--tc, var(--blue));
+  .cd-track{fill:none; stroke-width:4; stroke:color-mix(in oklab, var(--tc, var(--accent)) 16%, transparent)}
+  .cd-prog{fill:none; stroke-width:4; stroke-linecap:round; stroke:var(--tc-ink, var(--accent));
     stroke-dasharray:339.3; stroke-dashoffset:0; transition:stroke-dashoffset 1s linear}
   .cd-num{font-family:var(--font-display); font-weight:700; color:var(--ink);
     font-size:clamp(92px,19vh,184px); line-height:1; letter-spacing:-.04em;
@@ -533,7 +535,7 @@
   @keyframes cdBeat{0%{transform:scale(1.24); opacity:.3} 100%{transform:scale(1); opacity:1}}
   .cd-team{display:flex; align-items:center; gap:12px; font-weight:600;
     font-family:var(--font-display); letter-spacing:-.01em;
-    font-size:clamp(22px,3.2vh,32px); color:var(--tc, var(--blue))}
+    font-size:clamp(22px,3.2vh,32px); color:var(--tc-ink, var(--accent))}
   .cd-team .cd-mark{font-size:1.15em; line-height:1}
   .cd-team .cd-mark svg,.cd-team .cd-mark .mark-img{display:block; width:1em; height:1em}
 
@@ -567,14 +569,14 @@
     font-size:clamp(60px,12vh,112px); line-height:1; letter-spacing:-.04em;
     margin-top:clamp(2px,.4vh,4px); font-variant-numeric:tabular-nums}
   .te-score em{font-style:normal; font-size:.32em; font-weight:600;
-    color:color-mix(in oklab, var(--on-accent) 74%, transparent);
+    color:color-mix(in oklab, var(--on-accent) 92%, transparent);
     margin-left:var(--s2); letter-spacing:0}
-  .te-score.zero{color:color-mix(in oklab, var(--on-accent) 46%, transparent)}
+  .te-score.zero{color:color-mix(in oklab, var(--on-accent) 90%, transparent)}   /* 0 分都要讀到：4.7:1 */
   .te-stats{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:clamp(2px,.8vh,8px)}
   .stat{display:flex; align-items:center; gap:var(--s2); padding:var(--s1) var(--s2) var(--s1) var(--s3); border-radius:999px;
-    background:color-mix(in oklab, var(--on-accent) 10%, transparent)}
+    background:color-mix(in oklab, var(--ink) 14%, transparent)}   /* 白 10% 疊橙會把白字壓到 4.55；改深底 → 6.6 */
   .stat i{font-style:normal; font-size:13px; letter-spacing:.02em;
-    color:color-mix(in oklab, var(--on-accent) 62%, transparent)}
+    color:var(--on-accent)}   /* 62% 白疊橙 = 3.04；純白 = 5.44 */
   .stat b{min-width:15px; font-size:15px; font-variant-numeric:tabular-nums}
   /* 命中區 44×44（iPad 手指都夠大），視覺圓點仍然 30px：用 ::before 畫圓，
      負 margin 抵銷多出嘅尺寸，所以藥丸高度、字距、整體節奏一律不變 */
@@ -582,8 +584,8 @@
     border-radius:50%; display:grid; place-items:center; font-size:17px; line-height:1; color:var(--on-accent);
     background:transparent; touch-action:manipulation}
   .stat button::before{content:""; position:absolute; inset:7px; border-radius:50%;
-    background:color-mix(in oklab, var(--on-accent) 16%, transparent)}
-  .stat button:active::before{background:color-mix(in oklab, var(--on-accent) 32%, transparent)}
+    background:color-mix(in oklab, var(--ink) 22%, transparent)}   /* 深圓底：白 ± 由 3.19 → 5.5 */
+  .stat button:active::before{background:color-mix(in oklab, var(--ink) 34%, transparent)}
   .stat button:focus-visible{outline:0}
   .stat button:focus-visible::before{box-shadow:0 0 0 3px var(--focus-ring)}
   /* 矮視窗（手機橫屏）：結算卡連覆核列都要塞得入 */
@@ -602,9 +604,9 @@
   }
   .te-next{margin-top:clamp(24px,3.6vh,32px); min-height:56px; padding:0 var(--s6);
     display:inline-flex; align-items:center; gap:12px;
-    background:var(--on-accent); color:var(--blue); font-size:19px; font-weight:600;
+    background:var(--on-accent); color:var(--accent); font-size:19px; font-weight:600;
     border-radius:var(--r-lg)}
-  .te-next:active{background:color-mix(in oklab, var(--on-accent) 84%, var(--blue))}
+  .te-next:active{background:color-mix(in oklab, var(--on-accent) 84%, var(--accent))}
   /* 結算卡「繼續」同樣唔顯示 → */
 
   /* ---------- result：逐格揭榜 ---------- */
@@ -623,6 +625,10 @@
     animation-name:fall; animation-timing-function:linear; animation-iteration-count:infinite}
 
   .rank{position:relative; z-index:2; display:flex; flex-direction:column; gap:2px}
+  /* 隊色當「文字／圖示」用時混入暖墨：保住色相，但由白底 2.0–2.2 拉到 7.1–11.1。
+     隊色本身留給面積（底色、邊框、燈條），所以身份沒有被洗掉。 */
+  .name-row, .animal-opt, .turn-chip, .ready, .readyScores .score-tile, .rk, .countdown{
+    --tc-ink:color-mix(in oklab, var(--tc, var(--accent)) 40%, var(--ink))}
   .rk{position:relative; padding:var(--s2) var(--s4); border-radius:14px;
     transition:opacity .26s var(--ease), transform .34s var(--ease),
                background .34s var(--ease), padding .34s var(--ease), border-radius .34s var(--ease)}
@@ -650,14 +656,14 @@
   .front-card::after{content:"?"; font-size:clamp(28px,4.6vh,38px); font-weight:700; color:var(--ink-2);
     animation:qBreathe 1.4s ease-in-out infinite}
   .front-card::before{content:""; position:absolute; inset:0; border-radius:22px;
-    box-shadow:0 0 0 1px color-mix(in oklab, var(--blue) 35%, transparent);
+    box-shadow:0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
     animation:ringPulse 1.6s ease-out infinite}
 
-  .rk .no{font-size:15px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+  .rk .no{font-size:15px; color:var(--ink-2); font-variant-numeric:tabular-nums}
   .rk-tile{width:44px; height:44px; border-radius:12px; display:grid; place-items:center;
-    background:color-mix(in oklab, var(--tc) 14%, transparent);
+    background:color-mix(in oklab, var(--tc) 20%, transparent);
     box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 34%, transparent); flex:0 0 auto}
-  .rk-tile .rk-mark{display:block; font-size:24px; line-height:1; color:var(--tc)}
+  .rk-tile .rk-mark{display:block; font-size:24px; line-height:1; color:var(--tc-ink)}
   .rk-mark svg,.rk-mark .mark-img{display:block; width:1em; height:1em}
   .rk .nm{font-size:17px; font-weight:500; line-height:1.2}
   .rk .st{font-size:14px; color:var(--ink-2); margin-top:2px}
@@ -677,7 +683,7 @@
   .rk.is-champ .nm{font-family:var(--font-display); font-size:clamp(24px,4.4vh,34px);
     font-weight:700; letter-spacing:-.02em; text-align:left; max-width:min(46vw,420px)}
   .rk.is-champ .st{font-size:15px}
-  .rk.is-champ .pt{font-size:clamp(32px,5.4vh,46px); color:var(--tc)}
+  .rk.is-champ .pt{font-size:clamp(32px,5.4vh,46px); color:var(--tc-ink)}
   .rank.compact .rk.is-champ{padding:var(--s2) var(--s4)}
   .rank.compact .rk.is-champ .st{display:none}
   .rank.compact .rk.is-champ .nm{font-size:clamp(20px,3.4vh,26px)}
@@ -708,7 +714,7 @@
   .key-chip{min-width:92px; height:40px; padding:0 12px; border:0; border-radius:10px; font:inherit;
     font-family:var(--font-mono); font-size:15px; font-weight:600; color:var(--ink); cursor:pointer;
     background:var(--surface); box-shadow:inset 0 0 0 1px var(--sep)}
-  .key-chip.listening{color:var(--blue); box-shadow:inset 0 0 0 2px var(--blue)}
+  .key-chip.listening{color:var(--accent); box-shadow:inset 0 0 0 2px var(--accent)}
   .rule{display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:16px;
     padding:var(--s4) var(--s1); border-bottom:var(--hair) solid var(--sep)}
   .rule:last-child{border-bottom:0}
@@ -726,7 +732,7 @@
   .switch i{position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
     background:var(--surface); box-shadow:0 1px 2px var(--vs-shadow);
     transition:transform .22s var(--ease)}
-  .switch[aria-checked="true"]{background:var(--blue)}
+  .switch[aria-checked="true"]{background:var(--accent)}
   .switch[aria-checked="true"] i{transform:translateX(18px)}
   .switch:disabled{cursor:default}
 
