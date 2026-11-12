@@ -181,7 +181,7 @@
   .stage{position:relative; flex:1; min-height:0; margin:8px 0}
   .js .sstep{opacity:0; transform:translateX(56px); pointer-events:none}
   .sstep{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:var(--s5); text-align:center;
+    justify-content:center; gap:var(--s3); text-align:center;
     overflow-y:auto; overscroll-behavior:contain; padding:var(--s2) 0;
     transition:opacity .42s var(--ease), transform .42s var(--ease)}
   @supports (justify-content: safe center){ .sstep{justify-content: safe center} }
@@ -195,7 +195,9 @@
 
   .sstep-title{margin:0; font-family:var(--font-display); font-size:clamp(32px,4.6vh,44px);
     font-weight:700; letter-spacing:-.02em}
-  .sstep-hint{margin:var(--s4) 0 0; font-size:15px; color:var(--ink-2)}   /* 提示係數值嘅註腳：比 gap 再多 16px，唔同標題同級 */
+  .sstep-hint{margin:0; font-size:15px; color:var(--ink-2)}   /* 提示係數值嘅註腳：跟 12px 節奏，貼住佢註解嘅數字 */
+  .sstep > .bignum, .sstep > .chips, .sstep > .namegrid,
+  .sstep > .rules, .sstep > .key-rows{margin-top:var(--s3)}   /* 組與組之間 12+12=24，提示唔會被推遠 */
 
   .bignum{display:flex; align-items:baseline; gap:clamp(16px,3.4vw,40px)}
   .bignum input{width:2ch; min-height:0; padding:0; background:transparent; border:0; text-align:center;
@@ -658,7 +660,7 @@
      隊色本身留給面積（底色、邊框、燈條），所以身份沒有被洗掉。 */
   .name-row, .animal-opt, .turn-chip, .ready, .readyScores .score-tile, .rk, .countdown{
     --tc-ink:color-mix(in oklab, var(--tc, var(--accent)) 40%, var(--ink))}
-  .rk{position:relative; padding:6px var(--s4); border-radius:14px;
+  .rk{position:relative; padding:2px var(--s4); border-radius:14px;
     transition:opacity .26s var(--ease), transform .34s var(--ease),
                background .34s var(--ease), padding .34s var(--ease), border-radius .34s var(--ease)}
   .js .rk{opacity:0; transform:translateY(16px) scale(.985)}
@@ -669,7 +671,7 @@
   .flip{position:relative; transform-style:preserve-3d;
     transition:transform .62s cubic-bezier(.3,.82,.2,1)}
   .face{backface-visibility:hidden; -webkit-backface-visibility:hidden}
-  .face.back{display:grid; grid-template-columns:44px 44px minmax(0,1fr) auto;
+  .face.back{display:grid; grid-template-columns:36px 44px minmax(0,1fr) auto;
     align-items:center; gap:12px}
   @media (max-width:520px){ .face.back{grid-template-columns:26px 30px minmax(0,1fr) auto} }
   .face.front{position:absolute; inset:0; display:none}
@@ -689,15 +691,15 @@
     box-shadow:0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
     animation:ringPulse 1.6s ease-out infinite}
 
-  .rk .no{font-size:28px; color:var(--ink-2); font-variant-numeric:tabular-nums; line-height:1.1}
+  .rk .no{font-size:22px; color:var(--ink-2); font-variant-numeric:tabular-nums; line-height:1.1}
   @media (max-width:520px){ .rk .no{font-size:20px} }
   .rk-tile{width:44px; height:44px; border-radius:12px; display:grid; place-items:center;
     background:color-mix(in oklab, var(--tc) 20%, transparent);
     box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 34%, transparent); flex:0 0 auto}
   .rk-tile .rk-mark{display:block; font-size:24px; line-height:1; color:var(--tc-ink)}
   .rk-mark svg,.rk-mark .mark-img{display:block; width:1em; height:1em}
-  .rk .nm{font-size:20px; font-weight:500; line-height:1.2}
-  .rk .st{font-size:18px; line-height:1.3; color:var(--ink-2); margin-top:2px}
+  .rk .nm{font-size:26px; font-weight:500; line-height:1.15}
+  .rk .st{font-size:18px; line-height:1.2; color:var(--ink-2); margin-top:2px}
   .rk .pt{font-family:var(--font-display); font-size:22px; font-weight:600;
     font-variant-numeric:tabular-nums; transition:font-size .34s var(--ease), color .34s var(--ease)}
 
