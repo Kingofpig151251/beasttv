@@ -574,11 +574,16 @@
   .stat i{font-style:normal; font-size:13px; letter-spacing:.02em;
     color:color-mix(in oklab, var(--on-accent) 62%, transparent)}
   .stat b{min-width:15px; font-size:15px; font-variant-numeric:tabular-nums}
-  .stat button{width:30px; height:30px; min-height:0; padding:0; border:0; border-radius:50%;
-    display:grid; place-items:center; font-size:17px; line-height:1; color:var(--on-accent);
-    background:color-mix(in oklab, var(--on-accent) 16%, transparent); touch-action:manipulation}
-  .stat button:active{background:color-mix(in oklab, var(--on-accent) 32%, transparent)}
-  .stat button:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring)}
+  /* 命中區 44×44（iPad 手指都夠大），視覺圓點仍然 30px：用 ::before 畫圓，
+     負 margin 抵銷多出嘅尺寸，所以藥丸高度、字距、整體節奏一律不變 */
+  .stat button{position:relative; width:44px; height:44px; margin:-7px; min-height:0; padding:0; border:0;
+    border-radius:50%; display:grid; place-items:center; font-size:17px; line-height:1; color:var(--on-accent);
+    background:transparent; touch-action:manipulation}
+  .stat button::before{content:""; position:absolute; inset:7px; border-radius:50%;
+    background:color-mix(in oklab, var(--on-accent) 16%, transparent)}
+  .stat button:active::before{background:color-mix(in oklab, var(--on-accent) 32%, transparent)}
+  .stat button:focus-visible{outline:0}
+  .stat button:focus-visible::before{box-shadow:0 0 0 3px var(--focus-ring)}
   /* 矮視窗（手機橫屏）：結算卡連覆核列都要塞得入 */
   @media (max-height:420px){
     .te-card{gap:4px; padding:10px 18px}
@@ -589,7 +594,8 @@
     .stat{padding:3px 6px 3px 9px; gap:4px}
     .stat i{font-size:11px}
     .stat b{font-size:13px; min-width:12px}
-    .stat button{width:24px; height:24px; font-size:14px}
+    .stat button{width:44px; height:44px; margin:-10px; font-size:14px}
+    .stat button::before{inset:10px}
     .te-next{margin-top:8px; min-height:38px; padding:0 22px; font-size:15px}
   }
   .te-next{margin-top:clamp(22px,3.6vh,36px); min-height:56px; padding:0 34px;
