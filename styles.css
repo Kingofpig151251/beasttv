@@ -38,7 +38,7 @@
 
   /* ---------- layout ---------- */
   .wrap{max-width:1024px; margin:0 auto;
-    padding:22px max(20px,env(safe-area-inset-right)) var(--s5) max(20px,env(safe-area-inset-left))}
+    padding:var(--s5) max(20px,env(safe-area-inset-right)) var(--s5) max(20px,env(safe-area-inset-left))}
 
   .view{display:none}
   .view.active{display:block}
@@ -195,7 +195,7 @@
 
   .sstep-title{margin:0; font-family:var(--font-display); font-size:clamp(32px,4.6vh,44px);
     font-weight:700; letter-spacing:-.02em}
-  .sstep-hint{margin:0; font-size:15px; color:var(--ink-2)}   /* 清掉 <p> 預設 15px 上下邊距，節奏交返 gap 控制 */
+  .sstep-hint{margin:var(--s4) 0 0; font-size:15px; color:var(--ink-2)}   /* 提示係數值嘅註腳：比 gap 再多 16px，唔同標題同級 */
 
   .bignum{display:flex; align-items:baseline; gap:clamp(16px,3.4vw,40px)}
   .bignum input{width:2ch; min-height:0; padding:0; background:transparent; border:0; text-align:center;
@@ -362,7 +362,8 @@
   #v-play.active{display:flex}
 
   .flash-top{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:var(--s2);
-    padding:8px max(20px,env(safe-area-inset-right)) 8px max(20px,env(safe-area-inset-left))}
+    padding:10px max(20px,env(safe-area-inset-right)) 8px max(20px,env(safe-area-inset-left))}
+  @media (min-width:700px){ .flash-top{padding-top:0} }   /* 84px 環 + 4px 上緣 = 第一粒鍵落在 24px */
   .top-left{display:flex; align-items:center; gap:8px; justify-self:start; min-width:0}
   .top-right{display:flex; align-items:center; gap:12px; justify-self:end; min-width:0}
   .icon-btn{width:44px; height:44px; padding:0; display:grid; place-items:center; border-radius:50%;
@@ -371,7 +372,7 @@
   .icon-btn:active{background:var(--fill-2)}
   /* 浮動退出鍵：z-index 要蓋過 ready(60)／countdown(65)，但唔參與版面流 */
   /* 與其他畫面的離開鍵同一角：左上 20px、上 22px；固定係「退出遊戲」（×） */
-  .quit-float{position:fixed; z-index:90; top:calc(22px + env(safe-area-inset-top));
+  .quit-float{position:fixed; z-index:90; top:calc(24px + env(safe-area-inset-top));
     inset-inline-start:20px; inset-inline-end:auto; background:var(--fill); color:var(--ink);
     box-shadow:inset 0 0 0 1px var(--sep)}
   .quit-float:active{background:var(--fill-2); color:var(--ink)}
@@ -388,6 +389,7 @@
 
   .ring{position:relative; width:64px; height:64px; padding:0; display:grid; place-items:center;
     border:0; border-radius:50%; background:transparent; color:var(--ink)}
+  @media (min-width:700px){ .ring{width:84px; height:84px} }   /* 內徑 78px：36px 的 3 位數（73px）都擺得落 */
   .ring svg{position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg)}
   .ring-track{fill:none; stroke:var(--fill-2); stroke-width:3}
   .ring-prog{fill:none; stroke:var(--accent); stroke-width:3; stroke-linecap:round;
@@ -395,8 +397,9 @@
   .ring.warn .ring-prog{stroke:var(--amber)}
   .ring.dead .ring-prog{stroke:var(--red)}
   .ring.paused .ring-prog{stroke:var(--ink-3)}
-  .clock{font-family:var(--font-display); font-size:36px; font-weight:700; font-variant-numeric:tabular-nums;
+  .clock{font-family:var(--font-display); font-size:28px; font-weight:700; font-variant-numeric:tabular-nums;
     letter-spacing:-.02em; line-height:1}
+  @media (min-width:700px){ .clock{font-size:36px} }
   .clock.warn{color:var(--amber)}
   .clock.dead{color:var(--red)}
 
@@ -445,7 +448,7 @@
 
   .flash-hud{position:relative; display:grid; grid-template-columns:1fr auto 1fr; gap:clamp(8px,1.6vw,16px); align-items:center;
     padding:var(--s3) max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
-  .flash-hud .key{display:inline-flex; align-items:center; justify-content:center; gap:12px;
+  .flash-hud .key{display:inline-flex; align-items:center; justify-content:flex-start; gap:12px; padding-left:var(--s3);
     width:clamp(104px,22vw,180px); height:clamp(62px,9.2vh,80px); border-radius:var(--r-lg);
     font-size:clamp(18px,2.9vh,24px); font-weight:600;
     transition:transform var(--dur) var(--ease), background-color var(--dur), color var(--dur)}
@@ -472,8 +475,10 @@
   .icon-btn.report{color:var(--ink-2)}
   .icon-btn.report svg{width:20px; height:20px}
   @media (max-width:430px){
-    .undo-btn{padding:0 var(--s3); font-size:12px; gap:var(--s1)}
-    .undo-btn .glyph{font-size:13px}
+    /* 390 頂欄算術：44+44+chip+44+64 + 4×8 gap + 40 padding；撤回 88→44 剛好補上 24px 缺口 */
+    .undo-btn{width:44px; min-width:44px; height:44px; padding:0; border-radius:50%; gap:0}
+    .undo-btn .lbl{display:none}
+    .undo-btn .glyph{font-size:22px}
     .top-right{gap:8px}
   }
   /* 判定鍵唔再顯示方向符號：鍵位可自訂，方向已無意義（使用者指示 2026-11-06） */
@@ -637,7 +642,7 @@
   #v-result.active{display:flex; flex-direction:column; justify-content:center;
     min-height:calc(100dvh - 56px)}
   .res-head{position:relative; z-index:3; text-align:center;
-    margin:0 auto clamp(16px,2.6vh,24px); width:min(560px, 100%)}
+    margin:0 auto clamp(8px,1.6vh,12px); width:min(560px, 100%)}
   #v-result .rank, #v-result .result-actions{width:min(560px, 100%); margin-inline:auto}
   #v-result h1{margin:0; font-size:clamp(30px,4.8vh,44px)}
   #rSub{margin:8px 0 0; font-size:18px}
@@ -652,7 +657,7 @@
      隊色本身留給面積（底色、邊框、燈條），所以身份沒有被洗掉。 */
   .name-row, .animal-opt, .turn-chip, .ready, .readyScores .score-tile, .rk, .countdown{
     --tc-ink:color-mix(in oklab, var(--tc, var(--accent)) 40%, var(--ink))}
-  .rk{position:relative; padding:var(--s2) var(--s4); border-radius:14px;
+  .rk{position:relative; padding:6px var(--s4); border-radius:14px;
     transition:opacity .26s var(--ease), transform .34s var(--ease),
                background .34s var(--ease), padding .34s var(--ease), border-radius .34s var(--ease)}
   .js .rk{opacity:0; transform:translateY(16px) scale(.985)}
@@ -663,8 +668,9 @@
   .flip{position:relative; transform-style:preserve-3d;
     transition:transform .62s cubic-bezier(.3,.82,.2,1)}
   .face{backface-visibility:hidden; -webkit-backface-visibility:hidden}
-  .face.back{display:grid; grid-template-columns:26px 44px minmax(0,1fr) auto;
+  .face.back{display:grid; grid-template-columns:44px 44px minmax(0,1fr) auto;
     align-items:center; gap:12px}
+  @media (max-width:520px){ .face.back{grid-template-columns:26px 30px minmax(0,1fr) auto} }
   .face.front{position:absolute; inset:0; display:none}
   .rk.is-champ{perspective:1200px}
   .rk.is-champ .face.back{transform:rotateY(180deg)}
@@ -682,7 +688,8 @@
     box-shadow:0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
     animation:ringPulse 1.6s ease-out infinite}
 
-  .rk .no{font-size:20px; color:var(--ink-2); font-variant-numeric:tabular-nums; line-height:1.1}
+  .rk .no{font-size:28px; color:var(--ink-2); font-variant-numeric:tabular-nums; line-height:1.1}
+  @media (max-width:520px){ .rk .no{font-size:20px} }
   .rk-tile{width:44px; height:44px; border-radius:12px; display:grid; place-items:center;
     background:color-mix(in oklab, var(--tc) 20%, transparent);
     box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 34%, transparent); flex:0 0 auto}
@@ -694,8 +701,8 @@
     font-variant-numeric:tabular-nums; transition:font-size .34s var(--ease), color .34s var(--ease)}
 
   /* 冠軍卡：內容居中、皇冠做成角標 */
-  .rk.is-champ{background:var(--surface); margin:var(--s4) 0 var(--s2);
-    padding:var(--s5) var(--s4) var(--s4);
+  .rk.is-champ{background:var(--surface); margin:var(--s3) 0 var(--s2);
+    padding:var(--s4) var(--s4) var(--s3);
     border-radius:22px; box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 20%, transparent)}
 
   .rk.is-champ::before{content:""; position:absolute; inset:-28px -12px; border-radius:34px; z-index:-1;
@@ -726,7 +733,7 @@
     100%{transform:translate(0,0) rotate(0)}
   }
 
-  .rules{display:flex; flex-direction:column; gap:2px; margin-top:8px}
+  .rules{display:flex; flex-direction:column; gap:2px; margin-top:8px; width:min(560px,100%)}
   .key-edit{height:38px; padding:0 16px; border:0; border-radius:var(--r-md); background:var(--fill);
     color:var(--ink); font:inherit; font-size:14px; font-weight:600; cursor:pointer}
   .key-edit:active{background:var(--fill-2)}
@@ -747,6 +754,7 @@
     border-radius:1px; background:var(--fill-2)}
   .rule.sub .rule-txt b{font-size:15px; font-weight:500; color:var(--ink-2)}
   .rule.sub .rule-txt span{display:none}
+  .rule-txt{text-align:left}
   .rule-txt b{display:block; font-size:17px; font-weight:600}
   .rule-txt span{display:block; font-size:14px; color:var(--ink-2); margin-top:2px}
   .switch{position:relative; width:42px; height:24px; min-height:0; padding:0; border-radius:var(--pill);
@@ -759,7 +767,7 @@
   .switch[aria-checked="true"] i{transform:translateX(18px)}
   .switch:disabled{cursor:default}
 
-  .result-actions{display:flex; gap:var(--s3); margin-top:var(--s5); flex-wrap:wrap;
+  .result-actions{display:flex; gap:var(--s3); margin-top:var(--s3); flex-wrap:wrap;
     opacity:0; pointer-events:none; transition:opacity .45s var(--ease)}
   .result-actions.on{opacity:1; pointer-events:auto}
   .result-actions .btn-big{flex:1 1 100%; max-width:none; min-height:52px; padding:0 var(--s5); font-size:17px}
