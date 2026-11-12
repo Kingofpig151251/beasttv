@@ -59,24 +59,18 @@
   #v-home.active{position:relative; overflow:hidden}
   /* 首頁：拎走 radial 呼吸光暈（generic glow）；暖紙底 + 八隻動物已經夠 */
   #v-home.active::before{content:none}
-  @keyframes breathe{0%,100%{transform:scale(.92); opacity:.75} 50%{transform:scale(1.06); opacity:1}}
   .landing{position:relative; z-index:1; flex:1; display:grid; grid-template-rows:1fr auto auto;
     justify-items:center; align-items:center; text-align:center}
   /* 散佈群像：八隻全身動物浮喺標題四周，唔排隊、唔裁切 */
   .landing-beasts{position:absolute; inset:0; pointer-events:none; z-index:0}
   .beast{position:absolute; left:var(--x); top:var(--y);
     width:calc(var(--k,1) * clamp(54px, 8.6vmin, 112px));
-    transform:translate(-50%,-50%) rotate(var(--r,0deg));
-    animation:beastFloat var(--d,8s) ease-in-out calc(var(--i,0s) + .5s) infinite alternate backwards}
-  .beast .sway{display:block; transform:rotate(var(--r,0deg));
-    animation:beastSway var(--d,8s) ease-in-out calc(var(--i,0s) + .5s) infinite alternate backwards}
+    transform:translate(-50%,-50%) rotate(var(--r,0deg))}
+  /* 貼紙靜止：八隻同時無限漂浮係 slop，入場 rise 一次就夠 */
+  .beast .sway{display:block; transform:rotate(var(--r,0deg))}
   .beast img{display:block; width:100%; height:auto; aspect-ratio:1;
     animation:rise .62s .06s var(--ease) both}   /* 與標題同一條 rise、同一個延遲，唔再係貼圖先彈出 */
-  @keyframes beastSway{
-    from{transform:rotate(calc(var(--r,0deg) - 3.5deg))}
     to{transform:rotate(calc(var(--r,0deg) + 3.5deg))}}
-  @keyframes beastFloat{
-    from{transform:translate(-50%,-50%) rotate(var(--r,0deg)) translateY(-7px)}
     to{transform:translate(-50%,-50%) rotate(var(--r,0deg)) translateY(7px)}}
   /* 橫向：動物退到左右兩側，中軸留給標題 */
   @media (min-aspect-ratio: 1/1){
@@ -653,7 +647,7 @@
   .confetti{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; display:none}
   .confetti.on{display:block}
   .confetti i{position:absolute; top:-24px; width:8px; height:13px; border-radius:2px;
-    animation-name:fall; animation-timing-function:linear; animation-iteration-count:infinite}
+    animation-name:fall; animation-timing-function:linear; animation-iteration-count:1}
   /* 彩紙減半：60 塊蓋住榜單與統計字，3 米外變雜訊 */
   .confetti i:nth-child(2n){display:none}
 
@@ -685,13 +679,10 @@
 
   .front-card{position:absolute; inset:0; border-radius:22px; background:var(--surface);
     box-shadow:inset 0 0 0 1px var(--sep), 0 10px 24px var(--vs-shadow);
-    display:grid; place-items:center; overflow:hidden;
-    animation:shiver .12s steps(2,end) infinite; --amp:1}
-  .front-card::after{content:"?"; font-size:clamp(28px,4.6vh,38px); font-weight:700; color:var(--ink-2);
-    animation:qBreathe 1.4s ease-in-out infinite}
+    display:grid; place-items:center; overflow:hidden; --amp:1}
+  .front-card::after{content:"?"; font-size:clamp(28px,4.6vh,38px); font-weight:700; color:var(--ink-2)}
   .front-card::before{content:""; position:absolute; inset:0; border-radius:22px;
-    box-shadow:0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
-    animation:ringPulse 1.6s ease-out infinite}
+    box-shadow:0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent)}
 
   .rk .no{font-size:22px; color:var(--ink-2); font-variant-numeric:tabular-nums; line-height:1.1}
   @media (max-width:520px){ .rk .no{font-size:20px} }
@@ -714,7 +705,7 @@
   .rk.is-champ::before{content:""; position:absolute; inset:0 0 auto; height:8px;
     border-radius:22px 22px 0 0; background:var(--tc)}
   .rk.is-champ .rk-tile{border-radius:16px}
-  .rk.is-champ .rk-tile .rk-mark{font-size:34px; animation:sway 2.8s ease-in-out infinite}
+  .rk.is-champ .rk-tile .rk-mark{font-size:34px}
   .rk.is-champ .nm{font-family:var(--font-display); font-size:clamp(24px,4.4vh,34px);
     font-weight:700; letter-spacing:-.02em; text-align:left; max-width:min(46vw,420px)}
   .rk.is-champ .st{font-size:15px}
@@ -727,10 +718,6 @@
   .rk.is-champ.charging{background:transparent; box-shadow:none}
   .rk.is-champ.charging::before{display:none}
 
-  @keyframes ringPulse{0%{opacity:.85; transform:scale(1)} 70%,100%{opacity:0; transform:scale(1.3)}}
-  @keyframes qBreathe{0%,100%{opacity:.4; transform:scale(.92)} 50%{opacity:.95; transform:scale(1.08)}}
-  @keyframes shiver{
-    0%{transform:translate(0,0) rotate(0)}
     20%{transform:translate(calc(-2px * var(--amp)),calc(1px * var(--amp))) rotate(-.5deg)}
     40%{transform:translate(calc(2px * var(--amp)),calc(-1px * var(--amp))) rotate(.5deg)}
     60%{transform:translate(calc(-1px * var(--amp)),calc(-2px * var(--amp))) rotate(-.4deg)}
@@ -779,8 +766,6 @@
 
   @keyframes fall{from{transform:translate3d(0,0,0) rotate(0)}
     to{transform:translate3d(var(--dx,0px),108vh,0) rotate(var(--rot,540deg))}}
-  @keyframes champGlow{0%,100%{opacity:.5; transform:scale(.97)} 50%{opacity:1; transform:scale(1.04)}}
-  @keyframes sway{0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)}}
 
 /* ---------- toast ---------- */
   .toast{position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); z-index:90;
