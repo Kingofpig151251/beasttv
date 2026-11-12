@@ -348,7 +348,7 @@
 
 
   /* ---------- play ---------- */
-  body[data-view="play"]{background:var(--surface)}
+  body[data-view="play"]{background:var(--bg)}   /* 出題頁跟埋暖紙，唔再係純白另一個房間 */
   #v-play{position:relative; height:100dvh; overflow:hidden; flex-direction:column;
     padding:max(4px,env(safe-area-inset-top)) 0 0}   /* 令頂欄第一粒鍵落在 22px，同其他畫面一致 */
   body[data-view="play"]{overflow:hidden}
@@ -400,7 +400,20 @@
 
   #stage{flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden;
     padding:0 max(40px,env(safe-area-inset-right)) 0 max(40px,env(safe-area-inset-left))}
+  /* 題目大字卡：卡邊帶當前隊伍色（Moment①）。#stage／.card-word 冇 --tc，
+     app.js 只喺 #turnChip 設，所以用 chip 內隊徽檔名反推，同結算卡同一招；
+     用 box-shadow 畫邊（唔佔版面，長題目唔會被擠） */
+  #v-play{--play-tc:var(--accent)}
+  #v-play:has(#turnMark img[src*="/turtle.webp"]){--play-tc:#34C759}
+  #v-play:has(#turnMark img[src*="/fox.webp"]){--play-tc:#FF9500}
+  #v-play:has(#turnMark img[src*="/whale.webp"]){--play-tc:#0071E3}
+  #v-play:has(#turnMark img[src*="/octopus.webp"]){--play-tc:#AF52DE}
+  #v-play:has(#turnMark img[src*="/bee.webp"]){--play-tc:#F5A300}
+  #v-play:has(#turnMark img[src*="/flamingo.webp"]){--play-tc:#FF2D55}
+  #v-play:has(#turnMark img[src*="/dolphin.webp"]){--play-tc:#30B0C7}
+  #v-play:has(#turnMark img[src*="/bear.webp"]){--play-tc:#A2845E}
   .card-word{font-family:var(--font-display); font-weight:700; letter-spacing:-.03em; line-height:1.02;
+    box-shadow:0 0 0 8px var(--bg), 0 0 0 20px var(--play-tc);
     text-align:center; text-wrap:balance; word-break:break-word; max-width:100%;
     font-size:clamp(64px,21vh,200px); animation:wordIn var(--dur) var(--ease)}
   @keyframes wordIn{from{opacity:0; transform:scale(.96)} to{opacity:1; transform:scale(1)}}
@@ -482,7 +495,8 @@
   .flash-hud .key-pass{justify-self:center; background:var(--fill); color:var(--ink)}
   .flash-hud .key-pass:active{background:var(--fill-2)}
   .flash-hud.bad-foul .key-foul,
-  .flash-hud.bad-pass .key-pass{background:color-mix(in oklab, var(--red) 13%, var(--fill)); color:var(--red)}
+  .flash-hud.bad-pass .key-pass{background:color-mix(in oklab, var(--red) 13%, var(--surface)); color:var(--red)}
+  /* 底色用 surface 而唔係 fill：出題頁轉暖底後 fill 會把紅字壓到 5.07 */
   .flash-hud.bad-foul .key-foul:active,
   .flash-hud.bad-pass .key-pass:active{background:color-mix(in oklab, var(--red) 22%, var(--fill))}
   .flash-hud.no-skip .key-pass{display:none}
@@ -497,7 +511,8 @@
   .readyCard{position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center;
     /* 頂邊一條隊色燈條：#readyOverlay 由 app.js 設 --tc，同 chip／結算／排行榜同一條 */
     justify-content:center; text-align:center; padding:clamp(24px,6vh,56px) clamp(20px,4vw,48px); gap:var(--s2)}
-  .readyCard::before{content:""; position:absolute; top:0; left:0; right:0; height:12px; background:var(--tc, var(--accent))}
+  .readyCard::before{content:""; position:absolute; top:24px; left:24px; right:24px; height:12px;
+    border-radius:6px; background:var(--tc, var(--accent))}   /* 內縮 24px：電視 overscan 會切走貼邊元素 */
   .readyRound{font-size:20px; line-height:1.2; color:var(--ink-2); letter-spacing:.01em}
   .readyMark{font-size:clamp(54px,10vh,104px); line-height:1; color:var(--tc-ink); margin-bottom:var(--s2)}
   .readyMark svg,.readyMark .mark-img{display:block; width:1em; height:1em; margin:0 auto}
