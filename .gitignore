@@ -32,3 +32,10 @@ _demo*.html
 # 音效試聽（本機工具，唔入 repo）
 _sfx_audition*.html
 _sfx_candidates/
+_auditions*/
+
+# 調試頁與音效探測殘留（只在本機用，唔入 repo、唔對外發佈）
+_dbg*.html
+_probe_*/
+_probe_*
+_debug*.html
