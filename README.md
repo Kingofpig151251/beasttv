@@ -4,7 +4,7 @@
 
 - 主持台：<https://beasttv.vercel.app>
 - 題目編輯：<https://beasttv.vercel.app/edit>
-- 原始碼：<https://github.com/Kingofpig151251/beaststage>
+- 原始碼：<https://github.com/Kingofpig151251/beasttv>
 
 ---
 
