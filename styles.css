@@ -478,7 +478,7 @@
     /* 390 頂欄算術：44+44+chip+44+64 + 4×8 gap + 40 padding；撤回 88→44 剛好補上 24px 缺口 */
     .undo-btn{width:44px; min-width:44px; height:44px; padding:0; border-radius:50%; gap:0}
     .undo-btn .lbl{display:none}
-    .undo-btn .glyph{font-size:22px}
+    .undo-btn .glyph{font-size:24px}
     .top-right{gap:8px}
   }
   /* 判定鍵唔再顯示方向符號：鍵位可自訂，方向已無意義（使用者指示 2026-11-06） */
@@ -501,8 +501,7 @@
   .ready[style*="flex"]{display:flex}
   .readyCard{width:100%; height:100%; display:flex; flex-direction:column; align-items:center;
     justify-content:center; text-align:center; padding:clamp(24px,6vh,56px) clamp(20px,4vw,48px); gap:var(--s2)}
-  .readyRound{font-size:36px; line-height:1.15; color:var(--ink-2); letter-spacing:.01em}
-  @media (max-width:700px){ .readyRound{font-size:24px} }
+  .readyRound{font-size:20px; line-height:1.2; color:var(--ink-2); letter-spacing:.01em}
   .readyMark{font-size:clamp(54px,10vh,104px); line-height:1; color:var(--tc-ink); margin-bottom:var(--s2)}
   .readyMark svg,.readyMark .mark-img{display:block; width:1em; height:1em; margin:0 auto}
   .readyTeam{font-family:var(--font-display); font-weight:700; font-size:clamp(52px,13vh,140px);
@@ -577,7 +576,8 @@
   .gate.settle .te-card{position:relative; overflow:hidden;
     width:min(680px, calc(100% - 32px));   /* 面板要有邊，唔可以貼實螢幕邊 */
     background:var(--surface); border-radius:var(--r-xl);
-    box-shadow:inset 0 0 0 1px var(--sep), 0 24px 60px var(--vs-shadow)}
+    box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--ink) 34%, transparent),
+               0 24px 60px var(--vs-shadow)}
   .gate.settle .te-card::before{content:""; position:absolute; inset:0 0 auto; height:8px;
     background:var(--gate-tc, var(--accent))}
   .gate:has(img[src*="/turtle.webp"]){--gate-tc:#34C759}
@@ -595,12 +595,13 @@
   .te-mark svg{display:block; width:1em; height:1em}
   .te-name{font-family:var(--font-display); font-weight:700; font-size:clamp(38px,7.6vh,68px);
     letter-spacing:-.03em; line-height:1.06; color:var(--ink)}
-  .te-score{font-family:var(--font-display); font-weight:700; color:var(--ink);
+  .te-score{font-family:var(--font-display); font-weight:700;
+    color:color-mix(in oklab, var(--gate-tc, var(--accent)) 40%, var(--ink));
     font-size:clamp(60px,12vh,112px); line-height:1; letter-spacing:-.04em;
     margin-top:clamp(2px,.4vh,4px); font-variant-numeric:tabular-nums}
   .te-score em{font-style:normal; font-size:.32em; font-weight:600;
     color:var(--ink-2); margin-left:var(--s2); letter-spacing:0}
-  .te-score.zero{color:var(--ink-2)}   /* 0 分：白板上 8.4:1，唔再靠半透明白 */
+  /* 0 分都用隊色墨：一頁只得一個隊色亮點，灰掉就冇咗身份 */
   .te-stats{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:clamp(2px,.8vh,8px)}
   .stat{display:flex; align-items:center; gap:var(--s2); padding:var(--s1) var(--s2) var(--s1) var(--s3); border-radius:999px;
     background:var(--fill)}
@@ -796,6 +797,8 @@
   /* 極矮（手機橫向）：規則只留標題，四行一次過睇得完 */
   @media (max-height:420px){
     .rank{display:grid; grid-template-columns:1fr 1fr; gap:2px 10px}
+    .rk .nm, .rank.compact .rk.is-champ .nm{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .result-actions{margin-top:8px}
     .rk .st{display:none}
     .rk.is-champ .rk-tile{width:34px; height:34px}
     .rk.is-champ .rk-tile .rk-mark{font-size:20px}
@@ -983,7 +986,7 @@
     .readyRound{font-size:18px}
     .readyMark{font-size:clamp(34px,7vh,56px); margin-bottom:2px}
     .readyTeam{font-size:clamp(26px,6.4vh,46px); margin:6px 0 10px}
-    .readyScores{margin-top:8px; gap:8px}
+    .readyScores{margin-top:6px; gap:8px}
     .readyScores .score-tile{padding:6px 8px; gap:1px}
     .readyScores .pill-mark{width:16px; height:16px; font-size:16px}
     .readyScores .score-name{font-size:11px}
