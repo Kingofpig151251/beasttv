@@ -57,10 +57,8 @@
     min-height:calc(100svh - 74px)}
   body[data-view="home"]{overflow:hidden}
   #v-home.active{position:relative; overflow:hidden}
-  #v-home.active::before{content:""; position:absolute; width:min(120vh,900px); aspect-ratio:1;
-    border-radius:50%; pointer-events:none; z-index:0;
-    background:radial-gradient(circle, var(--spot) 0%, transparent 62%);
-    animation:breathe 7s ease-in-out infinite}
+  /* 首頁：拎走 radial 呼吸光暈（generic glow）；暖紙底 + 八隻動物已經夠 */
+  #v-home.active::before{content:none}
   @keyframes breathe{0%,100%{transform:scale(.92); opacity:.75} 50%{transform:scale(1.06); opacity:1}}
   .landing{position:relative; z-index:1; flex:1; display:grid; grid-template-rows:1fr auto auto;
     justify-items:center; align-items:center; text-align:center}
@@ -501,8 +499,10 @@
   /* ---------- ready ---------- */
   .ready{position:fixed; inset:0; z-index:60; display:none; background:var(--surface)}
   .ready[style*="flex"]{display:flex}
-  .readyCard{width:100%; height:100%; display:flex; flex-direction:column; align-items:center;
+  .readyCard{position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center;
+    /* 頂邊一條隊色燈條：#readyOverlay 由 app.js 設 --tc，同 chip／結算／排行榜同一條 */
     justify-content:center; text-align:center; padding:clamp(24px,6vh,56px) clamp(20px,4vw,48px); gap:var(--s2)}
+  .readyCard::before{content:""; position:absolute; top:0; left:0; right:0; height:8px; background:var(--tc, var(--accent))}
   .readyRound{font-size:20px; line-height:1.2; color:var(--ink-2); letter-spacing:.01em}
   .readyMark{font-size:clamp(54px,10vh,104px); line-height:1; color:var(--tc-ink); margin-bottom:var(--s2)}
   .readyMark svg,.readyMark .mark-img{display:block; width:1em; height:1em; margin:0 auto}
@@ -654,6 +654,8 @@
   .confetti.on{display:block}
   .confetti i{position:absolute; top:-24px; width:8px; height:13px; border-radius:2px;
     animation-name:fall; animation-timing-function:linear; animation-iteration-count:infinite}
+  /* 彩紙減半：60 塊蓋住榜單與統計字，3 米外變雜訊 */
+  .confetti i:nth-child(2n){display:none}
 
   .rank{position:relative; z-index:2; display:flex; flex-direction:column; gap:2px}
   /* 隊色當「文字／圖示」用時混入暖墨：保住色相，但由白底 2.0–2.2 拉到 7.1–11.1。
@@ -708,9 +710,9 @@
     padding:var(--s4) var(--s4) var(--s3);
     border-radius:22px; box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 20%, transparent)}
 
-  .rk.is-champ::before{content:""; position:absolute; inset:-28px -12px; border-radius:34px; z-index:-1;
-    background:radial-gradient(58% 70% at 50% 50%, color-mix(in oklab, var(--tc) 30%, transparent), transparent 72%);
-    filter:blur(16px); animation:champGlow 2.8s ease-in-out infinite}
+  /* 冠軍列：唔用模糊彩光（generic glow），改用同結算卡同一條隊色燈條 */
+  .rk.is-champ::before{content:""; position:absolute; inset:0 0 auto; height:8px;
+    border-radius:22px 22px 0 0; background:var(--tc)}
   .rk.is-champ .rk-tile{border-radius:16px}
   .rk.is-champ .rk-tile .rk-mark{font-size:34px; animation:sway 2.8s ease-in-out infinite}
   .rk.is-champ .nm{font-family:var(--font-display); font-size:clamp(24px,4.4vh,34px);
@@ -770,7 +772,7 @@
   .switch[aria-checked="true"] i{transform:translateX(18px)}
   .switch:disabled{cursor:default}
 
-  .result-actions{display:flex; gap:var(--s3); margin-top:var(--s3); flex-wrap:wrap;
+  .result-actions{position:relative; z-index:4; display:flex; gap:var(--s3); margin-top:var(--s3); flex-wrap:wrap;
     opacity:0; pointer-events:none; transition:opacity .45s var(--ease)}
   .result-actions.on{opacity:1; pointer-events:auto}
   .result-actions .btn-big{flex:1 1 100%; max-width:none; min-height:52px; padding:0 var(--s5); font-size:17px}
