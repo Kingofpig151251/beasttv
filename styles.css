@@ -16,6 +16,8 @@
     --on-accent:#FFFFFF; --focus-ring:rgba(0,113,227,.85);
     --flash-ok:rgba(52,199,89,.16); --toast-bg:rgba(28,28,30,.92);
     --toast-ink:#FFFFFF; --flash-bad:rgba(255,59,48,.15); 
+    /* spacing · 4px grid（control 4–12／相關項 8／組間 16–24／區段 32–48） */
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
     /* geometry */
     --r-xl:22px; --r-lg:16px; --r-md:12px; --pill:999px;
     --hair:1px;
@@ -34,7 +36,7 @@
 
   /* ---------- layout ---------- */
   .wrap{max-width:1024px; margin:0 auto;
-    padding:22px max(20px,env(safe-area-inset-right)) 28px max(20px,env(safe-area-inset-left))}
+    padding:22px max(20px,env(safe-area-inset-right)) var(--s5) max(20px,env(safe-area-inset-left))}
 
   .view{display:none}
   .view.active{display:block}
@@ -99,54 +101,54 @@
   .landing-main{display:flex; flex-direction:column; align-items:center}
   html.brand-pending .landing-title,
   html.brand-pending .landing-sub{visibility:hidden}   /* 等品牌到手先露，避免閃預設名 */
-  .landing-title{margin:14px 0 0; font-family:var(--font-display); font-weight:700;
+  .landing-title{margin:var(--s4) 0 0; font-family:var(--font-display); font-weight:700;
     font-size:clamp(76px,16vh,168px); letter-spacing:-.045em; line-height:.98; text-wrap:balance;
     display:flex; align-items:center; justify-content:center;
     min-height:calc(min(16vh, 168px) * .98);      /* 中英字階不同，但佔位一樣高 */
     animation:rise .62s .06s var(--ease) both}
   @media (max-width:560px){
-    .landing-go{margin-top:clamp(18px, 2.8vh, 32px)}
+    .landing-go{margin-top:clamp(16px, 2.8vh, 32px)}
     .landing-title{font-size:clamp(58px, 26vw, 116px); letter-spacing:-.03em;
     min-height:calc(min(26vw, 116px) * .98)} }
   /* 窄屏：版權行同品牌圖示分兩行，避免斷字成三欄 */
   @media (max-width:560px){
     #toast.multi{bottom:calc(124px + env(safe-area-inset-bottom))}
-    .landing-foot{gap:10px; row-gap:6px}          /* 只剩版權＋GitHub，一行過就夠 */
+    .landing-foot{gap:var(--s2); row-gap:var(--s2)}   /* 只剩版權＋GitHub，一行過就夠 */
   }
   .landing-title[data-len="mid"]{font-size:clamp(52px, 11vh, 118px); letter-spacing:-.035em}
   .landing-title[data-len="long"]{font-size:clamp(38px, 7.4vh, 82px); letter-spacing:-.025em; line-height:1.06}
   @media (max-width:560px){ .landing-title[data-len="long"]{font-size:clamp(30px, 9.4vw, 46px); letter-spacing:-.02em} }
-  .landing-sub{margin:clamp(12px,1.9vh,18px) 0 0; font-size:clamp(17px,2.5vh,22px);
+  .landing-sub{margin:clamp(12px,1.9vh,16px) 0 0; font-size:clamp(17px,2.5vh,22px);
     font-weight:500; color:var(--ink-2); letter-spacing:.02em;
     animation:rise .62s .12s var(--ease) both}
-  /* 開始鍵同下面 設定＋語言 那一行等寬（132×2＋10＝274），三粒左中右邊緣齊 */
-  .landing-go{margin-top:clamp(28px,3.8vh,40px); width:274px; max-width:100%; min-height:60px; font-size:21px; border-radius:var(--pill);
+  /* 開始鍵同下面 設定＋語言 那一行等寬（132×2＋12＝276），三粒左中右邊緣齊 */
+  .landing-go{margin-top:clamp(24px,3.8vh,40px); width:276px; max-width:100%; min-height:60px; font-size:21px; border-radius:var(--pill);
     animation:rise .62s .18s var(--ease) both}
-  .landing-foot{display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; row-gap:6px;
+  .landing-foot{display:flex; align-items:center; justify-content:center; gap:var(--s2); flex-wrap:wrap; row-gap:var(--s2);
     padding:0 0 4px; animation:rise .62s .3s var(--ease) both}
   /* 設定同語言：同一行、同高、同寬，切語言時兩粒都唔會跳 */
-  .home-tools{display:flex; align-items:center; justify-content:center; gap:10px; margin-top:20px}
-  .home-tools .landing-link{margin-top:0; width:132px; min-width:132px; padding:0; gap:6px;
+  .home-tools{display:flex; align-items:center; justify-content:center; gap:var(--s3); margin-top:var(--s5)}
+  .home-tools .landing-link{margin-top:0; width:132px; min-width:132px; padding:0; gap:var(--s2);
     min-height:48px; font-size:17px; line-height:1; color:var(--ink)}
-  .lang-toggle{min-width:92px; min-height:34px; padding:0 14px; border:0; border-radius:999px; background:var(--fill);
+  .lang-toggle{min-width:92px; min-height:34px; padding:0 var(--s4); border:0; border-radius:999px; background:var(--fill);
     color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:600; letter-spacing:.01em;
     touch-action:manipulation; white-space:nowrap}
   .lang-toggle:active{background:var(--fill-2)}
   .lang-toggle:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring)}
-  .my-bank{margin:10px 0 0; font-size:13px; color:var(--ink-2); display:flex; align-items:center; gap:8px; justify-content:center}
+  .my-bank{margin:var(--s3) 0 0; font-size:13px; color:var(--ink-2); display:flex; align-items:center; gap:8px; justify-content:center}
   .my-bank b{font-weight:600; color:var(--ink)}
   .my-bank button{font:inherit; font-size:12.5px; color:var(--blue); background:none; border:0; padding:2px 0; min-height:0}
   .landing-credit{font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums;
-    display:inline-flex; align-items:center; gap:6px; white-space:nowrap}
+    display:inline-flex; align-items:center; gap:var(--s1); white-space:nowrap}
   .credit-link{font:inherit; font-size:13px; color:var(--ink-2); background:none; border:0; padding:2px 0;
     min-height:0; cursor:pointer; font-variant-numeric:tabular-nums}
   .credit-link:hover{color:var(--ink)}
   .credit-link:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring); border-radius:6px}
   #toast.multi{text-align:left; white-space:pre-line; line-height:1.6; font-size:14px;
     bottom:calc(104px + env(safe-area-inset-bottom));
-    border-radius:var(--r-lg); padding:14px 16px; width:min(560px, calc(100% - 40px))}
+    border-radius:var(--r-lg); padding:var(--s4) var(--s5); width:min(560px, calc(100% - 40px))}
   /* 頁腳：只剩版權 ＋ 一個明顯嘅 GitHub 膠囊；Hermes／OpenCode 品牌搬去 /credits */
-  .gh-link{display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 13px;
+  .gh-link{display:inline-flex; align-items:center; gap:var(--s2); height:34px; padding:0 var(--s4);
     border-radius:var(--r-lg); background:var(--fill); color:var(--ink);
     font-size:13px; font-weight:600; letter-spacing:.01em; text-decoration:none;
     transition:background-color .2s var(--ease)}
@@ -154,7 +156,7 @@
   .gh-link:active{background:var(--fill-2)}
   .gh-link:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring)}
   .landing-link{display:inline-flex; align-items:center; justify-content:center; margin-top:20px;
-    min-width:132px; min-height:48px; padding:0 26px; border-radius:var(--pill); background:var(--fill);
+    min-width:132px; min-height:48px; padding:0 var(--s5); border-radius:var(--pill); background:var(--fill);
     color:var(--ink); font-size:17px; font-weight:600; text-decoration:none;
     animation:rise .62s .22s var(--ease) both}
   .landing-link:active{background:var(--fill-2)}
@@ -177,8 +179,8 @@
   .stage{position:relative; flex:1; min-height:0; margin:8px 0}
   .js .sstep{opacity:0; transform:translateX(56px); pointer-events:none}
   .sstep{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:22px; text-align:center;
-    overflow-y:auto; overscroll-behavior:contain; padding:6px 0;
+    justify-content:center; gap:var(--s5); text-align:center;
+    overflow-y:auto; overscroll-behavior:contain; padding:var(--s2) 0;
     transition:opacity .42s var(--ease), transform .42s var(--ease)}
   @supports (justify-content: safe center){ .sstep{justify-content: safe center} }
   .js .sstep.on{opacity:1; transform:none; pointer-events:auto}
@@ -191,7 +193,7 @@
 
   .sstep-title{margin:0; font-family:var(--font-display); font-size:clamp(32px,4.6vh,44px);
     font-weight:700; letter-spacing:-.02em}
-  .sstep-hint{font-size:15px; color:var(--ink-2)}
+  .sstep-hint{margin:0; font-size:15px; color:var(--ink-2)}   /* 清掉 <p> 預設 15px 上下邊距，節奏交返 gap 控制 */
 
   .bignum{display:flex; align-items:baseline; gap:clamp(16px,3.4vw,40px)}
   .bignum input{width:2ch; min-height:0; padding:0; background:transparent; border:0; text-align:center;
@@ -225,7 +227,7 @@
   .sheet-wrap.on{display:grid}
   /* 確認視窗一律置中（唔用底部動作表） */
   .sheet-wrap.center{place-items:center; padding:24px}
-  .sheet-wrap.center .sheet-card{width:min(380px,100%); gap:14px; padding:22px 20px;
+  .sheet-wrap.center .sheet-card{width:min(380px,100%); gap:var(--s4); padding:var(--s5) var(--s5);
     max-height:calc(100dvh - 32px); overflow-y:auto; overscroll-behavior:contain;
     box-shadow:inset 0 0 0 1px var(--sep), 0 24px 60px var(--vs-shadow)}
   .sheet-wrap.center .sheet-title{font-size:19px; font-weight:600; color:var(--ink); text-align:center}
@@ -243,9 +245,9 @@
   .sheet-card{width:min(560px,100%); background:var(--surface); border-radius:var(--r-xl);
     padding:20px; display:flex; flex-direction:column; gap:16px}
   .sheet-title{font-size:17px; font-weight:600; color:var(--ink-2)}
-  .animal-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
-  .animal-opt{position:relative; display:flex; flex-direction:column; align-items:center; gap:6px;
-    padding:12px 6px; border-radius:var(--r-md);
+  .animal-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--s3)}
+  .animal-opt{position:relative; display:flex; flex-direction:column; align-items:center; gap:var(--s2);
+    padding:var(--s3) var(--s2); border-radius:var(--r-md);
     background:color-mix(in oklab, var(--tc) 12%, transparent);
     box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 34%, transparent)}
   .animal-opt.on{box-shadow:inset 0 0 0 2.5px var(--tc)}
@@ -279,7 +281,7 @@
   .js .gate.closed .curtain.bot{transform:none}
 
   .vs{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    gap:clamp(10px,1.6vw,26px); padding:0 clamp(24px,4vw,64px); color:var(--on-accent);
+    gap:clamp(12px,1.6vw,24px); padding:0 clamp(24px,4vw,64px); color:var(--on-accent);
     pointer-events:none; transition:opacity .26s var(--ease), transform .44s var(--ease)}
   .js .vs{opacity:0; transform:scale(.97)}
   .js .launch.show .vs{opacity:1; transform:none}
@@ -305,7 +307,7 @@
     display:grid; place-items:center; line-height:1}
   .round-btn:active{background:var(--fill-2)}
   .sstep-hint + .sstep-hint{margin-top:2px; text-wrap:pretty}
-  .mini-step{display:flex; align-items:center; justify-content:center; gap:10px; margin:14px 0 6px}
+  .mini-step{display:flex; align-items:center; justify-content:center; gap:var(--s3); margin:var(--s4) 0 var(--s2)}
   .mini-step.tight{gap:2px; margin:0}
   .mini-step input{width:2ch; min-height:0; padding:0; background:transparent; border:0; text-align:center;
     font-family:var(--font-display); font-size:28px; font-weight:700; font-variant-numeric:tabular-nums}
@@ -324,13 +326,13 @@
 
   /* 秒數 chips（第三步） */
   .chips{display:flex; gap:12px; flex-wrap:wrap; justify-content:center}
-  .chips button{min-height:48px; padding:0 26px; border-radius:var(--pill); background:var(--fill);
+  .chips button{min-height:48px; padding:0 var(--s5); border-radius:var(--pill); background:var(--fill);
     color:var(--ink); font-size:17px; font-weight:600; font-variant-numeric:tabular-nums}
   .chips button[aria-pressed="true"]{background:var(--blue); color:var(--on-accent)}
 
   /* inputs */
   input,textarea,select{font-family:inherit; font-size:17px; color:var(--ink);
-    background:var(--fill); border:0; border-radius:var(--r-md); padding:11px 14px; min-height:48px; width:100%}
+    background:var(--fill); border:0; border-radius:var(--r-md); padding:var(--s3) var(--s4); min-height:48px; width:100%}
   input::placeholder,textarea::placeholder{color:var(--ink-3)}
   input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{
     outline:2px solid var(--focus-ring); outline-offset:3px}
@@ -338,13 +340,13 @@
   /* ---------- buttons ---------- */
   button{touch-action:manipulation; -webkit-tap-highlight-color:transparent;
     font-family:inherit; font-size:17px; font-weight:500; color:var(--ink); background:transparent;
-    border:0; border-radius:var(--r-md); padding:12px 18px; min-height:44px; cursor:pointer;
+    border:0; border-radius:var(--r-md); padding:var(--s3) var(--s5); min-height:44px; cursor:pointer;
     transition:background-color var(--dur) var(--ease), transform var(--dur) var(--ease), opacity var(--dur)}
   button:active{transform:scale(.97)}
   button:disabled{opacity:.35; cursor:not-allowed; transform:none}
   .btn-primary{background:var(--blue-fill); color:var(--on-accent); font-weight:600}
   .btn-primary:active{background:var(--blue-fill-press)}
-  .btn-big{width:100%; padding:17px 18px; font-size:19px; font-weight:600}
+  .btn-big{width:100%; padding:var(--s4) var(--s5); font-size:19px; font-weight:600}
 
 
   /* ---------- play ---------- */
@@ -355,7 +357,7 @@
   body[data-view="play"] .wrap{padding:0; max-width:none}
   #v-play.active{display:flex}
 
-  .flash-top{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  .flash-top{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:var(--s2);
     padding:8px max(20px,env(safe-area-inset-right)) 8px max(20px,env(safe-area-inset-left))}
   .top-left{display:flex; align-items:center; gap:8px; justify-self:start; min-width:0}
   .top-right{display:flex; align-items:center; gap:12px; justify-self:end; min-width:0}
@@ -370,7 +372,7 @@
     box-shadow:inset 0 0 0 1px var(--sep)}
   .quit-float:active{background:var(--fill-2); color:var(--ink)}
 
-  .turn-chip{display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 16px 0 10px;
+  .turn-chip{display:inline-flex; align-items:center; gap:var(--s2); height:44px; padding:0 var(--s4) 0 var(--s2);
     border-radius:var(--pill); background:color-mix(in oklab, var(--tc,var(--ink-2)) 14%, transparent);
     color:var(--ink); max-width:46vw}
   .turn-mark{display:grid; place-items:center; font-size:22px; color:var(--tc); flex:0 0 auto}
@@ -438,13 +440,13 @@
   }
 
   .flash-hud{position:relative; display:grid; grid-template-columns:1fr auto 1fr; gap:clamp(8px,1.6vw,16px); align-items:center;
-    padding:12px max(18px,env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left))}
+    padding:var(--s3) max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
   .flash-hud .key{display:inline-flex; align-items:center; justify-content:center; gap:12px;
     width:clamp(104px,22vw,180px); height:clamp(62px,9.2vh,80px); border-radius:var(--r-lg);
     font-size:clamp(18px,2.4vh,21px); font-weight:600;
     transition:transform var(--dur) var(--ease), background-color var(--dur), color var(--dur)}
   /* 撤回 = 控制鍵，同 × / 回報 / 計時環 同一排、同一 44px 高度，唔混入判定列 */
-  .undo-btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; height:44px; padding:0 15px; white-space:nowrap;
+  .undo-btn{display:inline-flex; align-items:center; justify-content:center; gap:var(--s2); height:44px; padding:0 var(--s4); white-space:nowrap;
     min-width:88px;
     border-radius:var(--pill); border:0; font:inherit; font-size:13.5px; font-weight:600;
     color:var(--ink); background:var(--fill); touch-action:manipulation;
@@ -460,7 +462,7 @@
   .icon-btn.report{color:var(--ink-2)}
   .icon-btn.report svg{width:20px; height:20px}
   @media (max-width:430px){
-    .undo-btn{padding:0 10px; font-size:12px; gap:4px}
+    .undo-btn{padding:0 var(--s3); font-size:12px; gap:var(--s1)}
     .undo-btn .glyph{font-size:13px}
     .top-right{gap:8px}
   }
@@ -483,20 +485,20 @@
   .ready{position:fixed; inset:0; z-index:60; display:none; background:var(--surface)}
   .ready[style*="flex"]{display:flex}
   .readyCard{width:100%; height:100%; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; text-align:center; padding:clamp(24px,6vh,56px) clamp(20px,4vw,48px); gap:6px}
+    justify-content:center; text-align:center; padding:clamp(24px,6vh,56px) clamp(20px,4vw,48px); gap:var(--s2)}
   .readyRound{font-size:15px; color:var(--ink-2); letter-spacing:.02em}
-  .readyMark{font-size:clamp(54px,10vh,104px); line-height:1; color:var(--tc); margin-bottom:6px}
+  .readyMark{font-size:clamp(54px,10vh,104px); line-height:1; color:var(--tc); margin-bottom:var(--s2)}
   .readyMark svg,.readyMark .mark-img{display:block; width:1em; height:1em; margin:0 auto}
   .readyTeam{font-family:var(--font-display); font-weight:700; font-size:clamp(52px,13vh,140px);
-    letter-spacing:-.03em; line-height:1.02; margin:10px 0 16px}
+    letter-spacing:-.03em; line-height:1.02; margin:var(--s2) 0 var(--s4)}
   .readyScores{display:grid; grid-template-columns:repeat(var(--cols,4), minmax(0,1fr));
-    gap:10px; justify-content:center; margin-top:clamp(16px,2.8vh,28px); width:min(620px,100%)}
-  .readyScores.many .score-tile{padding:7px 8px}
+    gap:var(--s3); justify-content:center; margin-top:clamp(16px,2.8vh,24px); width:min(620px,100%)}
+  .readyScores.many .score-tile{padding:var(--s2)}
   .readyScores.many .pill-mark{width:18px; height:18px; font-size:18px}
   .readyScores.many .score-name{font-size:12px}
   .readyScores.many b{font-size:15px}
-  .readyScores .score-tile{display:flex; flex-direction:column; align-items:center; gap:2px;
-    min-width:0; padding:9px 10px; border-radius:var(--r-md);
+  .readyScores .score-tile{display:flex; flex-direction:column; align-items:center; gap:var(--s1);
+    min-width:0; padding:var(--s2) var(--s3); border-radius:var(--r-md);
     background:var(--fill); box-shadow:inset 0 0 0 1px var(--sep)}
   .readyScores .score-tile.cur{background:color-mix(in oklab, var(--tc) 18%, var(--surface));
     box-shadow:inset 0 0 0 2.5px var(--tc)}
@@ -506,7 +508,7 @@
     max-width:12ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .readyScores b{font-family:var(--font-display); font-size:17px; font-weight:600; color:var(--ink);
     font-variant-numeric:tabular-nums}
-  .readyCard button{margin-top:clamp(24px,4vh,36px); min-height:56px; padding:0 40px;
+  .readyCard button{margin-top:clamp(24px,4vh,32px); min-height:56px; padding:0 40px;
     background:var(--blue-fill); color:var(--on-accent); font-size:19px; font-weight:600; border-radius:var(--r-lg)}
   /* 「準備好」唔再顯示 → ：鍵位可自訂，方向符號會誤導（同 HUD 三粒鍵一致） */
   /* ---------- 倒數（獨立過場動畫） ---------- */
@@ -516,7 +518,7 @@
   .countdown::before{content:""; position:absolute; inset:0; pointer-events:none;
     background:radial-gradient(58% 58% at 50% 50%,
       color-mix(in oklab, var(--tc, var(--blue)) 15%, transparent), transparent 72%)}
-  .cd-inner{position:relative; display:grid; place-items:center; gap:clamp(10px,1.8vh,18px)}
+  .cd-inner{position:relative; display:grid; place-items:center; gap:clamp(12px,1.8vh,16px)}
   .cd-dial{position:relative; display:grid; place-items:center;
     width:clamp(216px,33vh,312px); height:clamp(216px,33vh,312px)}
   .cd-dial svg{position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg)}
@@ -551,7 +553,7 @@
     transition:opacity .26s var(--ease), transform .3s var(--ease)}
   .js .gate.settle .gate-hit{opacity:0; transform:scale(1.05)}
 
-  .te-card{display:grid; justify-items:center; gap:clamp(6px,1.2vh,12px); text-align:center;
+  .te-card{display:grid; justify-items:center; gap:clamp(8px,1.2vh,12px); text-align:center;
     padding:clamp(20px,4vh,40px) clamp(24px,4vw,56px); color:var(--on-accent);
     transition:opacity .3s var(--ease), transform .34s var(--ease)}
   .js .te-card{opacity:0; transform:scale(.97)}
@@ -566,10 +568,10 @@
     margin-top:clamp(2px,.4vh,4px); font-variant-numeric:tabular-nums}
   .te-score em{font-style:normal; font-size:.32em; font-weight:600;
     color:color-mix(in oklab, var(--on-accent) 74%, transparent);
-    margin-left:10px; letter-spacing:0}
+    margin-left:var(--s2); letter-spacing:0}
   .te-score.zero{color:color-mix(in oklab, var(--on-accent) 46%, transparent)}
   .te-stats{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:clamp(2px,.8vh,8px)}
-  .stat{display:flex; align-items:center; gap:6px; padding:5px 8px 5px 12px; border-radius:999px;
+  .stat{display:flex; align-items:center; gap:var(--s2); padding:var(--s1) var(--s2) var(--s1) var(--s3); border-radius:999px;
     background:color-mix(in oklab, var(--on-accent) 10%, transparent)}
   .stat i{font-style:normal; font-size:13px; letter-spacing:.02em;
     color:color-mix(in oklab, var(--on-accent) 62%, transparent)}
@@ -586,7 +588,7 @@
   .stat button:focus-visible::before{box-shadow:0 0 0 3px var(--focus-ring)}
   /* 矮視窗（手機橫屏）：結算卡連覆核列都要塞得入 */
   @media (max-height:420px){
-    .te-card{gap:4px; padding:10px 18px}
+    .te-card{gap:var(--s1); padding:var(--s2) var(--s4)}
     .te-mark{font-size:34px}
     .te-name{font-size:26px}
     .te-score{font-size:44px; margin-top:0}
@@ -596,9 +598,9 @@
     .stat b{font-size:13px; min-width:12px}
     .stat button{width:44px; height:44px; margin:-10px; font-size:14px}
     .stat button::before{inset:10px}
-    .te-next{margin-top:8px; min-height:38px; padding:0 22px; font-size:15px}
+    .te-next{margin-top:8px; min-height:38px; padding:0 var(--s5); font-size:15px}
   }
-  .te-next{margin-top:clamp(22px,3.6vh,36px); min-height:56px; padding:0 34px;
+  .te-next{margin-top:clamp(24px,3.6vh,32px); min-height:56px; padding:0 var(--s6);
     display:inline-flex; align-items:center; gap:12px;
     background:var(--on-accent); color:var(--blue); font-size:19px; font-weight:600;
     border-radius:var(--r-lg)}
@@ -610,7 +612,7 @@
   #v-result.active{display:flex; flex-direction:column; justify-content:center;
     min-height:calc(100dvh - 56px)}
   .res-head{position:relative; z-index:3; text-align:center;
-    margin:0 auto clamp(16px,2.6vh,28px); width:min(560px, 100%)}
+    margin:0 auto clamp(16px,2.6vh,24px); width:min(560px, 100%)}
   #v-result .rank, #v-result .result-actions{width:min(560px, 100%); margin-inline:auto}
   #v-result h1{margin:0; font-size:clamp(30px,4.8vh,44px)}
   #rSub{margin:8px 0 0; font-size:15px}
@@ -621,7 +623,7 @@
     animation-name:fall; animation-timing-function:linear; animation-iteration-count:infinite}
 
   .rank{position:relative; z-index:2; display:flex; flex-direction:column; gap:2px}
-  .rk{position:relative; padding:10px 14px; border-radius:14px;
+  .rk{position:relative; padding:var(--s2) var(--s4); border-radius:14px;
     transition:opacity .26s var(--ease), transform .34s var(--ease),
                background .34s var(--ease), padding .34s var(--ease), border-radius .34s var(--ease)}
   .js .rk{opacity:0; transform:translateY(16px) scale(.985)}
@@ -663,8 +665,8 @@
     font-variant-numeric:tabular-nums; transition:font-size .34s var(--ease), color .34s var(--ease)}
 
   /* 冠軍卡：內容居中、皇冠做成角標 */
-  .rk.is-champ{background:var(--surface); margin:14px 0 6px;
-    padding:20px 14px 16px;
+  .rk.is-champ{background:var(--surface); margin:var(--s4) 0 var(--s2);
+    padding:var(--s5) var(--s4) var(--s4);
     border-radius:22px; box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 20%, transparent)}
 
   .rk.is-champ::before{content:""; position:absolute; inset:-28px -12px; border-radius:34px; z-index:-1;
@@ -676,7 +678,7 @@
     font-weight:700; letter-spacing:-.02em; text-align:left; max-width:min(46vw,420px)}
   .rk.is-champ .st{font-size:15px}
   .rk.is-champ .pt{font-size:clamp(32px,5.4vh,46px); color:var(--tc)}
-  .rank.compact .rk.is-champ{padding:10px 14px}
+  .rank.compact .rk.is-champ{padding:var(--s2) var(--s4)}
   .rank.compact .rk.is-champ .st{display:none}
   .rank.compact .rk.is-champ .nm{font-size:clamp(20px,3.4vh,26px)}
   .rank.compact .rk.is-champ .pt{font-size:clamp(24px,4vh,32px)}
@@ -701,18 +703,18 @@
   .key-edit:active{background:var(--fill-2)}
   .key-rows{display:flex; flex-direction:column; gap:8px}
   .key-row{display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px;
-    padding:9px 12px; border-radius:var(--r-md); background:var(--surface-2)}
+    padding:var(--s2) var(--s3); border-radius:var(--r-md); background:var(--surface-2)}
   .key-row b{font-size:15px; font-weight:600}
   .key-chip{min-width:92px; height:40px; padding:0 12px; border:0; border-radius:10px; font:inherit;
     font-family:var(--font-mono); font-size:15px; font-weight:600; color:var(--ink); cursor:pointer;
     background:var(--surface); box-shadow:inset 0 0 0 1px var(--sep)}
   .key-chip.listening{color:var(--blue); box-shadow:inset 0 0 0 2px var(--blue)}
   .rule{display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:16px;
-    padding:14px 4px; border-bottom:var(--hair) solid var(--sep)}
+    padding:var(--s4) var(--s1); border-bottom:var(--hair) solid var(--sep)}
   .rule:last-child{border-bottom:0}
   .rule.off{opacity:.38}
-  .rule.sub{position:relative; padding:0 4px 14px 22px; border-bottom:0}
-  .rule.sub::before{content:""; position:absolute; left:6px; top:1px; bottom:15px; width:2px;
+  .rule.sub{position:relative; padding:0 var(--s1) var(--s4) var(--s5); border-bottom:0}
+  .rule.sub::before{content:""; position:absolute; left:6px; top:1px; bottom:16px; width:2px;
     border-radius:1px; background:var(--fill-2)}
   .rule.sub .rule-txt b{font-size:15px; font-weight:500; color:var(--ink-2)}
   .rule.sub .rule-txt span{display:none}
@@ -728,10 +730,10 @@
   .switch[aria-checked="true"] i{transform:translateX(18px)}
   .switch:disabled{cursor:default}
 
-  .result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;
+  .result-actions{display:flex; gap:var(--s3); margin-top:var(--s5); flex-wrap:wrap;
     opacity:0; pointer-events:none; transition:opacity .45s var(--ease)}
   .result-actions.on{opacity:1; pointer-events:auto}
-  .result-actions .btn-big{flex:1 1 100%; max-width:none; min-height:52px; padding:0 22px; font-size:17px}
+  .result-actions .btn-big{flex:1 1 100%; max-width:none; min-height:52px; padding:0 var(--s5); font-size:17px}
 
   @keyframes fall{from{transform:translate3d(0,0,0) rotate(0)}
     to{transform:translate3d(var(--dx,0px),108vh,0) rotate(var(--rot,540deg))}}
@@ -742,7 +744,7 @@
   .toast{position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); z-index:90;
     transform:translate(-50%,10px); opacity:0; pointer-events:none;
     background:var(--toast-bg);
-    color:var(--toast-ink); font-size:15px; padding:12px 18px; border-radius:var(--pill);
+    color:var(--toast-ink); font-size:15px; padding:var(--s3) var(--s5); border-radius:var(--pill);
     transition:opacity var(--dur), transform var(--dur)}
   .toast.on{opacity:1; transform:translate(-50%,0)}
 
@@ -787,19 +789,19 @@
   }
   /* 窄機（手機直向）：隊名改兩欄，8 隊一屏睇完，唔需要滾 */
   @media (max-width:460px){
-    .namegrid{grid-template-columns:1fr 1fr; gap:12px 14px}
+    .namegrid{grid-template-columns:1fr 1fr; gap:var(--s3) var(--s4)}
     .name-row{grid-template-columns:44px minmax(0,1fr); gap:8px}
     .animal-btn{width:44px; height:44px}
     .animal-mark{font-size:22px}
     .animal-edit{width:18px; height:18px; padding:3px; right:-1px; bottom:-1px}
-    .name-row input{min-height:48px; padding:10px 12px; font-size:16px}
+    .name-row input{min-height:48px; padding:var(--s3); font-size:16px}
     .sstep-title{font-size:clamp(26px,7.4vw,32px)}
   }
 
   /* 窄機：結果頁壓縮，8 隊一屏 */
   @media (max-width:520px){
     #v-result h1{font-size:clamp(24px,3.6vh,30px)}
-    .rank{gap:1px}
+    .rank{gap:var(--s1)}
     .rk{padding:6px 10px; border-radius:12px}
     .rk-tile{width:34px; height:34px; border-radius:9px}
     .rk-tile .rk-mark{font-size:18px}
@@ -808,7 +810,7 @@
     .rk.is-champ .rk-tile{width:40px; height:40px}
     .rk.is-champ .rk-tile .rk-mark{font-size:24px}
     .rk .st{display:none}
-    #v-result .result-actions{gap:6px}
+    #v-result .result-actions{gap:var(--s2)}
     #v-result .result-actions .btn-big{min-height:44px; padding:10px 16px; font-size:16px}
     .res-head{margin-bottom:4px}
   }
@@ -854,16 +856,16 @@
     .bignum input{font-size:clamp(52px,13vh,110px)}
     .bignum-unit{font-size:clamp(18px,3vh,26px)}
     .chips{gap:8px}
-    .chips button{min-height:44px; padding:0 18px; font-size:15px}
+    .chips button{min-height:44px; padding:0 var(--s4); font-size:15px}
     .namegrid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px 12px}
-    .name-row{grid-template-columns:44px minmax(0,1fr); gap:10px}
+    .name-row{grid-template-columns:44px minmax(0,1fr); gap:var(--s2)}
     .animal-btn{width:44px; height:44px}
     .animal-mark{font-size:22px}
     .rules{margin-top:2px}
     .rule{padding:8px 4px; gap:12px}
     .rule-txt b{font-size:15px}
     .rule-txt span{font-size:12px; margin-top:1px}
-    .setup-foot{padding:8px 0 6px; gap:8px}
+    .setup-foot{padding:var(--s2) 0 var(--s2); gap:var(--s2)}
     .setup-foot .btn-primary{min-height:48px; min-width:200px; font-size:17px}
   }
   @media (prefers-reduced-motion: reduce){
@@ -873,18 +875,18 @@
 
   /* 手機：任何步驟都唔需要滾動（放最後，蓋過上面所有媒體查詢） */
   @media (max-width:520px){
-    .rk, .rk.is-champ, .rank.compact .rk.is-champ{padding:4px 9px; border-radius:11px}
+    .rk, .rk.is-champ, .rank.compact .rk.is-champ{padding:var(--s1) var(--s2); border-radius:11px}
     .rank.compact .rk.is-champ .rk-tile{width:30px; height:30px}
     .rank.compact .rk.is-champ .nm{font-size:17px}
     .rank.compact .rk.is-champ .pt{font-size:18px}
-    .rk.is-champ{margin:6px 0 3px}
+    .rk.is-champ{margin:var(--s2) 0 var(--s1)}
     .rank.compact .rk.is-champ .rk-tile .rk-mark{font-size:16px}
     .rk-tile, .rk.is-champ .rk-tile{width:30px; height:30px; border-radius:8px}
     .rk-tile .rk-mark, .rk.is-champ .rk-tile .rk-mark{font-size:16px}
     .rk .st{display:none}
-    #v-result .result-actions .btn-big{min-height:42px; padding:8px 14px; font-size:15px}
+    #v-result .result-actions .btn-big{min-height:42px; padding:var(--s2) var(--s4); font-size:15px}
     .res-head{margin-bottom:2px}
-    .rule{padding:10px 4px}
+    .rule{padding:var(--s3) var(--s1)}
   }
   @media (max-height:420px){
     .namegrid{grid-template-columns:1fr 1fr; gap:4px 10px}
