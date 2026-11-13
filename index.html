@@ -24,6 +24,17 @@
 </head>
 <body>
 <script>document.documentElement.classList.add("js");</script>
+<!-- 焦點環只在「鍵盤導覽」時出現：Tab 會加 .kbd-nav，任何指標操作會即刻取消。
+     只切一個 class，唔碰 app.js 的鍵盤判定與遊戲邏輯。 -->
+<script>
+(function(){
+  var root = document.documentElement;
+  addEventListener("pointerdown", function(){ root.classList.remove("kbd-nav"); }, true);
+  addEventListener("keydown", function(e){
+    if(e.key === "Tab"){ root.classList.add("kbd-nav"); }
+  }, true);
+})();
+</script>
 <div class="wrap">
 
   <!-- ========== 主頁 ========== -->
