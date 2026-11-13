@@ -4,7 +4,7 @@
    - 圖片、音效：cache-first（檔名不變、內容少變）
    - /api/*：唔攔，永遠直上網絡（題庫唯一真相源在雲端）
 */
-const CACHE = "beast-v11";
+const CACHE = "beast-v12";   // v11→v12：styles.css 改動要令舊快取作廢（cache-first 下唔換版就派舊檔）
 const SHELL = [
   "/", "/edit", "/credits",
   "/styles.css", "/app.js",

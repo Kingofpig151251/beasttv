@@ -24,14 +24,15 @@
 </head>
 <body>
 <script>document.documentElement.classList.add("js");</script>
-<!-- 焦點環只在「鍵盤導覽」時出現：Tab 會加 .kbd-nav，任何指標操作會即刻取消。
+<!-- 焦點環只在「鍵盤導覽」時出現：指標操作加 .pointer-mode 收環，Tab 會即刻解除。
+     腳本若被 CSP 擋或拋錯，--ring 預設仍係 --focus-ring → 退化成舊行為（有環）。
      只切一個 class，唔碰 app.js 的鍵盤判定與遊戲邏輯。 -->
 <script>
 (function(){
   var root = document.documentElement;
-  addEventListener("pointerdown", function(){ root.classList.remove("kbd-nav"); }, true);
+  addEventListener("pointerdown", function(){ root.classList.add("pointer-mode"); }, true);
   addEventListener("keydown", function(e){
-    if(e.key === "Tab"){ root.classList.add("kbd-nav"); }
+    if(e.key === "Tab"){ root.classList.remove("pointer-mode"); }
   }, true);
 })();
 </script>

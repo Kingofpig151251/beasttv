@@ -15,7 +15,7 @@
     --accent-fill:var(--accent); --accent-fill-press:var(--accent-press);
     /* semantic · 全部 ≥5:1（原本 2.0–3.6） */
     --green:#12703A; --red:#A01B12; --amber:#9A4A08;
-    --on-accent:#FFFFFF; --focus-ring:rgba(180,71,31,.9); --ring:transparent;
+    --on-accent:#FFFFFF; --focus-ring:rgba(180,71,31,.9); --ring:var(--focus-ring);
     --flash-ok:rgba(18,112,58,.14); --toast-bg:rgba(30,24,18,.94);
     --toast-ink:#FFFFFF; --flash-bad:rgba(160,27,18,.14); 
     /* spacing · 4px grid（control 4–12／相關項 8／組間 16–24／區段 32–48） */
@@ -30,9 +30,12 @@
     --font-mono:ui-monospace,"SF Mono",Menlo,monospace;
   }
 
-  /* 焦點環開關：pointerdown 之後 html 冇 .kbd-nav，環收埋；
-     Tab 導覽會加上 .kbd-nav，環保留（見 index.html 開頭幾行） */
-  html.kbd-nav{--ring:var(--focus-ring)}
+  /* 焦點環開關：預設可見（fail-open——腳本掛咗都仲有環，退化成舊行為）；
+     指標操作後 html 加 .pointer-mode 收環，Tab 導覽會即刻解除（見 index.html 開頭幾行） */
+  html.pointer-mode{--ring:transparent}
+  @media (forced-colors: active){
+    :root, html.pointer-mode{--ring:Highlight}   /* 高對比模式永遠見環 */
+  }
   *{box-sizing:border-box}
   [hidden]{display:none !important}
   html,body{margin:0; min-height:100%; background:var(--bg); overflow-x:clip}
