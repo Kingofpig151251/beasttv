@@ -512,10 +512,12 @@
   .flash-hud.bad-pass .key-pass{background:color-mix(in oklab, var(--red) 13%, var(--surface)); color:var(--red)}
   /* 底色用 surface 而唔係 fill：出題頁轉暖底後 fill 會把紅字壓到 5.07 */
   .flash-hud.bad-foul .key-foul:active,
-  .flash-hud.bad-pass .key-pass:active{background:color-mix(in oklab, var(--red) 22%, var(--fill))}
+  .flash-hud.bad-pass .key-pass:active{background:color-mix(in oklab, var(--red) 18%, var(--surface))}
+  /* 紅字配深底會跌（active 曾 4.35）：底改淺一格、由 scale(.97) 負責按壓回饋 */
   .flash-hud.no-skip .key-pass{display:none}
   .flash-hud.no-skip{grid-template-columns:1fr 1fr}
   .flash-hud .key-ok{justify-self:end; background:var(--accent-fill); color:var(--on-accent)}
+  .flash-hud .key-ok:hover{background:var(--accent-press)}   /* 白字 4.70→6.20 */
   .flash-hud .key-ok:active{background:var(--accent-fill-press)}
 
 

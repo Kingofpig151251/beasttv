@@ -4,7 +4,7 @@
    - 圖片、音效：cache-first（檔名不變、內容少變）
    - /api/*：唔攔，永遠直上網絡（題庫唯一真相源在雲端）
 */
-const CACHE = "beast-v14";   // 每次改 styles.css／index.html 都要 bump：cache-first 下唔換版就派舊檔
+const CACHE = "beast-v15";   // 每次改 styles.css／index.html 都要 bump：cache-first 下唔換版就派舊檔
 const SHELL = [
   "/", "/edit", "/credits",
   "/styles.css", "/app.js",
