@@ -10,7 +10,7 @@
     /* ink · 固體色，唔用 alpha 疊（alpha 疊出嚟嘅灰預測唔到對比） */
     --ink:#1F1B16; --ink-2:#554C42; --ink-3:#6E6459;
     --sep:rgba(31,27,22,.16);
-    /* accent · 鎢絲燈暖橙：白字 5.44:1、當文字 5.44:1、當圖形 5.44:1 */
+    /* accent · 藍藥丸 #0071E3：白字 4.70:1（a 案授權）；當文字落暖紙 4.28，只准圖形用 */
     --accent:#0071E3; --accent-press:#005FBF;   /* 舊版藍藥丸（a 案）：白字 4.70:1 ≥4.5 */
     --accent-fill:var(--accent); --accent-fill-press:var(--accent-press);
     /* semantic · 全部 ≥5:1（原本 2.0–3.6） */
