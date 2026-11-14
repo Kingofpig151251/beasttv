@@ -6,16 +6,16 @@
     color-scheme:light;
     /* ground · 暖灰 ramp（酒吧夜裡的鎢絲燈，唔用 iOS 冷灰） */
     --bg:#F7F4EE; --surface:#FFFFFF; --surface-2:#EFE9DF; --fill:rgba(90,80,66,.10);
-    --fill-2:rgba(90,80,66,.18); --fill-3:rgba(90,80,66,.07); --spot:rgba(180,71,31,.10); --sheet-veil:rgba(28,22,16,.45); --vs-shadow:rgba(60,44,26,.20);
+    --fill-2:rgba(90,80,66,.18); --fill-3:rgba(90,80,66,.07); --spot:rgba(11,79,158,.10); --sheet-veil:rgba(28,22,16,.45); --vs-shadow:rgba(60,44,26,.20);
     /* ink · 固體色，唔用 alpha 疊（alpha 疊出嚟嘅灰預測唔到對比） */
     --ink:#1F1B16; --ink-2:#554C42; --ink-3:#6E6459;
     --sep:rgba(31,27,22,.16);
     /* accent · 鎢絲燈暖橙：白字 5.44:1、當文字 5.44:1、當圖形 5.44:1 */
-    --accent:#B4471F; --accent-press:#963517;
+    --accent:#0B4F9E; --accent-press:#072F5C;   /* 深藍：白字 8.0:1（ux 色階）；#0071E3 只准小面積 */
     --accent-fill:var(--accent); --accent-fill-press:var(--accent-press);
     /* semantic · 全部 ≥5:1（原本 2.0–3.6） */
     --green:#12703A; --red:#A01B12; --amber:#9A4A08;
-    --on-accent:#FFFFFF; --focus-ring:rgba(180,71,31,.9); --ring:var(--focus-ring);
+    --on-accent:#FFFFFF; --focus-ring:rgba(11,79,158,.9); --ring:var(--focus-ring);
     --flash-ok:rgba(18,112,58,.14); --toast-bg:rgba(30,24,18,.94);
     --toast-ink:#FFFFFF; --flash-bad:rgba(160,27,18,.14); 
     /* spacing · 4px grid（control 4–12／相關項 8／組間 16–24／區段 32–48） */
@@ -423,7 +423,7 @@
   .card-word{font-family:var(--font-display); font-weight:700; letter-spacing:-.03em; line-height:1.02;
     box-shadow:0 0 0 8px var(--bg), 0 0 0 20px var(--play-tc);
     text-align:center; text-wrap:balance; word-break:break-word; max-width:100%;
-    font-size:clamp(64px,21vh,200px); animation:wordIn var(--dur) var(--ease)}
+    font-size:clamp(64px,21vh,200px); animation:wordIn .26s var(--ease)}   /* 活力 #4：新題 0.26s 淡入微縮 */
   @keyframes wordIn{from{opacity:0; transform:scale(.96)} to{opacity:1; transform:scale(1)}}
   /* 正確 = 放大淡出；犯規 = 震動；跳過 = 向下墜 */
   .question.fx-skip{animation:fxSkip .28s var(--ease)}
@@ -467,7 +467,8 @@
   .flash-hud .key{display:inline-flex; align-items:center; justify-content:flex-start; gap:12px; padding-left:var(--s3);
     width:clamp(104px,22vw,180px); height:clamp(62px,9.2vh,80px); border-radius:var(--r-lg);
     font-size:clamp(18px,2.9vh,24px); font-weight:600;
-    transition:transform var(--dur) var(--ease), background-color var(--dur), color var(--dur)}
+    /* 活力 #2：按下 0.12s 就回（其他按鈕仍 0.28s），主持連按有節奏 */
+    transition:transform .12s var(--ease), background-color .12s var(--ease), color .12s var(--ease)}
   /* 判定鍵符號：三粒鍵靠形狀就分得清，唔再只靠底色；方向箭嘴仍然唔用（鍵位可自訂）。
      用 ::before 而唔放 HTML——app.js 會改寫鍵內文字（跳過會變「跳過 3/3」），SVG 會被蓋走。 */
   .flash-hud .key::before{display:block; flex:0 0 auto; font-size:22px; line-height:1; font-weight:700}
@@ -681,7 +682,8 @@
   .name-row, .animal-opt, .turn-chip, .ready, .readyScores .score-tile, .rk, .countdown{
     --tc-ink:color-mix(in oklab, var(--tc, var(--accent)) 40%, var(--ink))}
   .rk{position:relative; padding:2px var(--s4); border-radius:14px;
-    transition:opacity .26s var(--ease), transform .34s var(--ease),
+    /* 活力 #6：每列揭曉 0.18s（行與行之間嘅間隔由 app.js 控制） */
+    transition:opacity .18s var(--ease), transform .18s var(--ease),
                background .34s var(--ease), padding .34s var(--ease), border-radius .34s var(--ease)}
   .js .rk{opacity:0; transform:translateY(16px) scale(.985)}
   .js .rk.in{opacity:1; transform:none}
@@ -1029,3 +1031,14 @@
     #scMinus::after{inset:-22px 0 0 -22px}
     #scPlus::after{inset:-22px -21px 0 -1px}
   }
+
+  /* ---------- 活力 #7：燈條掃光（一次性 0.4s 由左至右，唔係常駐） ----------
+     背景＝隊色（background-color），掃光＝半透明白漸層（background-image）疊喺上面；
+     動畫完結後 position 回到 100%，可見區只食到漸層嘅 transparent 段，所以靜止時零痕跡。 */
+  .gate.settle .te-card::before, .readyCard::before, .rk.is-champ::before{
+    background-image:linear-gradient(100deg, transparent 0 42%, rgba(255,255,255,.6) 50%, transparent 58% 100%);
+    background-size:260% 100%; background-position:100% 0;
+  }
+  .gate.settle .te-card::before, .readyCard::before{animation:barSweep .4s var(--ease) 1}
+  .rk.is-champ.in::before{animation:barSweep .4s var(--ease) 1}   /* 冠軍列揭咗先掃 */
+  @keyframes barSweep{from{background-position:100% 0} to{background-position:0% 0}}
