@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F7F4EE">
+<meta name="theme-color" content="#F2F2F7">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="百獸台">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="author" content="Leung Tung Lam">
 <meta name="copyright" content="© 2026 Leung Tung Lam. MIT License.">
-<meta name="description" content="百獸台：酒吧問答節目式的派對猜詞遊戲。一部 iPad 控場，一人背向大屏幕猜詞、全隊負責描述，主持按「犯規／跳過／正確」判定，八隊在 3 米外的大畫面追分。">
+<meta name="description" content="百獸台：派對猜詞主持台。一部 iPad 控場，一人背向屏幕猜詞、全隊負責描述，主持按「犯規／跳過／正確」判定。">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -24,18 +24,6 @@
 </head>
 <body>
 <script>document.documentElement.classList.add("js");</script>
-<!-- 焦點環只在「鍵盤導覽」時出現：指標操作加 .pointer-mode 收環，Tab 會即刻解除。
-     腳本若被 CSP 擋或拋錯，--ring 預設仍係 --focus-ring → 退化成舊行為（有環）。
-     只切一個 class，唔碰 app.js 的鍵盤判定與遊戲邏輯。 -->
-<script>
-(function(){
-  var root = document.documentElement;
-  addEventListener("pointerdown", function(){ root.classList.add("pointer-mode"); }, true);
-  addEventListener("keydown", function(e){
-    if(e.key === "Tab"){ root.classList.remove("pointer-mode"); }
-  }, true);
-})();
-</script>
 <div class="wrap">
 
   <!-- ========== 主頁 ========== -->
@@ -178,7 +166,7 @@
           <svg class="i-back" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg>
         </button>
         <button class="icon-btn report" id="btnReport" aria-label="回報問題" title="回報問題（空白題目等）">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5.2"/><path d="M12 16.4h.01"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.2v5.1"/><path d="M12 16.9h.01"/><circle cx="12" cy="12" r="8.6"/></svg>
         </button>
       </div>
       <div class="turn-chip" id="turnChip" aria-live="polite">
@@ -201,9 +189,9 @@
       <div class="card-word" id="pText"></div>
     </main>
     <div class="flash-hud" id="hud">
-      <button class="key key-foul" data-judge="foul" aria-label="犯規">犯規</button>
-      <button class="key key-pass" data-judge="skip" aria-label="跳過">跳過</button>
-      <button class="key key-ok" data-judge="ok" aria-label="正確">正確</button>
+      <button class="key key-foul" data-judge="foul" aria-label="犯規" title="犯規（←）">犯規</button>
+      <button class="key key-pass" data-judge="skip" aria-label="跳過" title="跳過（↓）">跳過</button>
+      <button class="key key-ok" data-judge="ok" aria-label="正確" title="正確（→）">正確</button>
     </div>
 
     <div class="ready" id="readyOverlay" style="display:none">
@@ -238,7 +226,7 @@
     <div class="confetti" id="confetti" aria-hidden="true"></div>
     <div class="res-head">
       <h1>最終排名</h1>
-      <p class="kv" id="rSub" style="margin:0 0 16px"></p>
+      <p class="kv" id="rSub" style="margin:0 0 14px"></p>
     </div>
     <div class="rank" id="rankList"></div>
     <div class="result-actions">
