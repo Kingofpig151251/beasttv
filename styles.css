@@ -6,16 +6,16 @@
     color-scheme:light;
     /* ground · 暖灰 ramp（酒吧夜裡的鎢絲燈，唔用 iOS 冷灰） */
     --bg:#F7F4EE; --surface:#FFFFFF; --surface-2:#EFE9DF; --fill:rgba(90,80,66,.10);
-    --fill-2:rgba(90,80,66,.18); --fill-3:rgba(90,80,66,.07); --spot:rgba(11,79,158,.10); --sheet-veil:rgba(28,22,16,.45); --vs-shadow:rgba(60,44,26,.20);
+    --fill-2:rgba(90,80,66,.18); --fill-3:rgba(90,80,66,.07); --spot:rgba(0,113,227,.10); --sheet-veil:rgba(28,22,16,.45); --vs-shadow:rgba(60,44,26,.20);
     /* ink · 固體色，唔用 alpha 疊（alpha 疊出嚟嘅灰預測唔到對比） */
     --ink:#1F1B16; --ink-2:#554C42; --ink-3:#6E6459;
     --sep:rgba(31,27,22,.16);
     /* accent · 鎢絲燈暖橙：白字 5.44:1、當文字 5.44:1、當圖形 5.44:1 */
-    --accent:#0B4F9E; --accent-press:#072F5C;   /* 深藍：白字 8.0:1（ux 色階）；#0071E3 只准小面積 */
+    --accent:#0071E3; --accent-press:#005FBF;   /* 舊版藍藥丸（a 案）：白字 4.70:1 ≥4.5 */
     --accent-fill:var(--accent); --accent-fill-press:var(--accent-press);
     /* semantic · 全部 ≥5:1（原本 2.0–3.6） */
     --green:#12703A; --red:#A01B12; --amber:#9A4A08;
-    --on-accent:#FFFFFF; --focus-ring:rgba(11,79,158,.9); --ring:var(--focus-ring);
+    --on-accent:#FFFFFF; --focus-ring:rgba(0,113,227,.9); --ring:var(--focus-ring);
     --flash-ok:rgba(18,112,58,.14); --toast-bg:rgba(30,24,18,.94);
     --toast-ink:#FFFFFF; --flash-bad:rgba(160,27,18,.14); 
     /* spacing · 4px grid（control 4–12／相關項 8／組間 16–24／區段 32–48） */
@@ -63,17 +63,22 @@
     min-height:calc(100svh - 74px)}
   body[data-view="home"]{overflow:hidden}
   #v-home.active{position:relative; overflow:hidden}
-  /* 首頁：拎走 radial 呼吸光暈（generic glow）；暖紙底 + 八隻動物已經夠 */
-  #v-home.active::before{content:none}
+  /* 首頁呼吸光暈：cfcad4a 原樣（rgba(0,113,227,.10)、直徑 min(120vh,900px)、7 秒一息） */
+  #v-home.active::before{content:""; position:absolute; width:min(120vh,900px); aspect-ratio:1;
+    border-radius:50%; pointer-events:none; z-index:0;
+    background:radial-gradient(circle, var(--spot) 0%, transparent 62%);
+    animation:breathe 7s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(.92); opacity:.75} 50%{transform:scale(1.06); opacity:1}}
   .landing{position:relative; z-index:1; flex:1; display:grid; grid-template-rows:1fr auto auto;
     justify-items:center; align-items:center; text-align:center}
   /* 散佈群像：八隻全身動物浮喺標題四周，唔排隊、唔裁切 */
   .landing-beasts{position:absolute; inset:0; pointer-events:none; z-index:0}
   .beast{position:absolute; left:var(--x); top:var(--y);
     width:calc(var(--k,1) * clamp(54px, 8.6vmin, 112px));
-    transform:translate(-50%,-50%) rotate(var(--r,0deg))}
-  /* 貼紙靜止：八隻同時無限漂浮係 slop，入場 rise 一次就夠 */
-  .beast .sway{display:block; transform:rotate(var(--r,0deg))}
+    transform:translate(-50%,-50%) rotate(var(--r,0deg));
+    animation:beastFloat var(--d,8s) ease-in-out calc(var(--i,0s) + .5s) infinite alternate backwards}
+  .beast .sway{display:block; transform:rotate(var(--r,0deg));
+    animation:beastSway var(--d,8s) ease-in-out calc(var(--i,0s) + .5s) infinite alternate backwards}
   .beast img{display:block; width:100%; height:auto; aspect-ratio:1;
     animation:rise .62s .06s var(--ease) both}   /* 與標題同一條 rise、同一個延遲，唔再係貼圖先彈出 */
     to{transform:rotate(calc(var(--r,0deg) + 3.5deg))}}
@@ -672,9 +677,8 @@
   .confetti{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; display:none}
   .confetti.on{display:block}
   .confetti i{position:absolute; top:-24px; width:8px; height:13px; border-radius:2px;
+    /* 密度回舊版；iteration 維持 1——舊版 infinite 會一直穿過統計字、亦會撐爆動畫計數 */
     animation-name:fall; animation-timing-function:linear; animation-iteration-count:1}
-  /* 彩紙減半：60 塊蓋住榜單與統計字，3 米外變雜訊 */
-  .confetti i:nth-child(2n){display:none}
 
   .rank{position:relative; z-index:2; display:flex; flex-direction:column; gap:2px}
   /* 隊色當「文字／圖示」用時混入暖墨：保住色相，但由白底 2.0–2.2 拉到 7.1–11.1。
@@ -705,10 +709,14 @@
 
   .front-card{position:absolute; inset:0; border-radius:22px; background:var(--surface);
     box-shadow:inset 0 0 0 1px var(--sep), 0 10px 24px var(--vs-shadow);
-    display:grid; place-items:center; overflow:hidden; --amp:1}
-  .front-card::after{content:"?"; font-size:clamp(28px,4.6vh,38px); font-weight:700; color:var(--ink-2)}
+    display:grid; place-items:center; overflow:hidden;
+    animation:shiver .12s steps(2,end) infinite; --amp:1}
+  /* 舊版 ? 下限 opacity .4（白底 1.99:1，睇唔到）→ 抬到 .8（4.88:1），呼吸照舊 */
+  .front-card::after{content:"?"; font-size:clamp(28px,4.6vh,38px); font-weight:700; color:var(--ink-2);
+    animation:qBreathe 1.4s ease-in-out infinite}
   .front-card::before{content:""; position:absolute; inset:0; border-radius:22px;
-    box-shadow:0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent)}
+    box-shadow:0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
+    animation:ringPulse 1.6s ease-out infinite}
 
   .rk .no{font-size:22px; color:var(--ink-2); font-variant-numeric:tabular-nums; line-height:1.1}
   @media (max-width:520px){ .rk .no{font-size:20px} }
@@ -727,11 +735,14 @@
     padding:var(--s4) var(--s4) var(--s3);
     border-radius:22px; box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 20%, transparent)}
 
-  /* 冠軍列：唔用模糊彩光（generic glow），改用同結算卡同一條隊色燈條 */
+  /* 冠軍列：12px 隊色燈條（::before，Signature 保留）＋ cfcad4a 原樣彩光（::after）並存 */
   .rk.is-champ::before{content:""; position:absolute; inset:0 0 auto; height:12px;
     border-radius:22px 22px 0 0; background:var(--tc)}
+  .rk.is-champ::after{content:""; position:absolute; inset:-28px -12px; border-radius:34px; z-index:-1;
+    background:radial-gradient(58% 70% at 50% 50%, color-mix(in oklab, var(--tc) 30%, transparent), transparent 72%);
+    filter:blur(16px); animation:champGlow 2.8s ease-in-out infinite}
   .rk.is-champ .rk-tile{border-radius:16px}
-  .rk.is-champ .rk-tile .rk-mark{font-size:34px}
+  .rk.is-champ .rk-tile .rk-mark{font-size:34px; animation:sway 2.8s ease-in-out infinite}
   .rk.is-champ .nm{font-family:var(--font-display); font-size:clamp(24px,4.4vh,34px);
     font-weight:700; letter-spacing:-.02em; text-align:left; max-width:min(46vw,420px)}
   .rk.is-champ .st{font-size:15px}
@@ -743,6 +754,7 @@
 
   .rk.is-champ.charging{background:transparent; box-shadow:none}
   .rk.is-champ.charging::before{display:none}
+  .rk.is-champ.charging::after{display:none}
 
     20%{transform:translate(calc(-2px * var(--amp)),calc(1px * var(--amp))) rotate(-.5deg)}
     40%{transform:translate(calc(2px * var(--amp)),calc(-1px * var(--amp))) rotate(.5deg)}
@@ -792,6 +804,24 @@
 
   @keyframes fall{from{transform:translate3d(0,0,0) rotate(0)}
     to{transform:translate3d(var(--dx,0px),108vh,0) rotate(var(--rot,540deg))}}
+  /* ---- cfcad4a 逐條抄回（參數不改）---- */
+  @keyframes beastSway{
+    from{transform:rotate(calc(var(--r,0deg) - 3.5deg))}
+    to{transform:rotate(calc(var(--r,0deg) + 3.5deg))}}
+  @keyframes beastFloat{
+    from{transform:translate(-50%,-50%) rotate(var(--r,0deg)) translateY(-7px)}
+    to{transform:translate(-50%,-50%) rotate(var(--r,0deg)) translateY(7px)}}
+  @keyframes shiver{
+    0%{transform:translate(0,0) rotate(0)}
+    20%{transform:translate(calc(-2px * var(--amp)),calc(1px * var(--amp))) rotate(-.5deg)}
+    40%{transform:translate(calc(2px * var(--amp)),calc(-1px * var(--amp))) rotate(.5deg)}
+    60%{transform:translate(calc(-1px * var(--amp)),calc(-2px * var(--amp))) rotate(-.4deg)}
+    80%{transform:translate(calc(1px * var(--amp)),calc(2px * var(--amp))) rotate(.4deg)}
+    100%{transform:translate(0,0) rotate(0)}}
+  @keyframes qBreathe{0%,100%{opacity:.8; transform:scale(.92)} 50%{opacity:.95; transform:scale(1.08)}}
+  @keyframes ringPulse{0%{opacity:.85; transform:scale(1)} 70%,100%{opacity:0; transform:scale(1.3)}}
+  @keyframes champGlow{0%,100%{opacity:.5; transform:scale(.97)} 50%{opacity:1; transform:scale(1.04)}}
+  @keyframes sway{0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)}}
 
 /* ---------- toast ---------- */
   .toast{position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); z-index:90;
