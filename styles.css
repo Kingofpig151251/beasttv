@@ -123,7 +123,7 @@
   .landing-go{margin-top:clamp(28px,3.8vh,40px); width:274px; max-width:100%; min-height:60px; font-size:21px; border-radius:var(--pill);
     animation:rise .62s .18s var(--ease) both}
   .landing-foot{display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; row-gap:6px;
-    padding:0 0 4px; animation:rise .62s .3s var(--ease) both}
+    padding:0 0 4px; animation:rise .62s .3s var(--ease) both; line-height:1}
   /* 設定同語言：同一行、同高、同寬，切語言時兩粒都唔會跳 */
   .home-tools{display:flex; align-items:center; justify-content:center; gap:10px; margin-top:20px}
   .home-tools .landing-link{margin-top:0; width:132px; min-width:132px; padding:0; gap:6px;
@@ -136,17 +136,19 @@
   .my-bank b{font-weight:600; color:var(--ink)}
   .my-bank button{font:inherit; font-size:12.5px; color:var(--blue-press); background:none; border:0; padding:2px 0; min-height:0}
   .landing-credit{font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums;
-    display:inline-flex; align-items:center; gap:6px; white-space:nowrap}
-  .credit-link{font:inherit; font-size:13px; color:var(--ink-2); background:none; border:0; padding:2px 0;
-    min-height:44px; cursor:pointer; font-variant-numeric:tabular-nums}
+    display:inline-flex; align-items:center; gap:6px; white-space:nowrap; min-height:44px}
+  /* 觸控目標維持 44×44，但不撐高行盒：用 padding 上下撐開、行高收窄，視覺仍與旁邊對齊 */
+  .credit-link{font:inherit; font-size:13px; color:var(--ink-2); background:none; border:0;
+    padding:14px 2px; margin:-14px 0; cursor:pointer; font-variant-numeric:tabular-nums;
+    display:inline-flex; align-items:center; border-radius:6px}
   .credit-link:hover{color:var(--ink)}
   #toast.multi{text-align:left; white-space:pre-line; line-height:1.6; font-size:14px;
     bottom:calc(104px + env(safe-area-inset-bottom));
     border-radius:var(--r-lg); padding:14px 16px; width:min(560px, calc(100% - 40px))}
   /* 頁腳：只剩版權 ＋ 一個明顯嘅 GitHub 膠囊；Hermes／OpenCode 品牌搬去 /credits */
-  .gh-link{display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 13px;
+  .gh-link{display:inline-flex; align-items:center; gap:6px; height:44px; padding:0 13px;
     border-radius:var(--r-lg); background:var(--fill); color:var(--ink);
-    min-height:44px; font-size:13px; font-weight:600; letter-spacing:.01em; text-decoration:none;
+    font-size:13px; font-weight:600; letter-spacing:.01em; text-decoration:none;
     transition:background-color .2s var(--ease)}
   .gh-link svg{width:15px; height:15px; flex:none}
   .gh-link:active{background:var(--fill-2)}
