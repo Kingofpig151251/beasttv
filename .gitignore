@@ -39,3 +39,7 @@ _dbg*.html
 _probe_*/
 _probe_*
 _debug*.html
+
+# build 產物與套件快取
+dist/
+.pnpm-store/
