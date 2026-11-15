@@ -173,6 +173,27 @@ before(() => {
 
 const boot = (expr) => vm.runInContext(expr, ctx);
 
+/* 沙箱內的替身 G：重寫後 G.phase 是狀態機鏡像，endGame() 會呼叫 G.sm.finish() */
+boot(`
+  globalThis.mkG = function(extra){
+    const sm = new GameStateMachine();
+    sm.force("interstitial");
+    const g = {
+      sm,
+      allowSkip: true, skipCap: 3, skipLeft: 3,
+      teams: [], cur: null, locked: false, judged: 0,
+      canJudge(){ return this.sm.canJudge(); },
+      canUndo(){ return this.sm.canUndo(); },
+      canResume(){ return this.sm.canResume(); },
+      canPause(){ return this.sm.canPause(); },
+      get phase(){ return this.sm.phase; },
+      get paused(){ return this.sm.paused; }
+    };
+    Object.assign(g, extra || {});
+    return g;
+  };
+`);
+
 /** 在沙箱內建 G 並呼叫真的 endGame() */
 function runEndGame(teams) {
   // 重設假元素的內容
@@ -181,14 +202,13 @@ function runEndGame(teams) {
   captured.compact = null;
 
   boot(`
-    G = {
-      phase: "running",
+    G = mkG({
       turn: 5, rounds: 6,
       order: [0,1,2,3,4,5],
       teams: ${JSON.stringify(teams)},
       timerToken: 0,
       base: { ok:0, skip:0, foul:0, score:0 }
-    };
+    });
   `);
   boot("endGame()");
   return {

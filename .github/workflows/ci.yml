@@ -29,7 +29,7 @@ jobs:
           node-version: "22"
 
       - name: 3. 跑邏輯測試
-        run: node --test tests/logic.test.js tests/real-app.test.js tests/endgame.test.js tests/turn.test.js tests/state.test.js tests/i18n.test.js tests/dom.test.js
+        run: node --test tests/logic.test.js tests/real-app.test.js tests/endgame.test.js tests/turn.test.js tests/state.test.js tests/i18n.test.js tests/dom.test.js tests/app-state.test.js
 
   check:
     name: 靜態檢查 + 冒煙測試

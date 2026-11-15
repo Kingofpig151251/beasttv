@@ -1,5 +1,100 @@
 "use strict";
 
+/* ================= 遊戲狀態機 =================
+ * 舊版把「階段」(G.phase) 與「暫停」(G.paused) 當成兩個獨立變數，
+ * 兩者正交組合出多種狀態，每個守門函式都要自己記得同時檢查兩者，
+ * F-01（暫停時仍可判定）與 F-02（倒數中背景偷跑）就是這樣漏掉的。
+ *
+ * 新版把「暫停」也變成狀態：paused-playing / paused-countdown。
+ * 判定守門收斂到單一 canJudge()，只看 state === "playing"，
+ * 「忘記檢查某一個變數」在結構上就不可能發生。
+ *
+ * 與 src/state.js 的轉移表完全一致（該檔有 25 個測試把關）。
+ * app.js 是 classic script（非 module），所以這裡內嵌同一份邏輯；
+ * 兩邊若有出入，tests/state.test.js 與 tests/app-state.test.js 都會失敗。
+ */
+const State = Object.freeze({
+  IDLE: "idle",
+  READY: "ready",
+  COUNTDOWN: "countdown",
+  PLAYING: "playing",
+  PAUSED_PLAYING: "paused-playing",
+  PAUSED_COUNTDOWN: "paused-countdown",
+  INTERSTITIAL: "interstitial",
+  DONE: "done",
+});
+
+/* 舊程式用的是 "running"，對外顯示的 phase 仍維持這個字串以減少改動面 */
+const PHASE_OF = Object.freeze({
+  [State.IDLE]: "idle",
+  [State.READY]: "ready",
+  [State.COUNTDOWN]: "countdown",
+  [State.PLAYING]: "running",
+  [State.PAUSED_PLAYING]: "running",
+  [State.PAUSED_COUNTDOWN]: "countdown",
+  [State.INTERSTITIAL]: "interstitial",
+  [State.DONE]: "done",
+});
+
+const TRANSITIONS = Object.freeze({
+  [State.IDLE]: new Set([State.READY]),
+  [State.READY]: new Set([State.COUNTDOWN, State.IDLE]),
+  [State.COUNTDOWN]: new Set([State.PLAYING, State.PAUSED_COUNTDOWN, State.IDLE]),
+  [State.PLAYING]: new Set([State.PAUSED_PLAYING, State.INTERSTITIAL, State.IDLE]),
+  [State.PAUSED_PLAYING]: new Set([State.PLAYING, State.INTERSTITIAL, State.IDLE]),
+  [State.PAUSED_COUNTDOWN]: new Set([State.COUNTDOWN, State.IDLE]),
+  [State.INTERSTITIAL]: new Set([State.READY, State.DONE, State.IDLE]),
+  [State.DONE]: new Set([State.IDLE, State.READY]),
+});
+
+const JUDGEABLE = new Set([State.PLAYING]);
+const UNDOABLE = new Set([State.PLAYING]);
+const PAUSABLE = new Set([State.PLAYING, State.COUNTDOWN]);
+const RESUMABLE = new Set([State.PAUSED_PLAYING, State.PAUSED_COUNTDOWN]);
+const RESUME_TARGET = Object.freeze({
+  [State.PAUSED_PLAYING]: State.PLAYING,
+  [State.PAUSED_COUNTDOWN]: State.COUNTDOWN,
+});
+
+class GameStateMachine {
+  constructor() {
+    this.state = State.IDLE;
+    this.history = [State.IDLE];
+  }
+  get phase() { return PHASE_OF[this.state]; }
+  get paused() { return RESUMABLE.has(this.state); }
+  canJudge() { return JUDGEABLE.has(this.state); }
+  canUndo() { return UNDOABLE.has(this.state); }
+  canPause() { return PAUSABLE.has(this.state); }
+  canResume() { return RESUMABLE.has(this.state); }
+  isTimerActive() { return this.state === State.PLAYING; }
+
+  go(to) {
+    const allowed = TRANSITIONS[this.state];
+    if (!allowed || !allowed.has(to)) return false;
+    this.state = to;
+    this.history.push(to);
+    return true;
+  }
+  /* 直接設定（供測試與舊呼叫點過渡用），不檢查轉移表 */
+  force(to) {
+    if (!TRANSITIONS[to] && to !== State.IDLE) return false;
+    this.state = to;
+    this.history.push(to);
+    return true;
+  }
+  start() { return this.go(State.READY); }
+  goCountdown() { return this.go(State.COUNTDOWN); }
+  begin() { return this.go(State.PLAYING); }
+  pause() { return this.canPause() ? this.go(this.state === State.PLAYING ? State.PAUSED_PLAYING : State.PAUSED_COUNTDOWN) : false; }
+  resume() { const t = RESUME_TARGET[this.state]; return t ? this.go(t) : false; }
+  turnEnd() { return this.go(State.INTERSTITIAL); }
+  nextTurn() { return this.go(State.READY); }
+  finish() { return this.go(State.DONE); }
+  abort() { return this.state === State.IDLE ? true : this.go(State.IDLE); }
+  reset() { this.state = State.IDLE; this.history = [State.IDLE]; }
+}
+
 /* ================= 語言 ================= */
 const LANG_KEY = "beasttv.lang";
 let LANG = (()=>{ try{ return localStorage.getItem(LANG_KEY) === "en" ? "en" : "zh"; }catch(_){ return "zh"; } })();
@@ -639,6 +734,8 @@ function startGame(){
 
   const order = [];                                  // 每隊出場 2 次：A B C D → A B C D
   for(let r = 0; r < cfg.roundsPer; r++) for(let i = 0; i < names.length; i++) order.push(i);
+  const sm = new GameStateMachine();
+  sm.force(State.READY);                             // 開局即進入準備階段
   G = {
     sec: Math.max(5, Number(cfg.sec)||90),
     teams: names.map((n,i)=>({name:n, id:looks[i].id, color:looks[i].color, score:0, ok:0, skip:0, foul:0})),
@@ -646,8 +743,18 @@ function startGame(){
     order, rounds: order.length,                 // turn = 第幾回合，隊伍 = order[turn]
     turn:0, skipCap: cfg.skipCap, skipLeft: cfg.skipCap,
     pool: shuffle(pool.slice()), used: [], cur:null,
-    judged:0, paused:false, remaining:0, timerId:null, timerToken:0,
-    phase:"ready"
+    judged:0, remaining:0, timerId:null, timerToken:0,
+    sm,                                          // 狀態機：phase 與 paused 都由它推算
+    /* phase / paused 為唯讀鏡像，寫入會被忽略並在 dev 下警告，避免新舊狀態分叉 */
+    get phase(){ return this.sm.phase; },
+    set phase(v){ warnLegacyState("phase", v); },
+    get paused(){ return this.sm.paused; },
+    set paused(v){ warnLegacyState("paused", v); },
+    /* 判定／撤回／暫停閘門統一走狀態機，呼叫方不必自己組合條件 */
+    canJudge(){ return this.sm.canJudge(); },
+    canUndo(){ return this.sm.canUndo(); },
+    canResume(){ return this.sm.canResume(); },
+    canPause(){ return this.sm.canPause(); }
   };
   const hud = $("#hud");
   if(hud){
@@ -662,6 +769,17 @@ function startGame(){
 
 const SKIP_CAP = 3;                                  // 每回合最多跳 3 條
 const curTeam = ()=> G.teams[G.order[G.turn]];
+
+/* 舊程式若仍直接寫 G.phase / G.paused，這裡會攔下來並提示改用狀態機。
+   保留這層是因為完全禁止寫入會令遺漏的呼叫點靜默失效；
+   警告可在 console 看到，方便逐步清理。 */
+let LEGACY_WARNED = Object.create(null);
+function warnLegacyState(field, value){
+  const k = field + ":" + value;
+  if(LEGACY_WARNED[k]) return;
+  LEGACY_WARNED[k] = 1;
+  try{ console.warn(`[state] 忽略對 G.${field} 的直接寫入（${value}）；請改用 G.sm.*`); }catch(_){}
+}
 
 /* 跳過掣顯示剩餘次數；用完即變灰 */
 function syncSkipBtn(){
@@ -707,10 +825,12 @@ function syncExitLabel(){
 function enterReady(){
   clearInterval(G.timerId);
   G.timerToken++;
-  G.phase = "ready";
+  /* enterReady 是「回到準備」的統一入口：
+     從 SCORE 卡按繼續是 INTERSTITIAL → READY；
+     首回合開局時已經是 READY，自轉視為成功。 */
+  if(!G.sm.go(State.READY)) G.sm.force(State.READY);
   G.cur = null;
   G.remaining = G.sec;
-  G.paused = false;
   setPauseIcon(false);
   $("#rdRound").textContent = LANG === "en" ? `Round ${G.turn+1} of ${G.rounds}` : `第 ${G.turn+1} 回合，共 ${G.rounds} 回合`;
   const cur = curTeam();
@@ -827,7 +947,7 @@ const CD_CIRC = 339.3;                 // 2πr，r = 54
 function startRound(){
   if(!G || G.phase !== "ready") return;
   clearInterval(CD_TIMER);
-  G.phase = "countdown";
+  if(!G.sm.goCountdown()) return;      // 只有 READY 才可進倒數
   $("#btnReady").style.display = "none";
   syncQuitFloat();
   const t = curTeam();
@@ -864,7 +984,7 @@ function startRound(){
 
 function beginRunning(){
   if(!G) return;                       // 倒數期間被退出
-  G.phase = "running";
+  if(!G.sm.begin()) return;            // 只有 COUNTDOWN 才可進 PLAYING
   syncQuitFloat();                     // 倒數完 → 收起浮動鍵，交返頂欄
   const t0 = curTeam();
   G.skipLeft = G.skipCap; syncSkipBtn();
@@ -1015,7 +1135,10 @@ const ACTIONS = {
 };
 function act(name){
   if(!ACTIONS[name]) return false;
-  if(!G || G.phase !== "running" || G.paused || !G.cur || G.locked) return false;
+  /* 判定閘門只看 canJudge()（＝ state === PLAYING）。
+     舊版寫 G.phase !== "running" || G.paused，兩個條件各自維護，
+     漏掉任何一個就是一個 bug（F-01 正是如此）。 */
+  if(!G || !G.canJudge() || !G.cur || G.locked) return false;
   G.locked = true;                        // 190ms 內只認一次，防連按食題
   setTimeout(()=>{ if(G) G.locked = false; }, 190);
   judge(name);
@@ -1074,7 +1197,7 @@ async function reportProblem(kind){
 let UNDO_HL_T = 0;
 function paintUndo(){
   const b = $("#btnUndo"); if(!b) return;
-  const ok = !!(G && G.phase === "running" && G.lastUndo);
+  const ok = !!(G && G.canUndo() && G.lastUndo);
   b.classList.toggle("off", !ok);
   b.setAttribute("aria-disabled", String(!ok));
   if(!ok){ b.classList.remove("fresh"); clearTimeout(UNDO_HL_T); }
@@ -1089,7 +1212,7 @@ function hintUndo(){
 /* ↑ 撤回：只可撤回本回合最後一次判定（新判定或回合結束即失效） */
 function undoJudge(){
   const snap = G && G.lastUndo;
-  if(!G || G.phase !== "running" || G.paused || !snap) return false;
+  if(!G || !G.canUndo() || !snap) return false;
   const t = G.teams[snap.ti];
   t.ok = snap.ok; t.skip = snap.skip; t.foul = snap.foul; t.score = snap.score;
   G.skipLeft = snap.skipLeft;
@@ -1126,7 +1249,10 @@ function judge(kind){
   hintUndo();
 
   setTimeout(()=>{                          // 三個判定都等文字滑走，再換下一題
-    if(!G || G.phase !== "running" || G.qToken !== snap.token) return;   // 已被 ↑ 撤回
+    /* 換題前檢查：還在同一題（qToken 未變）且仍在 PLAYING。
+       注意這裡用 canJudge() 而非 phase==="running"，
+       否則「暫停後又恢復」會因 phase 字串相同而誤換題。 */
+    if(!G || !G.canJudge() || G.qToken !== snap.token) return;   // 已被 ↑ 撤回
 
     const q = document.querySelector(".question");
     if(q) q.classList.remove("fx-down","fx-left","fx-right","fx-ok","fx-bad");
@@ -1264,9 +1390,11 @@ function endTurn(){
   const base = G.base || { ok:0, skip:0, foul:0, score:0 };
   const stats = { ok: team.ok - base.ok, skip: team.skip - base.skip,
                   foul: (team.foul||0) - (base.foul||0), score: team.score - base.score };
-  G.phase = "interstitial";
   G.lastUndo = null;                       // 跨回合唔可以撤回
   paintUndo();
+  /* 結束回合：PLAYING（或 PAUSED_PLAYING）→ INTERSTITIAL。
+     用 turnEnd() 走轉移表，倒數中誤按不會把局勢推進。 */
+  if(!G.sm.turnEnd()) return;
   G.settle = { id: team.id, name: team.name, color: team.color,
                ok: stats.ok, skip: stats.skip, foul: stats.foul, score: stats.score };
   slamGate(()=>{
@@ -1283,7 +1411,7 @@ function endGame(){
   resetTurnTimers();
   clearInterval(G.timerId);
   G.timerToken++;
-  G.phase = "done";
+  G.sm.finish();                       // INTERSTITIAL → DONE
   wakeOff();
   hideReady();
   const sorted = G.teams.map((t,i)=>({...t,i})).sort((a,b)=> b.score-a.score || b.ok-a.ok);
@@ -1572,17 +1700,20 @@ function doExit(){
   renderHome();
 }
 
-let EXIT_PAUSED = false;
+/* 退出面板開啟時暫停遊戲。舊版用 EXIT_PAUSED 這個外部旗標「記住是我暫停的」，
+   與 G.paused 兩份狀態各自維護，容易分叉。新版直接看狀態機：
+   面板開啟時 pause()，關閉時 resume()，是否暫停由 sm 唯一決定。 */
 function askExit(){
   const sheet = $("#exitSheet");
   sheet.classList.add("on");
   inertBackground(true);                         // F-08：鎖住背後 v-play／v-setup
   if(G && !G.paused){
     if(G.phase === "running"){                    // 跑緊 → 即時停錶
-      G.paused = true; EXIT_PAUSED = true;
+      G.sm.pause();                               // PLAYING → PAUSED_PLAYING
       setPauseIcon(true); renderTimer();
     } else if(G.phase === "countdown"){           // F-02：倒數中開面板 → 停住倒數，唔可以背景偷跑
-      clearInterval(CD_TIMER); CD_TIMER = 0; EXIT_PAUSED = true;
+      G.sm.pause();                               // COUNTDOWN → PAUSED_COUNTDOWN
+      clearInterval(CD_TIMER); CD_TIMER = 0;
     }
   }
   setTimeout(()=>$("#exitCancel").focus({preventScroll:true}), 40);
@@ -1591,10 +1722,15 @@ function closeExit(){
   $("#exitSheet").classList.remove("on");
   inertBackground(false);                         // F-08
   clearTrap();                                   // F-05/F-08
-  if(EXIT_PAUSED){
-    EXIT_PAUSED = false;
-    if(G && G.phase === "running"){ G.paused = false; G.endsAt = Date.now() + G.remaining*1000; setPauseIcon(false); renderTimer(); }
-    else if(G && G.phase === "countdown"){ startRound(); }   // F-02：重啟倒數
+  if(!G || !G.canResume()) return;                // 面板沒暫停過就無事可做
+  const wasCountdown = G.sm.state === State.PAUSED_COUNTDOWN;
+  if(!G.sm.resume()) return;                      // → PLAYING 或 COUNTDOWN
+  if(wasCountdown){
+    startRound();                                 // F-02：重啟倒數
+  } else {
+    G.endsAt = Date.now() + G.remaining*1000;
+    setPauseIcon(false);
+    renderTimer();
   }
 }
 
@@ -1622,8 +1758,12 @@ function setPauseIcon(p){
 }
 $("#btnPause").onclick = ()=>{
   if(!G || G.phase!=="running") return;
-  G.paused = !G.paused;
-  if(!G.paused) G.endsAt = Date.now() + G.remaining * 1000;
+  if(G.paused){
+    if(!G.sm.resume()) return;
+    G.endsAt = Date.now() + G.remaining * 1000;
+  } else {
+    if(!G.sm.pause()) return;
+  }
   setPauseIcon(G.paused);
   renderTimer();
 };
@@ -1760,14 +1900,14 @@ document.addEventListener("keydown", e=>{
   if(a === "ok"){
     e.preventDefault();
     if(G.phase === "ready") startRound();
-    else if(G.phase === "running") act("ok");
+    else if(G.canJudge()) act("ok");                        // 暫停時 act() 會自行拒絕
     else if(G.phase === "interstitial") closeTurnEnd();     // 結算卡：繼續
   }else if(a === "foul"){
     e.preventDefault();
-    if(G.phase === "running") act("foul");
+    if(G.canJudge()) act("foul");
   }else if(a === "skip"){
     e.preventDefault();
-    if(G.phase === "running") act("skip");
+    if(G.canJudge()) act("skip");
   }else if(a === "undo"){
     e.preventDefault();
     undoJudge();

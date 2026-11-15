@@ -199,6 +199,39 @@ before(() => {
   }
   // 用 eval 在沙箱內取得函式引用
   boot = (expr) => vm.runInContext(expr, ctx);
+
+  /* 在沙箱內註冊一個建構替身 G 的輔助函式。
+     重寫後 G.phase / G.paused 是狀態機的唯讀鏡像，測試替身必須一併給 sm，
+     否則 act()/judge()/undoJudge() 會找不到 canJudge()。
+     extra 若帶 phase/paused，改為決定 sm 的狀態，不可直接覆寫唯讀屬性。 */
+  boot(`
+    globalThis.mkG = function(extra, state){
+      extra = Object.assign({}, extra || {});
+      let st = state || "playing";
+      if (extra.phase !== undefined) {
+        if (extra.phase === "running") st = extra.paused ? "paused-playing" : "playing";
+        else st = extra.phase;
+        delete extra.phase;
+      }
+      delete extra.paused;
+
+      const sm = new GameStateMachine();
+      sm.force(st);
+      const g = {
+        sm,
+        allowSkip: true, skipCap: 3, skipLeft: 3,
+        teams: [], cur: { t: "x" }, locked: false, judged: 0,
+        canJudge(){ return this.sm.canJudge(); },
+        canUndo(){ return this.sm.canUndo(); },
+        canResume(){ return this.sm.canResume(); },
+        canPause(){ return this.sm.canPause(); },
+        get phase(){ return this.sm.phase; },
+        get paused(){ return this.sm.paused; }
+      };
+      Object.assign(g, extra);
+      return g;
+    };
+  `);
 });
 
 const grab = (name) => boot(`typeof ${name} !== "undefined" ? ${name} : undefined`);
@@ -218,8 +251,7 @@ describe("真實 canAct 語意（透過 act 內部條件驗證）", () => {
     // 直接構造最小 G 並呼叫 act
     const r = boot(`
       (() => {
-        G = { phase:"running", paused:true, cur:{t:"x"}, locked:false,
-              allowSkip:true, skipCap:3, skipLeft:3, teams:[] };
+        G = mkG({ cur:{t:"x"}, locked:false, allowSkip:true, skipCap:3, skipLeft:3, teams:[], }, "paused-playing");
         return act("ok");
       })()
     `);
@@ -230,8 +262,7 @@ describe("真實 canAct 語意（透過 act 內部條件驗證）", () => {
     for (const phase of ["ready", "countdown", "interstitial", "done"]) {
       const r = boot(`
         (() => {
-          G = { phase:${JSON.stringify(phase)}, paused:false, cur:{t:"x"}, locked:false,
-                allowSkip:true, skipCap:3, skipLeft:3, teams:[] };
+          G = mkG({ phase:${JSON.stringify(phase)}, cur:{t:"x"}, locked:false, allowSkip:true, skipCap:3, skipLeft:3, teams:[], }, "playing");
           return act("ok");
         })()
       `);
@@ -242,8 +273,7 @@ describe("真實 canAct 語意（透過 act 內部條件驗證）", () => {
   test("app.js 的 act() 在未知判定名回 false", () => {
     const r = boot(`
       (() => {
-        G = { phase:"running", paused:false, cur:{t:"x"}, locked:false,
-              allowSkip:true, skipCap:3, skipLeft:3, teams:[] };
+        G = mkG({ cur:{t:"x"}, locked:false, allowSkip:true, skipCap:3, skipLeft:3, teams:[], }, "playing");
         return act("nonexistent");
       })()
     `);
@@ -255,10 +285,7 @@ describe("真實 judge() 計分", () => {
   test("正確 +1", () => {
     const out = boot(`
       (() => {
-        G = { phase:"running", paused:false, cur:{t:"x"}, locked:false,
-              allowSkip:true, skipCap:3, skipLeft:3, skipPenalty:false, foulPenalty:false,
-              judged:0, order:[0], turn:0,
-              teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }] };
+        G = mkG({ cur:{t:"x"}, locked:false, allowSkip:true, skipCap:3, skipLeft:3, skipPenalty:false, foulPenalty:false, judged:0, order:[0], turn:0, teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }], }, "playing");
         judge("ok");
         return JSON.stringify({ score: G.teams[0].score, ok: G.teams[0].ok, judged: G.judged });
       })()
@@ -272,10 +299,7 @@ describe("真實 judge() 計分", () => {
   test("犯規無罰分 → 0 分，foul++", () => {
     const out = boot(`
       (() => {
-        G = { phase:"running", paused:false, cur:{t:"x"}, locked:false,
-              allowSkip:true, skipCap:3, skipLeft:3, skipPenalty:false, foulPenalty:false,
-              judged:0, order:[0], turn:0,
-              teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }] };
+        G = mkG({ cur:{t:"x"}, locked:false, allowSkip:true, skipCap:3, skipLeft:3, skipPenalty:false, foulPenalty:false, judged:0, order:[0], turn:0, teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }], }, "playing");
         judge("foul");
         return JSON.stringify({ score: G.teams[0].score, foul: G.teams[0].foul });
       })()
@@ -288,10 +312,7 @@ describe("真實 judge() 計分", () => {
   test("犯規有罰分 → -1", () => {
     const out = boot(`
       (() => {
-        G = { phase:"running", paused:false, cur:{t:"x"}, locked:false,
-              allowSkip:true, skipCap:3, skipLeft:3, skipPenalty:false, foulPenalty:true,
-              judged:0, order:[0], turn:0,
-              teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }] };
+        G = mkG({ cur:{t:"x"}, locked:false, allowSkip:true, skipCap:3, skipLeft:3, skipPenalty:false, foulPenalty:true, judged:0, order:[0], turn:0, teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }], }, "playing");
         judge("foul");
         return JSON.stringify({ score: G.teams[0].score });
       })()
@@ -302,10 +323,7 @@ describe("真實 judge() 計分", () => {
   test("跳過遞減 skipLeft；skipCap=0 時不遞減", () => {
     const capped = boot(`
       (() => {
-        G = { phase:"running", paused:false, cur:{t:"x"}, locked:false,
-              allowSkip:true, skipCap:3, skipLeft:3, skipPenalty:false, foulPenalty:false,
-              judged:0, order:[0], turn:0,
-              teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }] };
+        G = mkG({ cur:{t:"x"}, locked:false, allowSkip:true, skipCap:3, skipLeft:3, skipPenalty:false, foulPenalty:false, judged:0, order:[0], turn:0, teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }], }, "playing");
         judge("skip");
         return G.skipLeft;
       })()
@@ -314,10 +332,7 @@ describe("真實 judge() 計分", () => {
 
     const infinite = boot(`
       (() => {
-        G = { phase:"running", paused:false, cur:{t:"x"}, locked:false,
-              allowSkip:true, skipCap:0, skipLeft:5, skipPenalty:false, foulPenalty:false,
-              judged:0, order:[0], turn:0,
-              teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }] };
+        G = mkG({ cur:{t:"x"}, locked:false, allowSkip:true, skipCap:0, skipLeft:5, skipPenalty:false, foulPenalty:false, judged:0, order:[0], turn:0, teams:[{ name:"A", ok:0, skip:0, foul:0, score:0, id:"turtle", color:"#000" }], }, "playing");
         judge("skip");
         return G.skipLeft;
       })()
@@ -332,11 +347,7 @@ describe("真實排名邏輯（renderResult 內）", () => {
   test("原始碼的排序與排名演算法（抽自 app.js:1289-1300）", () => {
     const out = boot(`
       (() => {
-        const G = { teams: [
-          { name:"A", score:10, ok:10 },
-          { name:"B", score:10, ok:8 },
-          { name:"C", score:8,  ok:8  }
-        ]};
+        const G = mkG({ teams: [ { name:"A", score:10, ok:10 }, { name:"B", score:10, ok:8 }, { name:"C", score:8, ok:8 } ], }, "playing");
         const sorted = G.teams.map((t,i)=>({...t,i})).sort((a,b)=> b.score-a.score || b.ok-a.ok);
         let rank = 0, prev = null;
         const ranked = sorted.map((t,i)=>{
