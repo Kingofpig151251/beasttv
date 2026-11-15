@@ -13,6 +13,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # 純邏輯測試：直接在 Node 裡載入真實 app.js，測判定／計分／排名／回合。
+  # 不需要瀏覽器，幾秒跑完，是重寫時的主要行為防護網。
+  logic:
+    name: 行為邏輯測試
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 1. 取出程式碼
+        uses: actions/checkout@v4
+
+      - name: 2. 安裝 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 3. 跑邏輯測試
+        run: node --test tests/logic.test.js tests/real-app.test.js tests/endgame.test.js tests/turn.test.js
+
   check:
     name: 靜態檢查 + 冒煙測試
     runs-on: ubuntu-latest
