@@ -7,7 +7,7 @@
 <meta name="copyright" content="© 2026 Leung Tung Lam. MIT License.">
 <meta name="description" content="百獸台版權聲明：程式碼 MIT 授權全文，以及音效、圖像素材的來源與授權。">
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#F2F2F7">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="百獸台">
@@ -22,11 +22,10 @@
   :root{
     color-scheme:light;
     --bg:#F2F2F7; --surface:#FFFFFF;
-    --ink:#1D1D1F; --ink-2:rgba(60,60,67,.72); --ink-3:rgba(60,60,67,.42);
+    --ink:#000000; --ink-2:rgba(60,60,67,.72); --ink-3:rgba(60,60,67,.42);
     --sep:rgba(60,60,67,.18); --fill:rgba(118,118,128,.12);
     --blue:#0071E3; --red:#FF3B30;
     --r-xl:22px; --r-lg:16px; --r-md:12px;
-    --focus-ring:rgba(0,113,227,.85);
     --font:-apple-system,BlinkMacSystemFont,system-ui,"PingFang HK","Noto Sans HK",sans-serif;
     --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
   }
@@ -49,7 +48,6 @@
     text-decoration:none}
   .back svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2;
     stroke-linecap:round; stroke-linejoin:round}
-  .back:focus-visible{outline:0; box-shadow:inset 0 0 0 1px var(--sep), 0 0 0 3px var(--focus-ring)}
   h1{margin:0; font-size:26px; letter-spacing:-.02em; text-wrap:balance}
   .sub{margin:2px 0 0; font-size:14px; color:var(--ink-2)}
 
@@ -73,7 +71,6 @@
     padding:2px 8px; align-self:flex-start}
   .must{color:var(--red); font-weight:600}
   a{color:var(--blue); text-decoration:none}
-  a:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring); border-radius:4px}
 
   .foot{margin:4px 0 0; text-align:center; font-size:13px; color:var(--ink-3)}
   @media (max-width:520px){

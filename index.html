@@ -12,10 +12,6 @@
 <meta name="copyright" content="© 2026 Leung Tung Lam. MIT License.">
 <meta name="description" content="百獸台：派對猜詞主持台。一部 iPad 控場，一人背向屏幕猜詞、全隊負責描述，主持按「犯規／跳過／正確」判定。">
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#FFFFFF">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="百獸台">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -35,7 +31,7 @@
       <button class="btn-primary landing-go" id="btnEnter">開始</button>
       <div class="home-tools">
         <a class="landing-link" id="btnEditHome" href="/edit">設定</a>
-        <button type="button" class="landing-link lang-toggle" id="btnLang" aria-label="切換語言">English</button>
+        <button type="button" class="landing-link lang-toggle" id="btnLang">English</button>
       </div>
       <p class="my-bank" id="myBank" hidden></p>
       </div>
@@ -68,6 +64,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg>
       </button>
       <div class="dots" id="stepDots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span id="stepProgress" role="status" aria-live="polite" aria-atomic="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"></span>
       <span aria-hidden="true"></span>
     </div>
 
@@ -95,7 +92,7 @@
 
       <section class="sstep" data-step="2">
         <h2 class="sstep-title">為每一隊命名</h2>
-        <div class="namegrid" id="nameList"></div>
+        <div class="namegrid" id="nameList" role="group" aria-label="隊名"></div>
       </section>
 
       <section class="sstep" data-step="3">
@@ -180,7 +177,7 @@
           <circle class="ring-track" cx="22" cy="22" r="16"/>
           <circle class="ring-prog" id="ringProg" cx="22" cy="22" r="16"/>
         </svg>
-        <b class="clock" id="pClock">60</b>
+        <b class="clock" id="pClock" aria-hidden="true">60</b>
       </button>
       </div>
     </div>
@@ -189,9 +186,9 @@
       <div class="card-word" id="pText"></div>
     </main>
     <div class="flash-hud" id="hud">
-      <button class="key key-foul" data-judge="foul" aria-label="犯規" title="犯規（←）">犯規</button>
-      <button class="key key-pass" data-judge="skip" aria-label="跳過" title="跳過（↓）">跳過</button>
-      <button class="key key-ok" data-judge="ok" aria-label="正確" title="正確（→）">正確</button>
+      <button class="key key-foul" data-judge="foul" aria-label="犯規">犯規</button>
+      <button class="key key-pass" data-judge="skip" aria-label="跳過">跳過</button>
+      <button class="key key-ok" data-judge="ok" aria-label="正確">正確</button>
     </div>
 
     <div class="ready" id="readyOverlay" style="display:none">
@@ -251,10 +248,10 @@
 </div>
 
 
-<div class="sheet-wrap center" id="exitSheet" role="dialog" aria-modal="true" aria-labelledby="exitTitle">
+<div class="sheet-wrap center" id="exitSheet" role="dialog" aria-modal="true" aria-labelledby="exitTitle" aria-describedby="exitNote">
   <div class="sheet-card">
     <div class="sheet-title" id="exitTitle">退出遊戲？</div>
-    <p class="sheet-note">本局成績將不會記錄。</p>
+    <p class="sheet-note" id="exitNote">本局成績將不會記錄。</p>
     <div class="sheet-actions">
       <button class="sheet-btn" id="exitCancel">取消</button>
       <button class="sheet-btn danger" id="exitConfirm">退出</button>
@@ -262,7 +259,7 @@
   </div>
 </div>
 
-<div class="sheet-wrap" id="animalSheet" role="dialog" aria-modal="true" aria-label="選擇隊色">
+<div class="sheet-wrap" id="animalSheet" role="dialog" aria-modal="true" aria-label="選擇動物與隊色">
   <div class="sheet-card">
     <div class="sheet-title">選擇動物與隊色</div>
     <div class="animal-grid" id="animalGrid"></div>
@@ -270,7 +267,7 @@
   </div>
 </div>
 
-    <div class="gate" id="gate" aria-hidden="true">
+    <div class="gate" id="gate">
       <div class="curtain top"></div>
       <div class="curtain bot"></div>
       <div class="gate-body">
@@ -294,7 +291,7 @@
   <div class="curtain bot"></div>
   <div class="vs" id="vsBoard"></div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/app.js" defer></script>
 <script>
 if("serviceWorker" in navigator && location.protocol === "https:"){

@@ -346,6 +346,13 @@ async def t_keys(T):
     check("HUD tooltip 仍然顯示自訂鍵",
           "K" in (await T.js("document.querySelector('.key-foul').getAttribute('title')")))
 
+    # 自訂 skip 鍵 → .key-pass tooltip 要跟住（F-16：此前永遠顯示舊 ↓）
+    await T.js("document.querySelector('.key-chip[data-k=\"skip\"]').click()"); await asyncio.sleep(0.2)
+    await T.js("document.dispatchEvent(new KeyboardEvent('keydown',{key:'j',code:'KeyJ',bubbles:true}))")
+    await asyncio.sleep(0.25)
+    check("自訂 skip 鍵後 .key-pass tooltip 顯示新鍵",
+          "J" in (await T.js("document.querySelector('.key-pass').getAttribute('title')")))
+
     # 重新載入：設定要跟住
     await T.cmd("Page.reload"); await asyncio.sleep(2.0)
     await T.wait("!!document.getElementById('btnEnter')", 15, "重載首頁")

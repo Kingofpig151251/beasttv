@@ -479,12 +479,38 @@ function renderAnimalGrid(){
     b.onclick = ()=>selectAnimal(b.dataset.id);
   });
 }
+let TRAP = null;                                // F-05/F-08：當前焦點陷阱所屬 panel
+function setTrap(el){ TRAP = el; }
+function clearTrap(){ TRAP = null; }
+function trapFocusables(root){
+  return Array.from(root.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+    .filter(el=>!el.disabled && el.offsetParent !== null);
+}
+document.addEventListener("keydown", e=>{        // F-05/F-08：覆蓋層內 Tab 限制
+  if(!TRAP || e.key !== "Tab") return;
+  const f = trapFocusables(TRAP);
+  if(!f.length) return;
+  const first = f[0], last = f[f.length-1];
+  if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+}, true);
+function inertBackground(on){
+  ["v-play","v-setup"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.toggleAttribute("inert", on);
+  });
+}
 function openAnimals(i){
   animalTarget = i;
   renderAnimalGrid();
-  $("#animalSheet").classList.add("on");
+  const sheet = $("#animalSheet");
+  sheet.classList.add("on");
+  inertBackground(true);                         // F-08：鎖住背後 v-play／v-setup
+  setTrap(sheet);                                // F-05：焦點陷阱
+  const first = $("#animalGrid .animal-opt:not([aria-disabled='true'])");
+  if(first) setTimeout(()=>first.focus({preventScroll:true}), 40);   // F-05：初始焦點
 }
-function closeAnimals(){ $("#animalSheet").classList.remove("on"); }
+function closeAnimals(){ const sheet = $("#animalSheet"); sheet.classList.remove("on"); inertBackground(false); clearTrap(); }
 function animalOwner(id, except){
   for(let i=0;i<cfg.teams;i++) if(i !== except && cfg.animals[i] === id) return i;
   return -1;
@@ -510,9 +536,13 @@ function goStep(i, dir){
   SETUP.i = Math.max(0, Math.min(LAST_STEP, i));
   $$(".sstep").forEach(el=>{
     const k = +el.dataset.step;
-    el.classList.toggle("on", k === SETUP.i);
+    const on = k === SETUP.i;
+    el.classList.toggle("on", on);
     el.classList.toggle("back", k < SETUP.i || (dir < 0 && k > SETUP.i));
+    el.toggleAttribute("inert", !on);          // F-03：非作用中步鎖住，唔入 Tab 順序
   });
+  const sp = $("#stepProgress");               // F-25：進度告知（aria-live）
+  if(sp) sp.textContent = LANG === "en" ? `Step ${SETUP.i+1} of ${LAST_STEP+1}` : `第 ${SETUP.i+1} 步，共 ${LAST_STEP+1} 步`;
   $$("#stepDots i").forEach((d,n)=>{
     d.classList.toggle("on", n <= SETUP.i);
     d.classList.toggle("cur", n === SETUP.i);
@@ -643,7 +673,11 @@ function syncSkipBtn(){
   b.textContent = inf ? T("跳過 ∞") : LANG === "en" ? `Skip ${left}/${cap}` : `跳過 ${left}/${cap}`;
   b.disabled = !G || !G.allowSkip || (!inf && left <= 0);
   b.setAttribute("aria-label", inf ? T("跳過，不限次數") : LANG === "en" ? `Skip · ${left} left` : `跳過，剩 ${left} 次`);
-  b.setAttribute("title", inf ? T("跳過（↓）不限次數") : LANG === "en" ? `Skip (↓) · ${left} left` : `跳過（↓）剩 ${left} 次`);
+  /* F-16：鍵位要跟自訂設定走，唔可以寫死 ↓（否則 applyKeys 嘅動態提示會被蓋返舊鍵） */
+  const sk = (typeof KKEYS !== "undefined" && KKEYS.skip) ? keyLabel(KKEYS.skip) : "↓";
+  b.setAttribute("title", inf
+    ? (LANG === "en" ? `Skip (${sk}) · unlimited` : `跳過（${sk}）不限次數`)
+    : (LANG === "en" ? `Skip (${sk}) · ${left} left` : `跳過（${sk}）剩 ${left} 次`));
 }
 
 /* 準備／倒數時浮動退出鍵；跑緊時收起（頂欄已有同一粒） */
@@ -981,7 +1015,7 @@ const ACTIONS = {
 };
 function act(name){
   if(!ACTIONS[name]) return false;
-  if(!G || G.phase !== "running" || !G.cur || G.locked) return false;
+  if(!G || G.phase !== "running" || G.paused || !G.cur || G.locked) return false;
   G.locked = true;                        // 190ms 內只認一次，防連按食題
   setTimeout(()=>{ if(G) G.locked = false; }, 190);
   judge(name);
@@ -1055,7 +1089,7 @@ function hintUndo(){
 /* ↑ 撤回：只可撤回本回合最後一次判定（新判定或回合結束即失效） */
 function undoJudge(){
   const snap = G && G.lastUndo;
-  if(!G || G.phase !== "running" || !snap) return false;
+  if(!G || G.phase !== "running" || G.paused || !snap) return false;
   const t = G.teams[snap.ti];
   t.ok = snap.ok; t.skip = snap.skip; t.foul = snap.foul; t.score = snap.score;
   G.skipLeft = snap.skipLeft;
@@ -1542,17 +1576,25 @@ let EXIT_PAUSED = false;
 function askExit(){
   const sheet = $("#exitSheet");
   sheet.classList.add("on");
-  if(G && G.phase === "running" && !G.paused){    // 開面板即停錶，唔會喺對話框後面繼續倒數
-    G.paused = true; EXIT_PAUSED = true;
-    setPauseIcon(true); renderTimer();
+  inertBackground(true);                         // F-08：鎖住背後 v-play／v-setup
+  if(G && !G.paused){
+    if(G.phase === "running"){                    // 跑緊 → 即時停錶
+      G.paused = true; EXIT_PAUSED = true;
+      setPauseIcon(true); renderTimer();
+    } else if(G.phase === "countdown"){           // F-02：倒數中開面板 → 停住倒數，唔可以背景偷跑
+      clearInterval(CD_TIMER); CD_TIMER = 0; EXIT_PAUSED = true;
+    }
   }
   setTimeout(()=>$("#exitCancel").focus({preventScroll:true}), 40);
 }
 function closeExit(){
   $("#exitSheet").classList.remove("on");
+  inertBackground(false);                         // F-08
+  clearTrap();                                   // F-05/F-08
   if(EXIT_PAUSED){
     EXIT_PAUSED = false;
     if(G && G.phase === "running"){ G.paused = false; G.endsAt = Date.now() + G.remaining*1000; setPauseIcon(false); renderTimer(); }
+    else if(G && G.phase === "countdown"){ startRound(); }   // F-02：重啟倒數
   }
 }
 
@@ -1615,7 +1657,8 @@ document.addEventListener("keydown", e=>{
     e.preventDefault();
     if(SETUP.i < LAST_STEP) goStep(SETUP.i + 1, 1); else launchGame();
   }else if(e.key === "Escape"){
-    e.preventDefault(); $("#btnStepBack").click();
+    if($("#animalSheet").classList.contains("on")){ closeAnimals(); }   // F-05：Esc 只關面板，不跳步
+    else { e.preventDefault(); $("#btnStepBack").click(); }
   }
 });
 

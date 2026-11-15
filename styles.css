@@ -8,14 +8,14 @@
     --bg:#F2F2F7; --surface:#FFFFFF; --surface-2:#E9E9EE; --fill:rgba(118,118,128,.12);
     --fill-2:rgba(118,118,128,.20); --fill-3:rgba(118,118,128,.10); --spot:rgba(0,113,227,.10); --sheet-veil:rgba(0,0,0,.42); --vs-shadow:rgba(0,0,0,.18);
     /* ink */
-    --ink:#000000; --ink-2:rgba(60,60,67,.72); --ink-3:rgba(60,60,67,.40);
+    --ink:#000000; --ink-2:rgba(60,60,67,.90); --ink-3:rgba(60,60,67,.70);
     --sep:rgba(60,60,67,.18);
     /* system colours */
-    --blue:#0071E3; --blue-press:#005FBF;
-    --blue-fill:var(--blue); --blue-fill-press:var(--blue-press); --green:#34C759; --red:#FF3B30; --amber:#FF9F0A;
-    --on-accent:#FFFFFF; --focus-ring:rgba(0,113,227,.85);
-    --flash-ok:rgba(52,199,89,.16); --toast-bg:rgba(28,28,30,.92);
-    --toast-ink:#FFFFFF; --flash-bad:rgba(255,59,48,.15); 
+    --blue:#0071E3; --blue-press:#0056B3;
+    --blue-fill:var(--blue); --blue-fill-press:var(--blue-press); --green:#1E8E3E; --red:#D70015; --amber:#B25E00;
+    --on-accent:#FFFFFF;
+    --toast-bg:rgba(28,28,30,.92);
+    --toast-ink:#FFFFFF;
     /* geometry */
     --r-xl:22px; --r-lg:16px; --r-md:12px; --pill:999px;
     --hair:1px;
@@ -128,31 +128,28 @@
   .home-tools{display:flex; align-items:center; justify-content:center; gap:10px; margin-top:20px}
   .home-tools .landing-link{margin-top:0; width:132px; min-width:132px; padding:0; gap:6px;
     min-height:48px; font-size:17px; line-height:1; color:var(--ink)}
-  .lang-toggle{min-width:92px; min-height:34px; padding:0 14px; border:0; border-radius:999px; background:var(--fill);
+  .lang-toggle{min-width:44px; min-height:44px; padding:0 14px; border:0; border-radius:999px; background:var(--fill);
     color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:600; letter-spacing:.01em;
     touch-action:manipulation; white-space:nowrap}
   .lang-toggle:active{background:var(--fill-2)}
-  .lang-toggle:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring)}
   .my-bank{margin:10px 0 0; font-size:13px; color:var(--ink-2); display:flex; align-items:center; gap:8px; justify-content:center}
   .my-bank b{font-weight:600; color:var(--ink)}
-  .my-bank button{font:inherit; font-size:12.5px; color:var(--blue); background:none; border:0; padding:2px 0; min-height:0}
+  .my-bank button{font:inherit; font-size:12.5px; color:var(--blue-press); background:none; border:0; padding:2px 0; min-height:0}
   .landing-credit{font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums;
     display:inline-flex; align-items:center; gap:6px; white-space:nowrap}
   .credit-link{font:inherit; font-size:13px; color:var(--ink-2); background:none; border:0; padding:2px 0;
-    min-height:0; cursor:pointer; font-variant-numeric:tabular-nums}
+    min-height:44px; cursor:pointer; font-variant-numeric:tabular-nums}
   .credit-link:hover{color:var(--ink)}
-  .credit-link:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring); border-radius:6px}
   #toast.multi{text-align:left; white-space:pre-line; line-height:1.6; font-size:14px;
     bottom:calc(104px + env(safe-area-inset-bottom));
     border-radius:var(--r-lg); padding:14px 16px; width:min(560px, calc(100% - 40px))}
   /* 頁腳：只剩版權 ＋ 一個明顯嘅 GitHub 膠囊；Hermes／OpenCode 品牌搬去 /credits */
   .gh-link{display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 13px;
     border-radius:var(--r-lg); background:var(--fill); color:var(--ink);
-    font-size:13px; font-weight:600; letter-spacing:.01em; text-decoration:none;
+    min-height:44px; font-size:13px; font-weight:600; letter-spacing:.01em; text-decoration:none;
     transition:background-color .2s var(--ease)}
   .gh-link svg{width:15px; height:15px; flex:none}
   .gh-link:active{background:var(--fill-2)}
-  .gh-link:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring)}
   .landing-link{display:inline-flex; align-items:center; justify-content:center; margin-top:20px;
     min-width:132px; min-height:48px; padding:0 26px; border-radius:var(--pill); background:var(--fill);
     color:var(--ink); font-size:17px; font-weight:600; text-decoration:none;
@@ -313,7 +310,6 @@
   .sc-val{min-width:2.4ch; text-align:center; font-size:16px; font-weight:600;
     font-variant-numeric:tabular-nums; color:var(--ink)}
   .mini-step input::-webkit-outer-spin-button,.mini-step input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
-  .mini-step input:focus-visible{outline:2px solid var(--focus-ring); outline-offset:4px; border-radius:8px}
   /* 規則行內的小 stepper：視覺重量要同 42×24 的 switch 一致 */
   .round-btn.sm{position:relative; width:24px; height:24px; min-height:0; padding:0;
     font-size:14px; font-weight:500; color:var(--ink); background:var(--fill-2)}
@@ -332,8 +328,6 @@
   input,textarea,select{font-family:inherit; font-size:17px; color:var(--ink);
     background:var(--fill); border:0; border-radius:var(--r-md); padding:11px 14px; min-height:48px; width:100%}
   input::placeholder,textarea::placeholder{color:var(--ink-3)}
-  input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{
-    outline:2px solid var(--focus-ring); outline-offset:3px}
 
   /* ---------- buttons ---------- */
   button{touch-action:manipulation; -webkit-tap-highlight-color:transparent;
@@ -453,7 +447,6 @@
   .undo-btn.off{background:transparent; color:var(--ink-3); cursor:default;
     box-shadow:inset 0 0 0 1px var(--sep)}
   .undo-btn:not(.off):active{background:var(--fill-2)}
-  .undo-btn:focus-visible{outline:0; box-shadow:0 0 0 3px var(--focus-ring)}
   .undo-btn.fresh{background:color-mix(in oklab, var(--blue) 7%, var(--fill)); color:var(--blue);
     box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--blue) 32%, transparent)}
   /* 回報：同 × 一樣 44px 圓形，但細一級圖示 */
@@ -473,6 +466,11 @@
   .flash-hud.bad-pass .key-pass{background:color-mix(in oklab, var(--red) 13%, var(--fill)); color:var(--red)}
   .flash-hud.bad-foul .key-foul:active,
   .flash-hud.bad-pass .key-pass:active{background:color-mix(in oklab, var(--red) 22%, var(--fill))}
+  /* F-19：扣分狀態清楚揭露「−1」；可依 cfg 條件顯示（由 app.js 上 bad-foul/bad-pass 才出現） */
+  .flash-hud .key-foul::after,
+  .flash-hud .key-pass::after{content:""}
+  .flash-hud.bad-foul .key-foul::after{content:"−1"; color:var(--red); font-size:clamp(13px,1.6vh,15px); font-weight:700; margin-left:6px}
+  .flash-hud.bad-pass .key-pass::after{content:"−1"; color:var(--red); font-size:clamp(13px,1.6vh,15px); font-weight:700; margin-left:6px}
   .flash-hud.no-skip .key-pass{display:none}
   .flash-hud.no-skip{grid-template-columns:1fr 1fr}
   .flash-hud .key-ok{justify-self:end; background:var(--blue-fill); color:var(--on-accent)}
@@ -582,8 +580,6 @@
   .stat button::before{content:""; position:absolute; inset:7px; border-radius:50%;
     background:color-mix(in oklab, var(--on-accent) 16%, transparent)}
   .stat button:active::before{background:color-mix(in oklab, var(--on-accent) 32%, transparent)}
-  .stat button:focus-visible{outline:0}
-  .stat button:focus-visible::before{box-shadow:0 0 0 3px var(--focus-ring)}
   /* 矮視窗（手機橫屏）：結算卡連覆核列都要塞得入 */
   @media (max-height:420px){
     .te-card{gap:4px; padding:10px 18px}
@@ -696,14 +692,14 @@
   }
 
   .rules{display:flex; flex-direction:column; gap:2px; margin-top:8px}
-  .key-edit{height:38px; padding:0 16px; border:0; border-radius:var(--r-md); background:var(--fill);
+  .key-edit{height:44px; padding:0 16px; border:0; border-radius:var(--r-md); background:var(--fill);
     color:var(--ink); font:inherit; font-size:14px; font-weight:600; cursor:pointer}
   .key-edit:active{background:var(--fill-2)}
   .key-rows{display:flex; flex-direction:column; gap:8px}
   .key-row{display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px;
     padding:9px 12px; border-radius:var(--r-md); background:var(--surface-2)}
   .key-row b{font-size:15px; font-weight:600}
-  .key-chip{min-width:92px; height:40px; padding:0 12px; border:0; border-radius:10px; font:inherit;
+  .key-chip{min-width:92px; height:44px; padding:0 12px; border:0; border-radius:10px; font:inherit;
     font-family:var(--font-mono); font-size:15px; font-weight:600; color:var(--ink); cursor:pointer;
     background:var(--surface); box-shadow:inset 0 0 0 1px var(--sep)}
   .key-chip.listening{color:var(--blue); box-shadow:inset 0 0 0 2px var(--blue)}
@@ -793,6 +789,12 @@
     .animal-mark{font-size:22px}
     .animal-edit{width:18px; height:18px; padding:3px; right:-1px; bottom:-1px}
     .name-row input{min-height:48px; padding:10px 12px; font-size:16px}
+    .key-edit{height:44px}
+    .key-chip{height:44px}
+    .switch{width:46px; height:28px}
+    .switch::before{inset:-8px -6px}
+    .switch i{width:24px; height:24px}
+    .switch[aria-checked="true"] i{transform:translateX(18px)}
     .sstep-title{font-size:clamp(26px,7.4vw,32px)}
   }
 
@@ -824,7 +826,11 @@
   html[lang="en"] .rule-txt span{white-space:nowrap; font-size:12.5px}
   .flash-hud .key{white-space:nowrap}
   @media (max-width:430px){
-    .flash-hud .key{font-size:16px; gap:6px; min-width:112px}
+    .flash-hud{grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px}
+    .flash-hud .key{width:100%; min-width:0; font-size:15px; gap:6px}
+    .top-right{gap:8px}
+    .undo-btn{min-width:0; padding:0 10px; font-size:12px; gap:4px}
+    .undo-btn .glyph{font-size:13px}
     .flash-hud .key::before, .flash-hud .key::after{min-width:22px; padding:0 5px; font-size:13px}
   }
   html[lang="en"] .flash-hud .key{font-size:clamp(15px,2vh,18px); gap:8px}
@@ -869,6 +875,8 @@
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important;
       transition-duration:.001ms !important}
+    /* F-17：減少動態下浮字不要瞬間跳末幀消失，改靜態顯示、1.2s 後移除（app.js 仍按 REDUCE 縮短 setTimeout） */
+    .fx-score{animation:none; opacity:1; transform:translateX(-50%); font-size:clamp(56px,10vh,104px)}
   }
 
   /* 手機：任何步驟都唔需要滾動（放最後，蓋過上面所有媒體查詢） */
@@ -892,6 +900,12 @@
     .animal-btn{width:26px; height:26px; aspect-ratio:1}
     .animal-mark{font-size:14px}
     .name-row input{min-height:22px; padding:1px 5px; font-size:12px}
+    .key-edit{height:44px}
+    .key-chip{height:44px}
+    .switch{width:46px; height:28px}
+    .switch::before{inset:-8px -6px}
+    .switch i{width:24px; height:24px}
+    .switch[aria-checked="true"] i{transform:translateX(18px)}
     .rank{display:grid; grid-template-columns:1fr 1fr; gap:2px 8px}
     .rk, .rk.is-champ, .rank.compact .rk.is-champ{padding:3px 7px}
     .rank.compact .rk.is-champ .rk-tile{width:24px; height:24px}
