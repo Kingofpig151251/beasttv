@@ -1,0 +1,133 @@
+  /* ---------- result：逐格揭榜 ---------- */
+  #v-result{position:relative; overflow:hidden}
+  #v-result.active{display:flex; flex-direction:column; justify-content:center;
+    min-height:calc(100dvh - 56px)}
+  .res-head{position:relative; z-index:3; text-align:center;
+    margin:0 auto clamp(16px,2.6vh,28px); width:min(560px, 100%)}
+  #v-result .rank, #v-result .result-actions{width:min(560px, 100%); margin-inline:auto}
+  #v-result h1{margin:0; font-size:clamp(30px,4.8vh,44px)}
+  #rSub{margin:8px 0 0; font-size:15px}
+
+  .confetti{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; display:none}
+  .confetti.on{display:block}
+  .confetti i{position:absolute; top:-24px; width:8px; height:13px; border-radius:2px;
+    animation-name:fall; animation-timing-function:linear; animation-iteration-count:infinite}
+
+  .rank{position:relative; z-index:2; display:flex; flex-direction:column; gap:2px}
+  .rk{position:relative; padding:10px 14px; border-radius:14px;
+    transition:opacity .26s var(--ease), transform .34s var(--ease),
+               background .34s var(--ease), padding .34s var(--ease), border-radius .34s var(--ease)}
+  .js .rk{opacity:0; transform:translateY(16px) scale(.985)}
+  .js .rk.in{opacity:1; transform:none}
+  .rk.charging{opacity:1; transform:none}
+
+  /* 卡片反轉：正面問號、背面冠軍 */
+  .flip{position:relative; transform-style:preserve-3d;
+    transition:transform .62s cubic-bezier(.3,.82,.2,1)}
+  .face{backface-visibility:hidden; -webkit-backface-visibility:hidden}
+  .face.back{display:grid; grid-template-columns:26px 44px minmax(0,1fr) auto;
+    align-items:center; gap:12px}
+  .face.front{position:absolute; inset:0; display:none}
+  .rk.is-champ{perspective:1200px}
+  .rk.is-champ .face.back{transform:rotateY(180deg)}
+  .rk.charging .face.front{display:block}
+  .rk.charging .face.back{opacity:0}
+  .rk.flipped .flip{transform:rotateY(180deg)}
+
+  .front-card{position:absolute; inset:0; border-radius:22px; background:var(--surface);
+    box-shadow:inset 0 0 0 1px var(--sep), 0 10px 24px var(--vs-shadow);
+    display:grid; place-items:center; overflow:hidden;
+    animation:shiver .12s steps(2,end) infinite; --amp:1}
+  .front-card::after{content:"?"; font-size:clamp(28px,4.6vh,38px); font-weight:700; color:var(--ink-2);
+    animation:qBreathe 1.4s ease-in-out infinite}
+  .front-card::before{content:""; position:absolute; inset:0; border-radius:22px;
+    box-shadow:0 0 0 1px color-mix(in oklab, var(--blue) 35%, transparent);
+    animation:ringPulse 1.6s ease-out infinite}
+
+  .rk .no{font-size:15px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+  .rk-tile{width:44px; height:44px; border-radius:12px; display:grid; place-items:center;
+    background:color-mix(in oklab, var(--tc) 14%, transparent);
+    box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 34%, transparent); flex:0 0 auto}
+  .rk-tile .rk-mark{display:block; font-size:24px; line-height:1; color:var(--tc)}
+  .rk-mark svg,.rk-mark .mark-img{display:block; width:1em; height:1em}
+  .rk .nm{font-size:17px; font-weight:500; line-height:1.2}
+  .rk .st{font-size:14px; color:var(--ink-2); margin-top:2px}
+  .rk .pt{font-family:var(--font-display); font-size:22px; font-weight:600;
+    font-variant-numeric:tabular-nums; transition:font-size .34s var(--ease), color .34s var(--ease)}
+
+  /* 冠軍卡：內容居中、皇冠做成角標 */
+  .rk.is-champ{background:var(--surface); margin:14px 0 6px;
+    padding:20px 14px 16px;
+    border-radius:22px; box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--tc) 20%, transparent)}
+
+  .rk.is-champ::before{content:""; position:absolute; inset:-28px -12px; border-radius:34px; z-index:-1;
+    background:radial-gradient(58% 70% at 50% 50%, color-mix(in oklab, var(--tc) 30%, transparent), transparent 72%);
+    filter:blur(16px); animation:champGlow 2.8s ease-in-out infinite}
+  .rk.is-champ .rk-tile{border-radius:16px}
+  .rk.is-champ .rk-tile .rk-mark{font-size:34px; animation:sway 2.8s ease-in-out infinite}
+  .rk.is-champ .nm{font-family:var(--font-display); font-size:clamp(24px,4.4vh,34px);
+    font-weight:700; letter-spacing:-.02em; text-align:left; max-width:min(46vw,420px)}
+  .rk.is-champ .st{font-size:15px}
+  .rk.is-champ .pt{font-size:clamp(32px,5.4vh,46px); color:var(--tc)}
+  .rank.compact .rk.is-champ{padding:10px 14px}
+  .rank.compact .rk.is-champ .st{display:none}
+  .rank.compact .rk.is-champ .nm{font-size:clamp(20px,3.4vh,26px)}
+  .rank.compact .rk.is-champ .pt{font-size:clamp(24px,4vh,32px)}
+
+  .rk.is-champ.charging{background:transparent; box-shadow:none}
+  .rk.is-champ.charging::before{display:none}
+
+  @keyframes ringPulse{0%{opacity:.85; transform:scale(1)} 70%,100%{opacity:0; transform:scale(1.3)}}
+  @keyframes qBreathe{0%,100%{opacity:.4; transform:scale(.92)} 50%{opacity:.95; transform:scale(1.08)}}
+  @keyframes shiver{
+    0%{transform:translate(0,0) rotate(0)}
+    20%{transform:translate(calc(-2px * var(--amp)),calc(1px * var(--amp))) rotate(-.5deg)}
+    40%{transform:translate(calc(2px * var(--amp)),calc(-1px * var(--amp))) rotate(.5deg)}
+    60%{transform:translate(calc(-1px * var(--amp)),calc(-2px * var(--amp))) rotate(-.4deg)}
+    80%{transform:translate(calc(1px * var(--amp)),calc(2px * var(--amp))) rotate(.4deg)}
+    100%{transform:translate(0,0) rotate(0)}
+  }
+
+  .rules{display:flex; flex-direction:column; gap:2px; margin-top:8px}
+  .key-edit{height:44px; padding:0 16px; border:0; border-radius:var(--r-md); background:var(--fill);
+    color:var(--ink); font:inherit; font-size:14px; font-weight:600; cursor:pointer}
+  .key-edit:active{background:var(--fill-2)}
+  .key-rows{display:flex; flex-direction:column; gap:8px}
+  .key-row{display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px;
+    padding:9px 12px; border-radius:var(--r-md); background:var(--surface-2)}
+  .key-row b{font-size:15px; font-weight:600}
+  .key-chip{min-width:92px; height:44px; padding:0 12px; border:0; border-radius:10px; font:inherit;
+    font-family:var(--font-mono); font-size:15px; font-weight:600; color:var(--ink); cursor:pointer;
+    background:var(--surface); box-shadow:inset 0 0 0 1px var(--sep)}
+  .key-chip.listening{color:var(--blue); box-shadow:inset 0 0 0 2px var(--blue)}
+  .rule{display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:16px;
+    padding:14px 4px; border-bottom:var(--hair) solid var(--sep)}
+  .rule:last-child{border-bottom:0}
+  .rule.off{opacity:.38}
+  .rule.sub{position:relative; padding:0 4px 14px 22px; border-bottom:0}
+  .rule.sub::before{content:""; position:absolute; left:6px; top:1px; bottom:15px; width:2px;
+    border-radius:1px; background:var(--fill-2)}
+  .rule.sub .rule-txt b{font-size:15px; font-weight:500; color:var(--ink-2)}
+  .rule.sub .rule-txt span{display:none}
+  .rule-txt b{display:block; font-size:17px; font-weight:600}
+  .rule-txt span{display:block; font-size:14px; color:var(--ink-2); margin-top:2px}
+  .switch{position:relative; width:42px; height:24px; min-height:0; padding:0; border-radius:var(--pill);
+    border:0; background:var(--fill-2); cursor:pointer; transition:background-color .22s var(--ease)}
+  .switch::before{content:""; position:absolute; inset:-10px -6px; border-radius:var(--pill)}
+  .switch i{position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
+    background:var(--surface); box-shadow:0 1px 2px var(--vs-shadow);
+    transition:transform .22s var(--ease)}
+  .switch[aria-checked="true"]{background:var(--blue)}
+  .switch[aria-checked="true"] i{transform:translateX(18px)}
+  .switch:disabled{cursor:default}
+
+  .result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;
+    opacity:0; pointer-events:none; transition:opacity .45s var(--ease)}
+  .result-actions.on{opacity:1; pointer-events:auto}
+  .result-actions .btn-big{flex:1 1 100%; max-width:none; min-height:52px; padding:0 22px; font-size:17px}
+
+  @keyframes fall{from{transform:translate3d(0,0,0) rotate(0)}
+    to{transform:translate3d(var(--dx,0px),108vh,0) rotate(var(--rot,540deg))}}
+  @keyframes champGlow{0%,100%{opacity:.5; transform:scale(.97)} 50%{opacity:1; transform:scale(1.04)}}
+  @keyframes sway{0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)}}
+

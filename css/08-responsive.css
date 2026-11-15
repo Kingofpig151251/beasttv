@@ -1,0 +1,243 @@
+/* ---------- toast ---------- */
+  .toast{position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); z-index:90;
+    transform:translate(-50%,10px); opacity:0; pointer-events:none;
+    background:var(--toast-bg);
+    color:var(--toast-ink); font-size:15px; padding:12px 18px; border-radius:var(--pill);
+    transition:opacity var(--dur), transform var(--dur)}
+  .toast.on{opacity:1; transform:translate(-50%,0)}
+
+  /* ---------- iPad / 分段 ---------- */
+  @media (max-height:900px){
+    #v-home .top{margin-bottom:16px}
+    h1{font-size:30px}
+  }
+  @media (max-width:700px){
+    .result-actions .btn-big{flex:1 1 100%}
+  }
+  /* 極矮（手機橫向）：規則只留標題，四行一次過睇得完 */
+  @media (max-height:420px){
+    .rank{display:grid; grid-template-columns:1fr 1fr; gap:2px 10px}
+    .rk .st{display:none}
+    .rk.is-champ .rk-tile{width:34px; height:34px}
+    .rk.is-champ .rk-tile .rk-mark{font-size:20px}
+    #v-result h1{font-size:20px}
+    .res-head{margin-bottom:0}
+    #v-result .result-actions .btn-big{min-height:38px; padding:8px 14px; font-size:14px}
+    .sstep .sstep-hint:nth-of-type(3){display:none}
+    .bignum input{font-size:clamp(38px,10vh,60px)}
+    .bignum{gap:10px}
+    .sstep-hint{font-size:12px; margin-top:2px}
+    .chips{gap:6px}
+    .chips button{min-height:26px; padding:0 9px; font-size:12px}
+    .namegrid{grid-template-columns:1fr 1fr; gap:6px 14px}
+    .name-row{grid-template-columns:30px minmax(0,1fr); gap:6px}
+    .animal-btn{width:30px; height:30px; aspect-ratio:1}
+    .animal-mark{font-size:16px}
+    .animal-edit{display:none}
+    .name-row input{min-height:24px; padding:1px 5px; font-size:12px}
+    .sstep{gap:8px}
+    .sstep-title{font-size:22px}
+    .rules{display:grid; grid-template-columns:1fr 1fr; gap:0 16px; margin-top:0}
+    .rule{padding:7px 4px; border-bottom:0}
+    .rule.sub{padding:7px 4px}
+    .rule.sub::before{display:none}
+    .rule.sub .rule-txt b{font-size:15px; color:var(--ink)}
+    .rule-txt b{font-size:15px}
+    .rule-txt span{display:none}
+  }
+  /* 窄機（手機直向）：隊名改兩欄，8 隊一屏睇完，唔需要滾 */
+  @media (max-width:460px){
+    .namegrid{grid-template-columns:1fr 1fr; gap:12px 14px}
+    .name-row{grid-template-columns:44px minmax(0,1fr); gap:8px}
+    .animal-btn{width:44px; height:44px}
+    .animal-mark{font-size:22px}
+    .animal-edit{width:18px; height:18px; padding:3px; right:-1px; bottom:-1px}
+    .name-row input{min-height:48px; padding:10px 12px; font-size:16px}
+    .key-edit{height:44px}
+    .key-chip{height:44px}
+    .switch{width:46px; height:28px}
+    .switch::before{inset:-8px -6px}
+    .switch i{width:24px; height:24px}
+    .switch[aria-checked="true"] i{transform:translateX(18px)}
+    .sstep-title{font-size:clamp(26px,7.4vw,32px)}
+  }
+
+  /* 窄機：結果頁壓縮，8 隊一屏 */
+  @media (max-width:520px){
+    #v-result h1{font-size:clamp(24px,3.6vh,30px)}
+    .rank{gap:1px}
+    .rk{padding:6px 10px; border-radius:12px}
+    .rk-tile{width:34px; height:34px; border-radius:9px}
+    .rk-tile .rk-mark{font-size:18px}
+    .res-hero .big, .res-hero .num{font-size:clamp(28px,5.4vh,40px)}
+    .rk.is-champ{padding:8px 12px}
+    .rk.is-champ .rk-tile{width:40px; height:40px}
+    .rk.is-champ .rk-tile .rk-mark{font-size:24px}
+    .rk .st{display:none}
+    #v-result .result-actions{gap:6px}
+    #v-result .result-actions .btn-big{min-height:44px; padding:10px 16px; font-size:16px}
+    .res-head{margin-bottom:4px}
+  }
+
+  /* 英文排版：長句一律單行，必要時收細一級字階 */
+  /* 英文品牌：字比中文窄，主標略收一級；副標維持正常字階但唔換行 */
+  html[lang="en"] .landing-title{font-size:clamp(44px, min(16vw, 16vh), 150px); letter-spacing:-.045em; white-space:nowrap}
+  html[lang="en"] .landing-title[data-len="mid"]{font-size:clamp(40px, 12vw, 112px)}
+  html[lang="en"] .landing-title[data-len="long"]{font-size:clamp(28px, 8vw, 76px)}
+  html[lang="en"] .landing-sub{font-size:clamp(17px, 2.5vh, 22px); white-space:nowrap}
+  @media (max-width:360px){ html[lang="en"] .landing-sub{font-size:17px} }
+  html[lang="en"] .sstep-title{font-size:clamp(22px,5.4vw,34px); white-space:nowrap}
+  html[lang="en"] .rule-txt span{white-space:nowrap; font-size:12.5px}
+  .flash-hud .key{white-space:nowrap}
+  @media (max-width:430px){
+    .flash-hud{grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px}
+    .flash-hud .key{width:100%; min-width:0; font-size:15px; gap:6px}
+    .top-right{gap:8px}
+    .undo-btn{min-width:0; padding:0 10px; font-size:12px; gap:4px}
+    .undo-btn .glyph{font-size:13px}
+    .flash-hud .key::before, .flash-hud .key::after{min-width:22px; padding:0 5px; font-size:13px}
+  }
+  html[lang="en"] .flash-hud .key{font-size:clamp(15px,2vh,18px); gap:8px}
+  html[lang="en"] .flash-hud .key::before,
+  html[lang="en"] .flash-hud .key::after{min-width:24px; padding:0 6px; font-size:14px}
+
+  /* 矮螢幕（手機橫向、分割視窗）：壓縮首頁，避免內容被切 */
+  @media (max-height:420px){
+    body{padding:0}
+    .wrap{padding:8px 16px 10px}
+    .landing-title{font-size:clamp(40px, 13vh, 84px); margin-top:0; min-height:calc(min(13vh, 84px) * .98)}
+    html[lang="en"] .landing-title{font-size:clamp(30px, 9vh, 62px); min-height:calc(min(13vh, 84px) * .98)}
+    html[lang="en"] .landing-sub{font-size:clamp(13px, 3.4vh, 16px)}
+    html[lang="en"] .sstep-title{font-size:18px}
+  .landing-sub{margin-top:6px; font-size:14px}
+    .landing-go{margin-top:14px; min-height:48px; width:248px; max-width:100%; font-size:17px}
+    .landing-link{min-width:132px; justify-content:center; margin-top:10px; min-height:40px; padding:0 20px; font-size:15px}
+    .home-tools{margin-top:12px; gap:8px}
+    .home-tools .landing-link{width:120px; min-width:120px; min-height:40px; font-size:15px; margin-top:0; padding:0}
+    .landing-foot{padding-bottom:0}
+  }
+  /* 手機橫向／矮視窗：設定頁壓縮，唔會壓住圓點同「繼續」 */
+  @media (max-height:560px){
+    .sstep{gap:12px}
+    .sstep-title{font-size:clamp(24px,5.4vh,34px)}
+    .bignum{gap:clamp(12px,2.4vw,24px)}
+    .bignum input{font-size:clamp(52px,13vh,110px)}
+    .bignum-unit{font-size:clamp(18px,3vh,26px)}
+    .chips{gap:8px}
+    .chips button{min-height:44px; padding:0 18px; font-size:15px}
+    .namegrid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px 12px}
+    .name-row{grid-template-columns:44px minmax(0,1fr); gap:10px}
+    .animal-btn{width:44px; height:44px}
+    .animal-mark{font-size:22px}
+    .rules{margin-top:2px}
+    .rule{padding:8px 4px; gap:12px}
+    .rule-txt b{font-size:15px}
+    .rule-txt span{font-size:12px; margin-top:1px}
+    .setup-foot{padding:8px 0 6px; gap:8px}
+    .setup-foot .btn-primary{min-height:48px; min-width:200px; font-size:17px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important;
+      transition-duration:.001ms !important}
+    /* F-17：減少動態下浮字不要瞬間跳末幀消失，改靜態顯示、1.2s 後移除（app.js 仍按 REDUCE 縮短 setTimeout） */
+    .fx-score{animation:none; opacity:1; transform:translateX(-50%); font-size:clamp(56px,10vh,104px)}
+  }
+
+  /* 手機：任何步驟都唔需要滾動（放最後，蓋過上面所有媒體查詢） */
+  @media (max-width:520px){
+    .rk, .rk.is-champ, .rank.compact .rk.is-champ{padding:4px 9px; border-radius:11px}
+    .rank.compact .rk.is-champ .rk-tile{width:30px; height:30px}
+    .rank.compact .rk.is-champ .nm{font-size:17px}
+    .rank.compact .rk.is-champ .pt{font-size:18px}
+    .rk.is-champ{margin:6px 0 3px}
+    .rank.compact .rk.is-champ .rk-tile .rk-mark{font-size:16px}
+    .rk-tile, .rk.is-champ .rk-tile{width:30px; height:30px; border-radius:8px}
+    .rk-tile .rk-mark, .rk.is-champ .rk-tile .rk-mark{font-size:16px}
+    .rk .st{display:none}
+    #v-result .result-actions .btn-big{min-height:42px; padding:8px 14px; font-size:15px}
+    .res-head{margin-bottom:2px}
+    .rule{padding:10px 4px}
+  }
+  @media (max-height:420px){
+    .namegrid{grid-template-columns:1fr 1fr; gap:4px 10px}
+    .name-row{grid-template-columns:26px minmax(0,1fr); gap:5px}
+    .animal-btn{width:26px; height:26px; aspect-ratio:1}
+    .animal-mark{font-size:14px}
+    .name-row input{min-height:22px; padding:1px 5px; font-size:12px}
+    .key-edit{height:44px}
+    .key-chip{height:44px}
+    .switch{width:46px; height:28px}
+    .switch::before{inset:-8px -6px}
+    .switch i{width:24px; height:24px}
+    .switch[aria-checked="true"] i{transform:translateX(18px)}
+    .rank{display:grid; grid-template-columns:1fr 1fr; gap:2px 8px}
+    .rk, .rk.is-champ, .rank.compact .rk.is-champ{padding:3px 7px}
+    .rank.compact .rk.is-champ .rk-tile{width:24px; height:24px}
+    .rank.compact .rk.is-champ .nm{font-size:14px}
+    .rank.compact .rk.is-champ .pt{font-size:15px}
+    .rk.is-champ{margin:3px 0 2px}
+    .rk-tile, .rk.is-champ .rk-tile{width:24px; height:24px}
+    .rk-tile .rk-mark, .rk.is-champ .rk-tile .rk-mark{font-size:13px}
+    .rk .st{display:none}
+    #v-result h1{font-size:18px}
+    .res-head{margin-bottom:0}
+    #v-result .result-actions .btn-big{min-height:34px; padding:6px 12px; font-size:13px}
+    .chips button{min-height:26px}
+  }
+
+  /* 手機橫屏（瀏覽器 chrome 佔位後只剩 ~300px 高）：極簡壓縮，一屏完成 */
+  @media (max-height:340px){
+    body{padding:0}
+    .wrap{padding:4px 12px 6px; gap:0}
+    .setup-top{grid-template-columns:36px 1fr 36px; gap:8px}
+    .dots i{width:5px; height:5px}
+    .dots i.cur{width:8px; height:8px}
+    .stage{margin:2px 0}
+    .sstep{gap:6px}
+    .sstep-title{font-size:18px}
+    .bignum{gap:14px}
+    .bignum input{font-size:clamp(34px,9vh,48px)}
+    .bignum-unit{font-size:16px}
+    .round-btn{width:38px; height:38px; font-size:22px}
+    .sstep-hint{font-size:11px; margin:0}
+    .chips{gap:6px}
+    .chips button{min-height:26px; padding:0 9px; font-size:12px}
+    .namegrid{gap:4px}
+    .name-row{grid-template-columns:24px minmax(0,1fr); gap:4px}
+    .animal-btn{width:24px; height:24px}
+    .animal-mark{font-size:13px}
+    .name-row input{min-height:22px; padding:1px 5px; font-size:12px}
+    .rules{gap:0 10px}
+    .rule{padding:3px 2px}
+    .rule-txt b{font-size:13px}
+    .round-btn.sm{width:22px; height:22px; font-size:12px}
+    .mini-step.tight input{font-size:13px}
+    .sc-val{font-size:13px; min-width:2ch}
+    .setup-foot{padding:4px 0 0}
+    #btnNext{min-height:38px; padding:0 20px; font-size:15px}
+  }
+
+  /* 準備畫面：矮屏／8 隊都要見到「準備好」 */
+  @media (max-height:560px){
+    .readyCard{padding:6px 10px}
+    .readyRound{font-size:12px}
+    .readyMark{font-size:clamp(34px,7vh,56px); margin-bottom:2px}
+    .readyTeam{font-size:clamp(26px,6.4vh,46px); margin:6px 0 10px}
+    .readyScores{margin-top:8px; gap:8px}
+    .readyScores .score-tile{padding:6px 8px; gap:1px}
+    .readyScores .pill-mark{width:16px; height:16px; font-size:16px}
+    .readyScores .score-name{font-size:11px}
+    .readyScores b{font-size:14px}
+    .readyCard button{margin-top:10px; min-height:44px; padding:0 30px; font-size:17px}
+  }
+
+  /* 極矮（橫屏手機 + 瀏覽器工具列）：準備畫面再收一級 */
+  @media (max-height:340px){
+    .readyMark{display:none}
+    .readyTeam{font-size:clamp(22px,5.6vh,34px); margin:4px 0 6px}
+    .readyScores{margin-top:6px; gap:6px}
+    .readyScores .score-tile{padding:4px 6px}
+    .readyScores .pill-mark{width:14px; height:14px; font-size:14px}
+    .readyScores b{font-size:13px}
+    .readyCard button{margin-top:6px; min-height:38px; font-size:15px}
+  }
