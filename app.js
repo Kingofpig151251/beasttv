@@ -16,6 +16,8 @@ import { getLang, setLang as setI18nLang, isEn, T, translateTree } from "./src/i
 import { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted } from "./src/sfx.js";
 import { KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf } from "./src/keys.js";
 import { KEYS as STORAGE_KEYS, readJson, writeJson, getToken, clearToken, getBrand, setBrand, addReport } from "./src/storage.js";
+import { wakeOn, wakeOff, installWakeVisibility } from "./src/audio-ui.js";
+import { diagPush, getDiag, getDiagLog } from "./src/diag.js";
 
 /* 語言狀態與字典由 ./src/i18n.js 提供；app.js 只保留切語言時的畫面編排。 */
 function setLang(next){
@@ -474,22 +476,8 @@ function launchGame(){
 
 /* ================= 題庫管理（離線用） ================= */
 /* ================= 遊戲流程 ================= */
-let WAKE = null;
-async function wakeOn(){
-  if(!("wakeLock" in navigator)) return;
-  try{
-    WAKE = await navigator.wakeLock.request("screen");
-    WAKE.addEventListener("release", ()=>{ WAKE = null; });
-  }catch(e){ /* 省電模式／低電量會拒絕，靜默降級 */ }
-}
-function wakeOff(){
-  if(!WAKE) return;
-  try{ WAKE.release(); }catch(e){}
-  WAKE = null;
-}
-document.addEventListener("visibilitychange", ()=>{
-  if(document.visibilityState === "visible" && G && (G.phase === "running" || G.phase === "ready" || G.phase === "countdown")) wakeOn();
-});
+/* 螢幕常亮由 ./src/audio-ui.js 提供（wakeOn / wakeOff / installWakeVisibility） */
+installWakeVisibility(() => (typeof G !== "undefined" ? G : null));
 
 function startGame(){
   wakeOn();
@@ -804,7 +792,11 @@ function renderPlay(){
   void el.offsetWidth;
   el.style.animation = "";
   fitWord(it.t);
-  diagPush(it.t, el);
+  diagPush(it.t, el, {
+    team: G ? ((curTeam() || {}).name || "") : "",
+    turn: G ? G.turn : -1,
+    phase: G ? G.phase : ""
+  });
 
   renderTimer();
 }
@@ -831,23 +823,7 @@ function act(name){
   return true;
 }
 
-/* 診斷環形緩衝：每次出題記一筆，回報時一齊送出（連前幾題，唔怕漏咗先撳） */
-const DIAG = [];
-function diagPush(text, el){
-  try{
-    const card = el.parentElement, cs = getComputedStyle(el);
-    DIAG.push({
-      t: String(text).slice(0, 40), len: String(text).length,
-      at: new Date().toISOString(),
-      fs: cs.fontSize, op: cs.opacity, vis: cs.visibility,
-      sw: el.scrollWidth, sh: el.scrollHeight,
-      cw: card.clientWidth, ch: card.clientHeight,
-      mw: el.style.maxWidth || "", team: G ? (curTeam() || {}).name : "",
-      turn: G ? G.turn : -1, phase: G ? G.phase : ""
-    });
-    if(DIAG.length > 24) DIAG.shift();
-  }catch(e){}
-}
+/* 診斷環形緩衝由 ./src/diag.js 提供（diagPush / getDiag / getDiagLog） */
 
 function saveReportLocal(p){ addReport(p); }   // 由 ./src/storage.js 提供
 
@@ -862,7 +838,7 @@ async function reportProblem(kind){
            allowSkip: cfg.allowSkip, skipPenalty: cfg.skipPenalty, foulPenalty: cfg.foulPenalty },
     state: G ? { phase: G.phase, turn: G.turn, cur: G.cur && G.cur.t, judged: G.judged,
                  left: G.sec, paused: G.paused } : null,
-    log: DIAG.slice(-24)
+    log: getDiagLog(24)
   };
   saveReportLocal(p);
   try{
@@ -1658,5 +1634,5 @@ renderHome();
 boot();
 window.__bigtv = { get G(){return G}, get lines(){return lines}, get cfg(){return cfg},
   startGame, startRound, enterReady, judge, undoJudge, settleAdjust, endTurn, endGame,
-  reportProblem, get diag(){return DIAG},
+  reportProblem, get diag(){return getDiag()},
   renderHome, renderPlay, showView };

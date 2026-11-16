@@ -3,22 +3,24 @@
 > 這份文件記錄重寫的現況、執行指令、紅線與待辦。每次繼續工作前先讀這份。
 > 定時任務已於 2026-11-16 停用，改由團隊目標（group_goal）並行推進。
 
-## 目前狀態（2026-11-16 更新）
+## 目前狀態（2026-11-16 更新，最乾淨版）
 
 - 工作目錄：`C:\Users\KingLEUNGTungLam\DS Bot\beasttv`
 - 分支：`rewrite/modular`（**不要動 main**，main 與線上服務要保持可用）
-- 最新 commit：`23fe2d5 refactor(app): 接線 storage.js 模組`
-- 測試：**364 個全過**（`node --test "tests/*.test.js"`）
+- 最新 commit：`23fe2d5 refactor(app): 接線 storage.js 模組`（本輪進一步抽出 `audio-ui` / `diag` 與新增測試後，工作區尚有未提交變更）
+- 測試：**373 個全過**（`node --test "tests/*.test.js"`）
 - `static_check.py`：PASS（3 項）
-- Vite build：EXIT=0，**15 modules transformed**（產出 `main-*.js` / `app-*.js` / `styles-*.css`，sw.js SHELL 自動改寫）
-- 真實瀏覽器雙版本驗證：**dist 11 項 + raw 11 項 = 22 項全 PASS**（無 JS 例外、可進 COUNTDOWN/PLAYING、判定生效、隱藏分頁暫停 phase 正確、無重複載入 JS）
+- Vite build：EXIT=0，**17 modules transformed**（產出 `main-*.js` / `app-*.js` / `styles-*.css`，sw.js SHELL 自動改寫）
+- 真實瀏覽器雙版本驗證：先前已做 **dist 11 項 + raw 11 項 = 22 項全 PASS**（本輪純模組抽取後已再跑全套測試、static check、build 驗證）
 
-### 已完成：7 個 `src/` 模組全部接線（尚未上線）
+### 已完成：9 個 `src/` 模組全部接線（尚未上線）
 
 `app.js` 已改成 ES module，`index.html` 已 `type="module"`。以下模組已真正 import 進 `app.js`，並由 `tests/helpers/load-app.js` 的 `IMPORT_BINDINGS` 注入沙箱測試：
 - `src/format.js`、`src/state.js`、`src/dom.js`、`src/sfx.js`、`src/i18n.js`、`src/keys.js`、`src/storage.js`
+- `src/audio-ui.js`（wakeOn / wakeOff / installWakeVisibility，螢幕常亮）
+- `src/diag.js`（diagPush / getDiag / getDiagLog，診斷環形緩衝）
 
-接線提交：`d0b591f`（state+sfx）→ `e44744e`（i18n）→ `05c1e5e`（format）→ `876011c`（keys）→ `23fe2d5`（storage）。
+接線提交：`d0b591f`（state+sfx）→ `e44744e`（i18n）→ `05c1e5e`（format）→ `876011c`（keys）→ `23fe2d5`（storage）；本輪再補上 `audio-ui` / `diag` 接線與測試（未提交）。
 
 ### 已完成：Vite build 設定（尚未上線）
 
@@ -30,7 +32,7 @@
 
 ## 已完成的成果
 
-### src/ 模組（7 個，全部已接線）
+### src/ 模組（9 個，全部已接線）
 
 | 檔案 | 內容 | 測試數（約） |
 |---|---|---|
@@ -41,8 +43,10 @@
 | `src/format.js` | esc / fmtScore / statLine | 32 |
 | `src/keys.js` | KEY_DEF / loadKeys / keyLabel / codeOf 等 | 45 |
 | `src/storage.js` | 五個 localStorage 鍵讀寫封裝 | 42 |
+| `src/audio-ui.js` | 螢幕常亮（Wake Lock） | 5 |
+| `src/diag.js` | 診斷環形緩衝（diagPush / getDiag / getDiagLog） | 4 |
 
-後三個由團隊目標並行抽出並經交叉驗證後提交（`f0047cd`）。三名驗證者做了突變測試。
+`format` / `keys` / `storage` 由團隊目標並行抽出並經交叉驗證後提交（`f0047cd`）。`audio-ui` / `diag` 為本輪補齊的獨立子圖抽取。
 
 ### 兩處行為分歧（已收尾，重要）
 
@@ -84,7 +88,7 @@
 - 判定路徑全部收斂到 `G.canJudge()` / `G.canUndo()`
 - F-01（暫停時仍可判定）、F-02（倒數偷跑）已從結構上修好
 
-### 測試總覽（364）
+### 測試總覽（373）
 
 | 測試檔 | 數量 |
 |---|---|
@@ -101,7 +105,9 @@
 | `format.test.js` | 32 |
 | `keys.test.js` | 45 |
 | `storage.test.js` | 42 |
-| **合計** | **364** |
+| `audio-ui.test.js` | 5 |
+| `diag.test.js` | 4 |
+| **合計** | **373** |
 
 CI 已用 glob（`node --test "tests/*.test.js"`），新增測試檔自動納入。
 
@@ -172,21 +178,21 @@ Set-Location $d
 ## 待辦（按優先序）
 
 ### 1. ~~把 `src/` 模組真正接進 app.js~~（已完成）
-7 個模組（format/state/dom/sfx/i18n/keys/storage）已全部 import 進 app.js，並通過 364 測試、static check、vite build（15 modules）與 22 項雙版本瀏覽器驗證。
+9 個模組（format/state/dom/sfx/i18n/keys/storage/audio-ui/diag）已全部 import 進 app.js，並通過 373 測試、static check、vite build（17 modules）。
 
-### 2. 上線決策（下一個大關卡）
+### 2. ~~其餘可獨立抽出的部分~~（已完成）
+- `src/audio-ui.js`：wakeOn / wakeOff / installWakeVisibility（螢幕常亮）
+- `src/diag.js`：diagPush / getDiag / getDiagLog（診斷環形緩衝）
+
+### 3. 上線決策（下一個大關卡）
 Vite build 已完整驗證可行，但 `vercel.json` 未動、未部署。
 要上線需：
 - `vercel.json` 加三行（buildCommand / outputDirectory / installCommand）
-- push 後確認 Vercel 部署成功、線上是新版
+- 合回 `main` 並 push 後確認 Vercel 部署成功、線上是新版
 - 這會動到正式站，**要用戶明確同意才做**
 
-### 3. 其餘可獨立抽出的部分
-- `src/audio-ui.js`：wakeOn / wakeOff（螢幕常亮，與音效不同職責）
-- `src/diag.js`：DIAG 環形緩衝與 diagPush
-
-### 3. 最終合併
-全部完成且用戶同意後，才把 `rewrite/modular` 合回 main 並部署。
+### 4. 最終合併
+上線驗證通過後，確認 `rewrite/modular` 已合回/同步到 `main`，整理並收尾。
 
 ## 工作守則
 

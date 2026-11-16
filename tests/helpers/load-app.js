@@ -39,6 +39,8 @@ import {
 import {
   KEYS as STORAGE_KEYS, readJson, writeJson, getToken, clearToken, getBrand, setBrand, addReport,
 } from "../../src/storage.js";
+import { wakeOn, wakeOff, installWakeVisibility } from "../../src/audio-ui.js";
+import { diagPush, getDiag, getDiagLog } from "../../src/diag.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const ROOT = resolve(HERE, "..", "..");
@@ -67,6 +69,8 @@ const IMPORT_BINDINGS = Object.freeze({
   "./src/i18n.js": { getLang, setLang: setI18nLang, isEn, T, translateTree },
   "./src/keys.js": { KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf },
   "./src/storage.js": { KEYS: STORAGE_KEYS, readJson, writeJson, getToken, clearToken, getBrand, setBrand, addReport },
+  "./src/audio-ui.js": { wakeOn, wakeOff, installWakeVisibility },
+  "./src/diag.js": { diagPush, getDiag, getDiagLog },
 });
 
 /** 取出 app.js 源碼（含 import），供需要自行解析的測試使用 */
