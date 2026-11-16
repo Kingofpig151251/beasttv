@@ -36,6 +36,9 @@ import {
 import {
   KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf,
 } from "../../src/keys.js";
+import {
+  KEYS as STORAGE_KEYS, readJson, writeJson, getToken, clearToken, getBrand, setBrand, addReport,
+} from "../../src/storage.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const ROOT = resolve(HERE, "..", "..");
@@ -63,6 +66,7 @@ const IMPORT_BINDINGS = Object.freeze({
   "./src/sfx.js": { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted },
   "./src/i18n.js": { getLang, setLang: setI18nLang, isEn, T, translateTree },
   "./src/keys.js": { KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf },
+  "./src/storage.js": { KEYS: STORAGE_KEYS, readJson, writeJson, getToken, clearToken, getBrand, setBrand, addReport },
 });
 
 /** 取出 app.js 源碼（含 import），供需要自行解析的測試使用 */

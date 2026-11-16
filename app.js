@@ -15,6 +15,7 @@ import { $, $$ } from "./src/dom.js";
 import { getLang, setLang as setI18nLang, isEn, T, translateTree } from "./src/i18n.js";
 import { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted } from "./src/sfx.js";
 import { KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf } from "./src/keys.js";
+import { KEYS as STORAGE_KEYS, readJson, writeJson, getToken, clearToken, getBrand, setBrand, addReport } from "./src/storage.js";
 
 /* 語言狀態與字典由 ./src/i18n.js 提供；app.js 只保留切語言時的畫面編排。 */
 function setLang(next){
@@ -40,10 +41,8 @@ if(btnLang) btnLang.addEventListener("click", ()=>{
 
 /* ================= 狀態 ================= */
 const K_CFG="beaststage.cfg.v3", K_CFG_OLD=["baishoutai.cfg.v3","bigtv.cfg.v3"];   // 題目不存本機，只存雲端
-const store = {
-  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
-  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
-};
+/* store 由 ./src/storage.js 提供（readJson / writeJson），保留介面給現有呼叫點 */
+const store = { get: readJson, set: writeJson };
 
 let lines = [];                                  // 題目：一行一題
 /* 8 個動物 SVG（單色，跟 currentColor；唔靠 emoji 字型） */
@@ -118,7 +117,7 @@ let REMOTE = { ok:false };
 /* 題目一律以 {t:"..."} 存；舊格式（字串 / {t,ban}）都食得住 */
 /* 題庫 slug：/b/<slug> 或 ?b=<slug>，默認 default */
 /* 帳號：登入後每個人都係自己一份題庫；/b/<slug> 只係「玩某人嘅題庫」嘅公開連結 */
-const TOKEN = ()=> localStorage.getItem("beasttv.token") || "";
+const TOKEN = ()=> getToken();   // 由 ./src/storage.js 提供
 const URL_BANK = (()=>{
   const m = location.pathname.match(/^\/b\/([a-z0-9][a-z0-9-]{1,31})\/?$/i);
   const q = new URLSearchParams(location.search).get("b");
@@ -162,12 +161,12 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.rand
 /* ================= 品牌（可由 /edit 自訂） ================= */
 const BRAND_DEF = { title: "百獸台", sub: "派對猜詞主持台" };   // 預設品牌（按語言翻譯）
 let BRAND_RAW = { t: "", s: "" };                                // 伺服器／自訂品牌，空＝用預設
-const BRAND_KEY = "beastbrand.v1";
+const BRAND_KEY = STORAGE_KEYS.BRAND;
 
 /* 開頁即用上次的品牌（冇快取就暫時收埋標題，避免先閃「百獸台」再變） */
 (function(){
   let c = null;
-  try{ c = JSON.parse(localStorage.getItem(BRAND_KEY) || "null"); }catch(e){}
+  c = getBrand();
   if(c && c.t){ applyBrand(c.t, c.s, false); }
   else{ document.documentElement.classList.add("brand-pending"); }
   setTimeout(()=>document.documentElement.classList.remove("brand-pending"), 1400);
@@ -191,7 +190,7 @@ function applyBrand(title, sub, save){
                                 : (n > 8 ? "long" : n > 5 ? "mid" : "");
   document.title = s ? `${t} · ${s}` : t;
   document.documentElement.classList.remove("brand-pending");
-  if(save){ try{ localStorage.setItem(BRAND_KEY, JSON.stringify(BRAND_RAW)); }catch(e){} }
+  if(save){ setBrand(BRAND_RAW); }
 }
 
 /* ================= 後端 ================= */
@@ -850,12 +849,7 @@ function diagPush(text, el){
   }catch(e){}
 }
 
-function saveReportLocal(p){
-  try{
-    const k = "beasttv.reports", arr = JSON.parse(localStorage.getItem(k) || "[]");
-    arr.push(p); localStorage.setItem(k, JSON.stringify(arr.slice(-10)));
-  }catch(e){}
-}
+function saveReportLocal(p){ addReport(p); }   // 由 ./src/storage.js 提供
 
 async function reportProblem(kind){
   const p = {
@@ -1626,7 +1620,7 @@ function renderIdentity(){
     btn.type = "button"; btn.textContent = T("登出");
     btn.onclick = async ()=>{
       try{ await fetch("/api/logout", { method:"POST", headers:{ authorization:"Bearer " + TOKEN() } }); }catch(_){}
-      localStorage.removeItem("beasttv.token");
+      clearToken();
       location.href = "/";
     };
     el.append(btn);
@@ -1649,7 +1643,7 @@ async function boot(){
         ME = d;
         if(d.bank && d.bank.slug) BANK = d.bank.slug;
       }else{
-        localStorage.removeItem("beasttv.token");   // 過期／失效
+        clearToken();   // 過期／失效
       }
     }catch(_){}
   }
