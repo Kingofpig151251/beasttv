@@ -14,6 +14,7 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { GameStateMachine, State } from "../src/state.js";
 
+import { runnableAppCode, injectedGlobals } from "./helpers/load-app.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const APP_JS = resolve(HERE, "..", "app.js");
 const noop = () => {};
@@ -111,9 +112,10 @@ before(() => {
     JSON,
   };
   sb.globalThis = sb;
+  Object.assign(sb, injectedGlobals());
   ctx = vm.createContext(sb);
   try {
-    new vm.Script(readFileSync(APP_JS, "utf8")).runInContext(ctx, { timeout: 10000 });
+    new vm.Script(runnableAppCode()).runInContext(ctx, { timeout: 10000 });
   } catch (e) {
     if (!/is not (defined|a function)|Cannot read/.test(String(e.message))) throw e;
   }

@@ -1,5 +1,16 @@
 "use strict";
 
+/* ================= 模組引入 =================
+ * app.js 原本是 classic script，所有函式都擠在同一個檔案。
+ * 現在逐步改成 module：把已抽出、並經「與原版逐項比對」測試驗證過的
+ * 純函式，改由 src/ 提供。
+ *
+ * 注意（重要）：一旦加上 import，index.html 的 script 標籤必須改成
+ * type="module"，且必須經過 Vite 打包（見 vite.config.js）。
+ * 這一步只在 rewrite/modular 分支做，尚未上線。
+ */
+import { esc, fmtScore, statLine } from "./src/format.js";
+
 /* ================= 遊戲狀態機 =================
  * 舊版把「階段」(G.phase) 與「暫停」(G.paused) 當成兩個獨立變數，
  * 兩者正交組合出多種狀態，每個守門函式都要自己記得同時檢查兩者，
@@ -344,7 +355,7 @@ let REMOTE = { ok:false };
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 
-function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+/* esc 由 ./src/format.js 提供（已與原版逐項比對） */
 
 /* 題目一律以 {t:"..."} 存；舊格式（字串 / {t,ban}）都食得住 */
 /* 題庫 slug：/b/<slug> 或 ?b=<slug>，默認 default */
@@ -1116,16 +1127,9 @@ function renderPlay(){
   renderTimer();
 }
 
-function fmtScore(v){ return (v < 0 ? "−" : "+") + Math.abs(v); }
-
-/* 統計文字：對 N · 跳過 M · 犯規 K（跳過關閉時不顯示） */
-function statLine(t, bold){
-  const b = v => bold ? `<b>${v}</b>` : `${v}`;
-  const parts = [LANG === "en" ? `${b(t.ok || 0)} correct` : `答中 ${b(t.ok || 0)}`];
-  if(t.foul) parts.push(LANG === "en" ? `${b(t.foul)} foul` : `犯規 ${b(t.foul)}`);                       // 有犯規才提，解釋扣分
-  if(G && G.skipPenalty && t.skip) parts.push(LANG === "en" ? `${b(t.skip)} skipped` : `跳過 ${b(t.skip)}`);  // 跳過扣分時才提
-  return parts.join(" · ");
-}
+/* fmtScore / statLine 由 ./src/format.js 提供。
+   原本 statLine 讀全域 LANG 與 G.skipPenalty，模組版改成可注入參數，
+   所以呼叫點必須明確帶上 lang 與 skipPenalty，行為才與原版一致。 */
 
 /* 動作層：所有輸入來源（鍵盤／觸控／將來陀螺儀）都經 act() 入 judge() */
 const ACTIONS = {
@@ -1437,7 +1441,7 @@ function endGame(){
           <div class="no">${t.rank}</div>
           <div class="rk-tile"><span class="rk-mark">${ICONS[t.id] || ""}</span></div>
           <div class="nm">${esc(t.name)}
-            <div class="st">${statLine(t, false)}</div>
+            <div class="st">${statLine(t, { bold:false, lang:LANG, skipPenalty: G && G.skipPenalty })}</div>
           </div>
           <div class="pt" data-score="${t.score}">${t.score}</div>
         </div>

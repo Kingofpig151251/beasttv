@@ -20,6 +20,7 @@ import vm from "node:vm";
 
 import { esc, fmtScore, statLine } from "../src/format.js";
 
+import { runnableAppCode, injectedGlobals, legacyAppCode } from "./helpers/load-app.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const APP_JS = resolve(HERE, "..", "app.js");
 const FORMAT_JS = resolve(HERE, "..", "src", "format.js");
@@ -161,9 +162,13 @@ before(() => {
   sb.globalThis = sb;
   sb.self = sb.window;
 
+  Object.assign(sb, injectedGlobals());
+
+  /* 基準用「module 化之前」的 app.js（git 裡的固定 commit），
+     而不是工作區版本——工作區的 esc/fmtScore/statLine 已經換成 src/ 模組了。 */
   const ctx = vm.createContext(sb);
   try {
-    new vm.Script(readFileSync(APP_JS, "utf8"), { filename: "app.js" }).runInContext(ctx, { timeout: 10000 });
+    new vm.Script(legacyAppCode(), { filename: "app.js (legacy)" }).runInContext(ctx, { timeout: 10000 });
   } catch (e) {
     // 頂層有些依賴真 DOM 的呼叫會失敗，只要函式定義存在即可
     if (!/is not defined|Cannot read/.test(String(e))) throw e;

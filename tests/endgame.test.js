@@ -11,6 +11,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
+import { runnableAppCode, injectedGlobals } from "./helpers/load-app.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const APP_JS = resolve(HERE, "..", "app.js");
 
@@ -161,8 +162,10 @@ before(() => {
   });
   captured.rSub = makeEl();
 
+  Object.assign(sandbox, injectedGlobals());
+
   ctx = vm.createContext(sandbox);
-  const code = readFileSync(APP_JS, "utf8");
+  const code = runnableAppCode();
   try {
     new vm.Script(code, { filename: "app.js" }).runInContext(ctx, { timeout: 10000 });
   } catch (e) {

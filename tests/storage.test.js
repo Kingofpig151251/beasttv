@@ -16,10 +16,11 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
+import { runnableAppCode, injectedGlobals } from "./helpers/load-app.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..");
 const APP_JS = resolve(ROOT, "app.js");
-const APP_SRC = readFileSync(APP_JS, "utf8");
+const APP_SRC = runnableAppCode();
 const noop = () => {};
 
 const storage = await import("../src/storage.js");
@@ -143,6 +144,7 @@ function makeSandbox(seed = {}, opts = {}) {
     Object,
   };
   sb.globalThis = sb;
+  Object.assign(sb, injectedGlobals());
   const ctx = vm.createContext(sb);
   try {
     new vm.Script(APP_SRC).runInContext(ctx, { timeout: 15000 });

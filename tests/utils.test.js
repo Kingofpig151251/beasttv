@@ -17,6 +17,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
+import { runnableAppCode, injectedGlobals, legacyAppCode } from "./helpers/load-app.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const APP_JS = resolve(HERE, "..", "app.js");
 
@@ -158,11 +159,13 @@ let ctx;
 let boot;
 
 before(() => {
-  const code = readFileSync(APP_JS, "utf8");
+  /* 這個檔記錄的是「module 化之前 app.js 裡六個純函式」的行為，
+     所以基準要取 git 裡的固定舊版，而不是已改用 src/ 模組的工作區版本。 */
+  const code = legacyAppCode();
   const sandbox = makeEnv();
   ctx = vm.createContext(sandbox);
   try {
-    new vm.Script(code, { filename: "app.js" }).runInContext(ctx, { timeout: 10000 });
+    new vm.Script(code, { filename: "app.js (legacy)" }).runInContext(ctx, { timeout: 10000 });
   } catch (e) {
     // app.js 可能有依賴真實 DOM 的頂層呼叫失敗；只要函式有定義就算載入成功
     if (!/is not defined|Cannot read/.test(String(e))) throw e;
