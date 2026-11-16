@@ -1,162 +1,30 @@
 "use strict";
 
-/* ================= 語言 ================= */
-const LANG_KEY = "beasttv.lang";
-let LANG = (()=>{ try{ return localStorage.getItem(LANG_KEY) === "en" ? "en" : "zh"; }catch(_){ return "zh"; } })();
-const EN = {
-  "百獸台": "Beast TV",
-  "派對猜詞主持台": "Party word-guessing game",
-  "開始": "Start",
-  "設定": "Settings",
-  "繼續": "Continue",
-  "準備好": "Ready",
-  "犯規": "Foul",
-  "跳過": "Skip",
-  "正確": "Correct",
-  "上一步": "Back",
-  "上一步（Esc）": "Back (Esc)",
-  "開始遊戲": "Start game",
-  "隊伍數量": "Teams",
-  "每隊回合數": "Rounds per team",
-  "每回合秒數": "Seconds per round",
-  "每回合可跳次數": "Skips per round",
-  "可以跳過": "Allow skipping",
-  "跳過扣分": "Skipping costs 1",
-  "犯規扣分": "Foul costs 1",
-  "選擇隊色": "Pick a colour",
-  "更改隊色": "Change colour",
-  "減少一隊": "Fewer teams",
-  "增加一隊": "More teams",
-  "減少回合": "Fewer rounds",
-  "增加回合": "More rounds",
-  "減少可跳次數": "Fewer skips",
-  "增加可跳次數": "More skips",
-  "跳過，不限次數": "Skip, unlimited",
-  "跳過（↓）不限次數": "Skip (↓) · unlimited",
-  "跳過 ∞": "Skip ∞",
-  "沒有可撤回的判定": "Nothing to undo",
-  "已撤回上一個判定": "Undone",
-  "撤回上一個判定": "Undo last call",
-  "撤回上一個判定（↑）": "Undo last call (↑)",
-  "回報問題": "Report",
-  "回報問題（空白題目等）": "Report a problem (blank question etc.)",
-  "已回報，多謝": "Reported, thanks",
-  "回報未送出，已存本機": "Report saved on this device",
-  "退出遊戲": "Exit game",
-  "暫停": "Pause",
-  "暫停（Esc）": "Pause (Esc)",
-  "重試載入": "Retry loading",
-  "題目尚未載入": "Questions not loaded yet",
-  "題目尚未載入，重新連線中…": "Questions not loaded — reconnecting…",
-  "題目尚未連線，正在重試…": "Not connected — retrying…",
-  "題目已用完，正在重新洗牌": "Out of questions — reshuffling",
-  "一行一題，任何人皆可修改": "One question per line",
-  "先設定題目": "Set up questions",
-  "登出": "Log out",
-  "登入 / 註冊": "Log in / Sign up",
-  "已登入：": "Signed in: ",
-  "烏龜隊": "Turtle",
-  "狐狸隊": "Fox",
-  "鯨魚隊": "Whale",
-  "章魚隊": "Octopus",
-  "蜜蜂隊": "Bee",
-  "火烈鳥隊": "Flamingo",
-  "海豚隊": "Dolphin",
-  "棕熊隊": "Bear",
-  "正確加一": "Correct +1",
-  "正確減一": "Correct −1",
-  "犯規加一": "Foul +1",
-  "犯規減一": "Foul −1",
-  "跳過加一": "Skip +1",
-  "跳過減一": "Skip −1",
-  "正確（→）": "Correct (→)",
-  "犯規（←）": "Foul (←)",
-  "跳過（↓）": "Skip (↓)",
-  "更改第 ${i+1} 隊的隊色": "Change colour of team ${i+1}",
-  "版權聲明": "Legal",
-  "GitHub 原始碼": "Source on GitHub",
-  "有多少隊參賽？": "How many teams?",
-  "最少 2 隊，最多 8 隊": "2 to 8 teams",
-  "每隊出場幾回合？": "Turns per team?",
-  "1 至 5 回合": "1 to 5 turns",
-  "為每一隊命名": "Name each team",
-  "每回合時間": "Time per turn",
-  "秒": "sec",
-  "規則": "Rules",
-  "主持可按「↓ 跳過」直接換下一題": "Press ↓ to skip a question",
-  "每回合可跳": "Skips per turn",
-  "用完之後不能再跳": "No skips left after these",
-  "跳過扣 1 分": "Skipping costs 1 point",
-  "每跳過一題，該隊扣一分": "Each skip: −1 point",
-  "犯規扣 1 分": "A foul costs 1 point",
-  "每犯規一次，該隊扣一分": "Each foul: −1 point",
-  "最終排名": "Final standings",
-  "返回主頁": "Back to home",
-  "退出遊戲？": "Exit the game?",
-  "本局成績將不會記錄。": "This game will not be recorded.",
-  "取消": "Cancel",
-  "退出": "Exit",
-  "選擇動物與隊色": "Choose an animal and colour",
-  "時間到！": "Time's up!",
-  "切換語言": "Switch language",
-  "撤回": "Undo",
-  "撤回上一個判定": "Undo last call",
-  "鍵盤快捷鍵": "Keyboard shortcuts",
-  "更改": "Change",
-  "按鍵…": "Press a key",
-  "還原預設": "Reset to default",
-  "完成": "Done",
-  "按一下右邊的鍵，再按鍵盤上的新鍵。Esc 取消。": "Tap the key on the right, then press a new one. Esc cancels.",
-  "繼續（Esc）": "Continue (Esc)",
-  "題": "questions",
-  "分": "pts",
-  "中文": "中文",
-  "隊名": "Team name",
-  "用完之後不能再跳：「": "No more skips after these run out",
-  "全場答對": "Correct"
-};
-const T = (zh)=> LANG === "en" ? (EN[zh] || zh) : zh;
+/* ================= 模組引入 =================
+ * app.js 原本是 classic script，所有函式都擠在同一個檔案。
+ * 現在逐步改成 module：把已抽出、並經「與原版逐項比對」測試驗證過的
+ * 純函式與狀態機，改由 src/ 提供。
+ *
+ * 注意（重要）：一旦加上 import，index.html 的 script 標籤必須改成
+ * type="module"，且必須經過 Vite 打包（見 vite.config.js）。
+ * 這一步只在 rewrite/modular 分支做，尚未上線。
+ */
+import { esc, fmtScore, statLine } from "./src/format.js";
+import { State, GameStateMachine, StateError } from "./src/state.js";
+import { $, $$ } from "./src/dom.js";
+import { getLang, setLang as setI18nLang, isEn, T, translateTree } from "./src/i18n.js";
+import { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted } from "./src/sfx.js";
+import { KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf } from "./src/keys.js";
+import { KEYS as STORAGE_KEYS, readJson, writeJson, getToken, clearToken, getBrand, setBrand, addReport } from "./src/storage.js";
+import { wakeOn, wakeOff, installWakeVisibility } from "./src/audio-ui.js";
+import { diagPush, getDiag, getDiagLog } from "./src/diag.js";
 
-const ATTR_I18N = ["title","aria-label","placeholder"];
-function translateTree(root){
-  if(!root) return;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  while(walker.nextNode()) nodes.push(walker.currentNode);
-  for(const n of nodes){
-    const p = n.parentElement;
-    if(p && (p.closest("#pText,script,style") )) continue;   // 題目本身唔翻譯
-    /* 內容被程式重寫過（或第一次見）就重新記原文；否則用快取。
-       之前只認 __zh === undefined，令「先寫英文再切中文」同「空節點後來填字」都會卡死。 */
-    if(n.__zh === undefined || n.nodeValue !== n.__applied) n.__zh = n.nodeValue;
-    const key = String(n.__zh).trim();
-    if(!key){ n.__applied = n.nodeValue; continue; }
-    const en = EN[key];
-    n.nodeValue = (LANG === "en" && en) ? n.__zh.replace(key, en) : n.__zh;
-    n.__applied = n.nodeValue;
-  }
-  if(!root.querySelectorAll) return;
-  root.querySelectorAll("[title],[aria-label],[placeholder]").forEach(el=>{
-    for(const a of ATTR_I18N){
-      if(!el.hasAttribute(a)) continue;
-      const store = "__zh_" + a.replace("-","_"), applied = store + "_ap";
-      const cur = el.getAttribute(a);
-      if(el[store] === undefined || cur !== el[applied]) el[store] = cur;
-      const src = el[store];
-      const en = EN[String(src).trim()];
-      const out = (LANG === "en" && en) ? en : src;
-      el.setAttribute(a, out);
-      el[applied] = out;
-    }
-  });
-}
-
+/* 語言狀態與字典由 ./src/i18n.js 提供；app.js 只保留切語言時的畫面編排。 */
 function setLang(next){
-  LANG = next === "en" ? "en" : "zh";
-  try{ localStorage.setItem(LANG_KEY, LANG); }catch(_){}
-  document.documentElement.lang = LANG === "en" ? "en" : "zh-Hant-HK";
+  const cur = setI18nLang(next);              // 更新模組內的語言狀態並持久化
+  document.documentElement.lang = cur === "en" ? "en" : "zh-Hant-HK";
   const lb = document.getElementById("btnLang");
-  if(lb) lb.textContent = LANG === "en" ? "中文" : "English";
+  if(lb) lb.textContent = isEn() ? "中文" : "English";
   applyBrand(BRAND_RAW.t, BRAND_RAW.s, false);   // 品牌名按語言重譯
   translateTree(document.body);
   if(G){ syncSkipBtn(); }                     // 跳過鍵嘅 aria/title 係即時組字，要跟語言重算
@@ -169,16 +37,14 @@ const btnLang = document.getElementById("btnLang");
 if(btnLang) btnLang.addEventListener("click", ()=>{
   const b = document.getElementById("btnLang");
   b.__tapAt = 0;                                  // 語言鍵唔受 260ms 防連按影響
-  setLang(LANG === "en" ? "zh" : "en");
+  setLang(getLang() === "en" ? "zh" : "en");
 });
 
 
 /* ================= 狀態 ================= */
 const K_CFG="beaststage.cfg.v3", K_CFG_OLD=["baishoutai.cfg.v3","bigtv.cfg.v3"];   // 題目不存本機，只存雲端
-const store = {
-  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
-  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
-};
+/* store 由 ./src/storage.js 提供（readJson / writeJson），保留介面給現有呼叫點 */
+const store = { get: readJson, set: writeJson };
 
 let lines = [];                                  // 題目：一行一題
 /* 8 個動物 SVG（單色，跟 currentColor；唔靠 emoji 字型） */
@@ -246,15 +112,14 @@ ensureUniqueAnimals();
 let G = null;
 let REMOTE = { ok:false };
 
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
+/* $ / $$ 由 ./src/dom.js 提供（簽名與原本完全一致） */
 
-function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+/* esc 由 ./src/format.js 提供（已與原版逐項比對） */
 
 /* 題目一律以 {t:"..."} 存；舊格式（字串 / {t,ban}）都食得住 */
 /* 題庫 slug：/b/<slug> 或 ?b=<slug>，默認 default */
 /* 帳號：登入後每個人都係自己一份題庫；/b/<slug> 只係「玩某人嘅題庫」嘅公開連結 */
-const TOKEN = ()=> localStorage.getItem("beasttv.token") || "";
+const TOKEN = ()=> getToken();   // 由 ./src/storage.js 提供
 const URL_BANK = (()=>{
   const m = location.pathname.match(/^\/b\/([a-z0-9][a-z0-9-]{1,31})\/?$/i);
   const q = new URLSearchParams(location.search).get("b");
@@ -298,12 +163,12 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.rand
 /* ================= 品牌（可由 /edit 自訂） ================= */
 const BRAND_DEF = { title: "百獸台", sub: "派對猜詞主持台" };   // 預設品牌（按語言翻譯）
 let BRAND_RAW = { t: "", s: "" };                                // 伺服器／自訂品牌，空＝用預設
-const BRAND_KEY = "beastbrand.v1";
+const BRAND_KEY = STORAGE_KEYS.BRAND;
 
 /* 開頁即用上次的品牌（冇快取就暫時收埋標題，避免先閃「百獸台」再變） */
 (function(){
   let c = null;
-  try{ c = JSON.parse(localStorage.getItem(BRAND_KEY) || "null"); }catch(e){}
+  c = getBrand();
   if(c && c.t){ applyBrand(c.t, c.s, false); }
   else{ document.documentElement.classList.add("brand-pending"); }
   setTimeout(()=>document.documentElement.classList.remove("brand-pending"), 1400);
@@ -323,11 +188,11 @@ function applyBrand(title, sub, save){
   p.textContent = s;
   /* 拉丁字比中文窄：英文用較寬的長度門檻，避免「Beast TV」被降兩級字階 */
   const n = t.length;
-  h.dataset.len = LANG === "en" ? (n > 16 ? "long" : n > 10 ? "mid" : "")
+  h.dataset.len = isEn() ? (n > 16 ? "long" : n > 10 ? "mid" : "")
                                 : (n > 8 ? "long" : n > 5 ? "mid" : "");
   document.title = s ? `${t} · ${s}` : t;
   document.documentElement.classList.remove("brand-pending");
-  if(save){ try{ localStorage.setItem(BRAND_KEY, JSON.stringify(BRAND_RAW)); }catch(e){} }
+  if(save){ setBrand(BRAND_RAW); }
 }
 
 /* ================= 後端 ================= */
@@ -403,7 +268,7 @@ $("#btnEnter").addEventListener("click", (e)=>{
 function renderSetup(){
   translateTree(document.body);
   const qc = $("#qCount");
-  if(qc) qc.innerHTML = lines.length ? `${lines.length}<span class="unit">${LANG==="en"?"questions":"題"}</span>` : "";
+  if(qc) qc.innerHTML = lines.length ? `${lines.length}<span class="unit">${isEn()?"questions":"題"}</span>` : "";
   const qh = $("#qHint");
   if(qh) qh.textContent = lines.length ? T("一行一題，任何人皆可修改") : T("題目尚未連線，正在重試…");
   $("#teamInput").value = cfg.teams;
@@ -416,7 +281,7 @@ function renderSetup(){
     $("#rpPlus").disabled  = cfg.roundsPer >= 5;
   }
   const sum = $("#roundSum");
-  if(sum) sum.textContent = LANG === "en" ? `${cfg.teams} teams × ${cfg.roundsPer} rounds = ${cfg.teams * cfg.roundsPer} turns` : `${cfg.teams} 隊 × ${cfg.roundsPer} 回合 = 共 ${cfg.teams * cfg.roundsPer} 回合`;
+  if(sum) sum.textContent = isEn() ? `${cfg.teams} teams × ${cfg.roundsPer} rounds = ${cfg.teams * cfg.roundsPer} turns` : `${cfg.teams} 隊 × ${cfg.roundsPer} 回合 = 共 ${cfg.teams * cfg.roundsPer} 回合`;
 
   $("#nameList").innerHTML = Array.from({length:cfg.teams},(_,i)=>{
     const a = animalAt(i);
@@ -434,7 +299,7 @@ function renderSetup(){
     const zhName = animalAt(i).name;
     cfg.names[i] = v || zhName;
     cfg.custom[i] = !!v && v !== zhName && v !== T(zhName);   // 手動改過就鎖住，換動物時唔覆蓋
-    inp.value = LANG === "en" && !cfg.custom[i] ? T(zhName) : cfg.names[i];
+    inp.value = isEn() && !cfg.custom[i] ? T(zhName) : cfg.names[i];
     saveCfg(); syncNext();
   });
   $$("#nameList .animal-btn").forEach(btn=>btn.onclick=()=>openAnimals(+btn.dataset.animal));
@@ -542,7 +407,7 @@ function goStep(i, dir){
     el.toggleAttribute("inert", !on);          // F-03：非作用中步鎖住，唔入 Tab 順序
   });
   const sp = $("#stepProgress");               // F-25：進度告知（aria-live）
-  if(sp) sp.textContent = LANG === "en" ? `Step ${SETUP.i+1} of ${LAST_STEP+1}` : `第 ${SETUP.i+1} 步，共 ${LAST_STEP+1} 步`;
+  if(sp) sp.textContent = isEn() ? `Step ${SETUP.i+1} of ${LAST_STEP+1}` : `第 ${SETUP.i+1} 步，共 ${LAST_STEP+1} 步`;
   $$("#stepDots i").forEach((d,n)=>{
     d.classList.toggle("on", n <= SETUP.i);
     d.classList.toggle("cur", n === SETUP.i);
@@ -611,22 +476,8 @@ function launchGame(){
 
 /* ================= 題庫管理（離線用） ================= */
 /* ================= 遊戲流程 ================= */
-let WAKE = null;
-async function wakeOn(){
-  if(!("wakeLock" in navigator)) return;
-  try{
-    WAKE = await navigator.wakeLock.request("screen");
-    WAKE.addEventListener("release", ()=>{ WAKE = null; });
-  }catch(e){ /* 省電模式／低電量會拒絕，靜默降級 */ }
-}
-function wakeOff(){
-  if(!WAKE) return;
-  try{ WAKE.release(); }catch(e){}
-  WAKE = null;
-}
-document.addEventListener("visibilitychange", ()=>{
-  if(document.visibilityState === "visible" && G && (G.phase === "running" || G.phase === "ready" || G.phase === "countdown")) wakeOn();
-});
+/* 螢幕常亮由 ./src/audio-ui.js 提供（wakeOn / wakeOff / installWakeVisibility） */
+installWakeVisibility(() => (typeof G !== "undefined" ? G : null));
 
 function startGame(){
   wakeOn();
@@ -639,6 +490,8 @@ function startGame(){
 
   const order = [];                                  // 每隊出場 2 次：A B C D → A B C D
   for(let r = 0; r < cfg.roundsPer; r++) for(let i = 0; i < names.length; i++) order.push(i);
+  const sm = new GameStateMachine();
+  sm.force(State.READY);                             // 開局即進入準備階段
   G = {
     sec: Math.max(5, Number(cfg.sec)||90),
     teams: names.map((n,i)=>({name:n, id:looks[i].id, color:looks[i].color, score:0, ok:0, skip:0, foul:0})),
@@ -646,8 +499,18 @@ function startGame(){
     order, rounds: order.length,                 // turn = 第幾回合，隊伍 = order[turn]
     turn:0, skipCap: cfg.skipCap, skipLeft: cfg.skipCap,
     pool: shuffle(pool.slice()), used: [], cur:null,
-    judged:0, paused:false, remaining:0, timerId:null, timerToken:0,
-    phase:"ready"
+    judged:0, remaining:0, timerId:null, timerToken:0,
+    sm,                                          // 狀態機：phase 與 paused 都由它推算
+    /* phase / paused 為唯讀鏡像，寫入會被忽略並在 dev 下警告，避免新舊狀態分叉 */
+    get phase(){ return this.sm.phase; },
+    set phase(v){ warnLegacyState("phase", v); },
+    get paused(){ return this.sm.paused; },
+    set paused(v){ warnLegacyState("paused", v); },
+    /* 判定／撤回／暫停閘門統一走狀態機，呼叫方不必自己組合條件 */
+    canJudge(){ return this.sm.canJudge(); },
+    canUndo(){ return this.sm.canUndo(); },
+    canResume(){ return this.sm.canResume(); },
+    canPause(){ return this.sm.canPause(); }
   };
   const hud = $("#hud");
   if(hud){
@@ -663,6 +526,17 @@ function startGame(){
 const SKIP_CAP = 3;                                  // 每回合最多跳 3 條
 const curTeam = ()=> G.teams[G.order[G.turn]];
 
+/* 舊程式若仍直接寫 G.phase / G.paused，這裡會攔下來並提示改用狀態機。
+   保留這層是因為完全禁止寫入會令遺漏的呼叫點靜默失效；
+   警告可在 console 看到，方便逐步清理。 */
+let LEGACY_WARNED = Object.create(null);
+function warnLegacyState(field, value){
+  const k = field + ":" + value;
+  if(LEGACY_WARNED[k]) return;
+  LEGACY_WARNED[k] = 1;
+  try{ console.warn(`[state] 忽略對 G.${field} 的直接寫入（${value}）；請改用 G.sm.*`); }catch(_){}
+}
+
 /* 跳過掣顯示剩餘次數；用完即變灰 */
 function syncSkipBtn(){
   const b = document.querySelector('[data-judge="skip"]');
@@ -670,14 +544,14 @@ function syncSkipBtn(){
   const cap = G ? G.skipCap : SKIP_CAP;
   const left = G ? Math.max(0, G.skipLeft) : cap;
   const inf = cap === 0;
-  b.textContent = inf ? T("跳過 ∞") : LANG === "en" ? `Skip ${left}/${cap}` : `跳過 ${left}/${cap}`;
+  b.textContent = inf ? T("跳過 ∞") : isEn() ? `Skip ${left}/${cap}` : `跳過 ${left}/${cap}`;
   b.disabled = !G || !G.allowSkip || (!inf && left <= 0);
-  b.setAttribute("aria-label", inf ? T("跳過，不限次數") : LANG === "en" ? `Skip · ${left} left` : `跳過，剩 ${left} 次`);
+  b.setAttribute("aria-label", inf ? T("跳過，不限次數") : isEn() ? `Skip · ${left} left` : `跳過，剩 ${left} 次`);
   /* F-16：鍵位要跟自訂設定走，唔可以寫死 ↓（否則 applyKeys 嘅動態提示會被蓋返舊鍵） */
   const sk = (typeof KKEYS !== "undefined" && KKEYS.skip) ? keyLabel(KKEYS.skip) : "↓";
   b.setAttribute("title", inf
-    ? (LANG === "en" ? `Skip (${sk}) · unlimited` : `跳過（${sk}）不限次數`)
-    : (LANG === "en" ? `Skip (${sk}) · ${left} left` : `跳過（${sk}）剩 ${left} 次`));
+    ? (isEn() ? `Skip (${sk}) · unlimited` : `跳過（${sk}）不限次數`)
+    : (isEn() ? `Skip (${sk}) · ${left} left` : `跳過（${sk}）剩 ${left} 次`));
 }
 
 /* 準備／倒數時浮動退出鍵；跑緊時收起（頂欄已有同一粒） */
@@ -707,12 +581,14 @@ function syncExitLabel(){
 function enterReady(){
   clearInterval(G.timerId);
   G.timerToken++;
-  G.phase = "ready";
+  /* enterReady 是「回到準備」的統一入口：
+     從 SCORE 卡按繼續是 INTERSTITIAL → READY；
+     首回合開局時已經是 READY，自轉視為成功。 */
+  if(!G.sm.go(State.READY)) G.sm.force(State.READY);
   G.cur = null;
   G.remaining = G.sec;
-  G.paused = false;
   setPauseIcon(false);
-  $("#rdRound").textContent = LANG === "en" ? `Round ${G.turn+1} of ${G.rounds}` : `第 ${G.turn+1} 回合，共 ${G.rounds} 回合`;
+  $("#rdRound").textContent = isEn() ? `Round ${G.turn+1} of ${G.rounds}` : `第 ${G.turn+1} 回合，共 ${G.rounds} 回合`;
   const cur = curTeam();
   $("#rdMark").innerHTML = ICONS[cur.id] || "";
   $("#rdTeam").textContent = cur.name;
@@ -738,83 +614,8 @@ function hideReady(){
   document.body.classList.remove("is-ready");
 }
 
-/* 音效：WebAudio 直接合成，唔使音檔 */
-let AC = null;
-function audioCtx(){
-  const C = window.AudioContext || window.webkitAudioContext;
-  if(!C) return null;
-  if(!AC) AC = new C();
-  if(AC.state === "suspended") AC.resume();
-  return AC;
-}
-/* 音檔：判定用真音源（門鐘／子彈），其餘場合仍用合成音 */
-const SFX_SRC = { ding: "/sfx/dingdong.mp3", whoosh: "/sfx/whoosh.mp3", heart: "/sfx/hb3.mp3",
-                   countdown: "/sfx/countdown.mp3", whistle: "/sfx/whistle.mp3",
-                   settle: "/sfx/settle.mp3", champion: "/sfx/champion.mp3",
-                   tick: "/sfx/tick.mp3", drums: "/sfx/drums.mp3", snare: "/sfx/snare.mp3",
-                   foul: "/sfx/foul.mp3", tap: "/sfx/tap.mp3" };
-const SFX = {};
-let SFX_LOADING = false;
-/* 分層載入：頁面一開就備好判定用的四聲（26KB），其餘等第一次觸碰才拉。
-   全部一次過拉會令第一下按掣冇聲——loadSfx 同 pointerdown 同時開始，buffer 未 decode 完。 */
-const SFX_CORE = ["tap","ding","whoosh","tick"];
-const SFX_REST = ["countdown","whistle","settle","champion","drums","snare","foul","heart"];
-async function loadSfx(keys){
-  const c = audioCtx(); if(!c || !keys) return;
-  const todo = keys.filter(k => !SFX[k]);
-  if(!todo.length) return;
-  SFX_LOADING = true;
-  await Promise.all(todo.map(async (k)=>{
-    try{
-      const r = await fetch(SFX_SRC[k], {cache:"force-cache"});
-      SFX[k] = await c.decodeAudioData(await r.arrayBuffer());
-    }catch(e){ /* 音檔拿不到就靜靜留空，唔影響流程 */ }
-  }));
-  SFX_LOADING = false;
-}
-function sfx(name, vol=0.85, rate=1, delay=0){
-  const c = audioCtx(), buf = SFX[name];
-  if(!c || !buf) return false;
-  const src = c.createBufferSource(), g = c.createGain();
-  src.buffer = buf; src.playbackRate.value = rate; g.gain.value = vol;
-  src.connect(g).connect(c.destination);
-  src.start(c.currentTime + Math.max(0, delay)/1000);
-  return true;
-}
-
-/* 冠軍頁背景音樂：無縫 loop，離開結果頁／重開一局即停
-   loop = true 之外再加一層保險：ended 即重新接上，
-   並喺頁面返前景／context 被暫停時自動 resume，避免個別瀏覽器中斷 */
-let BGM = null, BGM_WANT = null;
-function bgm(name, vol=0.42){
-  stopBgm();
-  if(!SFX[name]) return;
-  BGM_WANT = { name, vol };
-  startBgm();
-}
-function startBgm(){
-  if(!BGM_WANT) return;
-  const c = audioCtx(), buf = SFX[BGM_WANT.name];
-  if(!c || !buf) return;
-  const src = c.createBufferSource(), g = c.createGain();
-  src.buffer = buf; src.loop = true;
-  src.loopStart = 0; src.loopEnd = buf.duration;
-  g.gain.value = BGM_WANT.vol;
-  src.connect(g).connect(c.destination);
-  src.onended = ()=>{ if(BGM_WANT){ BGM = null; setTimeout(startBgm, 0); } };
-  src.start();
-  BGM = src;
-}
-function stopBgm(){
-  BGM_WANT = null;
-  if(BGM){ try{ BGM.onended = null; BGM.stop(); }catch(e){} BGM = null; }
-}
-document.addEventListener("visibilitychange", ()=>{
-  if(document.hidden || !BGM_WANT) return;
-  const c = audioCtx();
-  if(c && c.state === "suspended") c.resume();
-  if(!BGM) startBgm();
-});
+/* 音效由 ./src/sfx.js 提供。
+   visibilitychange 的 BGM resume 邏輯也已搬進模組，app.js 不再碰私有狀態。 */
 loadSfx(SFX_CORE);                                    // 判定四聲即刻備好（唔需要手勢都 decode 得）
 document.addEventListener("pointerdown", ()=>loadSfx(SFX_REST), {once:true});
 document.addEventListener("keydown", ()=>loadSfx(SFX_REST), {once:true});
@@ -827,7 +628,7 @@ const CD_CIRC = 339.3;                 // 2πr，r = 54
 function startRound(){
   if(!G || G.phase !== "ready") return;
   clearInterval(CD_TIMER);
-  G.phase = "countdown";
+  if(!G.sm.goCountdown()) return;      // 只有 READY 才可進倒數
   $("#btnReady").style.display = "none";
   syncQuitFloat();
   const t = curTeam();
@@ -864,7 +665,7 @@ function startRound(){
 
 function beginRunning(){
   if(!G) return;                       // 倒數期間被退出
-  G.phase = "running";
+  if(!G.sm.begin()) return;            // 只有 COUNTDOWN 才可進 PLAYING
   syncQuitFloat();                     // 倒數完 → 收起浮動鍵，交返頂欄
   const t0 = curTeam();
   G.skipLeft = G.skipCap; syncSkipBtn();
@@ -991,21 +792,18 @@ function renderPlay(){
   void el.offsetWidth;
   el.style.animation = "";
   fitWord(it.t);
-  diagPush(it.t, el);
+  diagPush(it.t, el, {
+    team: G ? ((curTeam() || {}).name || "") : "",
+    turn: G ? G.turn : -1,
+    phase: G ? G.phase : ""
+  });
 
   renderTimer();
 }
 
-function fmtScore(v){ return (v < 0 ? "−" : "+") + Math.abs(v); }
-
-/* 統計文字：對 N · 跳過 M · 犯規 K（跳過關閉時不顯示） */
-function statLine(t, bold){
-  const b = v => bold ? `<b>${v}</b>` : `${v}`;
-  const parts = [LANG === "en" ? `${b(t.ok || 0)} correct` : `答中 ${b(t.ok || 0)}`];
-  if(t.foul) parts.push(LANG === "en" ? `${b(t.foul)} foul` : `犯規 ${b(t.foul)}`);                       // 有犯規才提，解釋扣分
-  if(G && G.skipPenalty && t.skip) parts.push(LANG === "en" ? `${b(t.skip)} skipped` : `跳過 ${b(t.skip)}`);  // 跳過扣分時才提
-  return parts.join(" · ");
-}
+/* fmtScore / statLine 由 ./src/format.js 提供。
+   原本 statLine 讀全域 LANG 與 G.skipPenalty，模組版改成可注入參數，
+   所以呼叫點必須明確帶上 lang 與 skipPenalty，行為才與原版一致。 */
 
 /* 動作層：所有輸入來源（鍵盤／觸控／將來陀螺儀）都經 act() 入 judge() */
 const ACTIONS = {
@@ -1015,37 +813,19 @@ const ACTIONS = {
 };
 function act(name){
   if(!ACTIONS[name]) return false;
-  if(!G || G.phase !== "running" || G.paused || !G.cur || G.locked) return false;
+  /* 判定閘門只看 canJudge()（＝ state === PLAYING）。
+     舊版寫 G.phase !== "running" || G.paused，兩個條件各自維護，
+     漏掉任何一個就是一個 bug（F-01 正是如此）。 */
+  if(!G || !G.canJudge() || !G.cur || G.locked) return false;
   G.locked = true;                        // 190ms 內只認一次，防連按食題
   setTimeout(()=>{ if(G) G.locked = false; }, 190);
   judge(name);
   return true;
 }
 
-/* 診斷環形緩衝：每次出題記一筆，回報時一齊送出（連前幾題，唔怕漏咗先撳） */
-const DIAG = [];
-function diagPush(text, el){
-  try{
-    const card = el.parentElement, cs = getComputedStyle(el);
-    DIAG.push({
-      t: String(text).slice(0, 40), len: String(text).length,
-      at: new Date().toISOString(),
-      fs: cs.fontSize, op: cs.opacity, vis: cs.visibility,
-      sw: el.scrollWidth, sh: el.scrollHeight,
-      cw: card.clientWidth, ch: card.clientHeight,
-      mw: el.style.maxWidth || "", team: G ? (curTeam() || {}).name : "",
-      turn: G ? G.turn : -1, phase: G ? G.phase : ""
-    });
-    if(DIAG.length > 24) DIAG.shift();
-  }catch(e){}
-}
+/* 診斷環形緩衝由 ./src/diag.js 提供（diagPush / getDiag / getDiagLog） */
 
-function saveReportLocal(p){
-  try{
-    const k = "beasttv.reports", arr = JSON.parse(localStorage.getItem(k) || "[]");
-    arr.push(p); localStorage.setItem(k, JSON.stringify(arr.slice(-10)));
-  }catch(e){}
-}
+function saveReportLocal(p){ addReport(p); }   // 由 ./src/storage.js 提供
 
 async function reportProblem(kind){
   const p = {
@@ -1058,7 +838,7 @@ async function reportProblem(kind){
            allowSkip: cfg.allowSkip, skipPenalty: cfg.skipPenalty, foulPenalty: cfg.foulPenalty },
     state: G ? { phase: G.phase, turn: G.turn, cur: G.cur && G.cur.t, judged: G.judged,
                  left: G.sec, paused: G.paused } : null,
-    log: DIAG.slice(-24)
+    log: getDiagLog(24)
   };
   saveReportLocal(p);
   try{
@@ -1074,7 +854,7 @@ async function reportProblem(kind){
 let UNDO_HL_T = 0;
 function paintUndo(){
   const b = $("#btnUndo"); if(!b) return;
-  const ok = !!(G && G.phase === "running" && G.lastUndo);
+  const ok = !!(G && G.canUndo() && G.lastUndo);
   b.classList.toggle("off", !ok);
   b.setAttribute("aria-disabled", String(!ok));
   if(!ok){ b.classList.remove("fresh"); clearTimeout(UNDO_HL_T); }
@@ -1089,7 +869,7 @@ function hintUndo(){
 /* ↑ 撤回：只可撤回本回合最後一次判定（新判定或回合結束即失效） */
 function undoJudge(){
   const snap = G && G.lastUndo;
-  if(!G || G.phase !== "running" || G.paused || !snap) return false;
+  if(!G || !G.canUndo() || !snap) return false;
   const t = G.teams[snap.ti];
   t.ok = snap.ok; t.skip = snap.skip; t.foul = snap.foul; t.score = snap.score;
   G.skipLeft = snap.skipLeft;
@@ -1126,7 +906,10 @@ function judge(kind){
   hintUndo();
 
   setTimeout(()=>{                          // 三個判定都等文字滑走，再換下一題
-    if(!G || G.phase !== "running" || G.qToken !== snap.token) return;   // 已被 ↑ 撤回
+    /* 換題前檢查：還在同一題（qToken 未變）且仍在 PLAYING。
+       注意這裡用 canJudge() 而非 phase==="running"，
+       否則「暫停後又恢復」會因 phase 字串相同而誤換題。 */
+    if(!G || !G.canJudge() || G.qToken !== snap.token) return;   // 已被 ↑ 撤回
 
     const q = document.querySelector(".question");
     if(q) q.classList.remove("fx-down","fx-left","fx-right","fx-ok","fx-bad");
@@ -1181,15 +964,15 @@ function showTurnEnd(team, stats, done){
   const target = stats.score;
   if(target > 0 && !REDUCE){
     let v = 0;
-    sc.innerHTML = `+0<em>${LANG==="en"?"pts":"分"}</em>`;
+    sc.innerHTML = `+0<em>${isEn()?"pts":"分"}</em>`;
     const step = Math.max(1, Math.round(target / 5));
     TE_IV = setInterval(()=>{
       v = Math.min(target, v + step);
-      sc.innerHTML = `+${v}<em>${LANG==="en"?"pts":"分"}</em>`;
+      sc.innerHTML = `+${v}<em>${isEn()?"pts":"分"}</em>`;
       if(v >= target){ clearInterval(TE_IV); TE_IV = 0; }
     }, 95);
   } else {
-    sc.innerHTML = `${fmtScore(target)}<em>${LANG==="en"?"pts":"分"}</em>`;
+    sc.innerHTML = `${fmtScore(target)}<em>${isEn()?"pts":"分"}</em>`;
   }
   const box = $("#teStats");
   if(box){
@@ -1211,7 +994,7 @@ function paintStats(){
   clearInterval(TE_IV); TE_IV = 0;         // 停分數滾動動畫，直接顯示新值
   const sc = $("#teScore");
   sc.classList.toggle("zero", S.score === 0);
-  sc.innerHTML = `${fmtScore(S.score)}<em>${LANG==="en"?"pts":"分"}</em>`;
+  sc.innerHTML = `${fmtScore(S.score)}<em>${isEn()?"pts":"分"}</em>`;
 }
 
 function settleAdjust(kind, d){
@@ -1264,9 +1047,11 @@ function endTurn(){
   const base = G.base || { ok:0, skip:0, foul:0, score:0 };
   const stats = { ok: team.ok - base.ok, skip: team.skip - base.skip,
                   foul: (team.foul||0) - (base.foul||0), score: team.score - base.score };
-  G.phase = "interstitial";
   G.lastUndo = null;                       // 跨回合唔可以撤回
   paintUndo();
+  /* 結束回合：PLAYING（或 PAUSED_PLAYING）→ INTERSTITIAL。
+     用 turnEnd() 走轉移表，倒數中誤按不會把局勢推進。 */
+  if(!G.sm.turnEnd()) return;
   G.settle = { id: team.id, name: team.name, color: team.color,
                ok: stats.ok, skip: stats.skip, foul: stats.foul, score: stats.score };
   slamGate(()=>{
@@ -1283,13 +1068,13 @@ function endGame(){
   resetTurnTimers();
   clearInterval(G.timerId);
   G.timerToken++;
-  G.phase = "done";
+  G.sm.finish();                       // INTERSTITIAL → DONE
   wakeOff();
   hideReady();
   const sorted = G.teams.map((t,i)=>({...t,i})).sort((a,b)=> b.score-a.score || b.ok-a.ok);
   const total = G.teams.reduce((s,t)=>s+t.score,0);
   const okTotal = G.teams.reduce((s,t)=>s+t.ok,0);
-  $("#rSub").textContent = LANG === "en" ? `${okTotal} correct · ${total} points in total` : `全場答對 ${okTotal} 題 · 總分 ${total}`;
+  $("#rSub").textContent = isEn() ? `${okTotal} correct · ${total} points in total` : `全場答對 ${okTotal} 題 · 總分 ${total}`;
 
   const topScore = sorted[0].score;
   const tied = sorted.filter(t=>t.score === topScore).length > 1;
@@ -1309,7 +1094,7 @@ function endGame(){
           <div class="no">${t.rank}</div>
           <div class="rk-tile"><span class="rk-mark">${ICONS[t.id] || ""}</span></div>
           <div class="nm">${esc(t.name)}
-            <div class="st">${statLine(t, false)}</div>
+            <div class="st">${statLine(t, { bold:false, lang:getLang(), skipPenalty: G && G.skipPenalty })}</div>
           </div>
           <div class="pt" data-score="${t.score}">${t.score}</div>
         </div>
@@ -1404,7 +1189,7 @@ function finishReveal(){
   });
   RES.rows.forEach(r=>r.classList.add("in"));
   burstConfetti();
-  if(!BGM_WANT) bgm("champion", 0.42);   // 已經喺 flip 時起咗就唔重播
+  if(!isBgmWanted()) bgm("champion", 0.42);   // 已經喺 flip 時起咗就唔重播
   const acts = $("#v-result .result-actions");
   if(acts) acts.classList.add("on");
 }
@@ -1572,17 +1357,20 @@ function doExit(){
   renderHome();
 }
 
-let EXIT_PAUSED = false;
+/* 退出面板開啟時暫停遊戲。舊版用 EXIT_PAUSED 這個外部旗標「記住是我暫停的」，
+   與 G.paused 兩份狀態各自維護，容易分叉。新版直接看狀態機：
+   面板開啟時 pause()，關閉時 resume()，是否暫停由 sm 唯一決定。 */
 function askExit(){
   const sheet = $("#exitSheet");
   sheet.classList.add("on");
   inertBackground(true);                         // F-08：鎖住背後 v-play／v-setup
   if(G && !G.paused){
     if(G.phase === "running"){                    // 跑緊 → 即時停錶
-      G.paused = true; EXIT_PAUSED = true;
+      G.sm.pause();                               // PLAYING → PAUSED_PLAYING
       setPauseIcon(true); renderTimer();
     } else if(G.phase === "countdown"){           // F-02：倒數中開面板 → 停住倒數，唔可以背景偷跑
-      clearInterval(CD_TIMER); CD_TIMER = 0; EXIT_PAUSED = true;
+      G.sm.pause();                               // COUNTDOWN → PAUSED_COUNTDOWN
+      clearInterval(CD_TIMER); CD_TIMER = 0;
     }
   }
   setTimeout(()=>$("#exitCancel").focus({preventScroll:true}), 40);
@@ -1591,10 +1379,15 @@ function closeExit(){
   $("#exitSheet").classList.remove("on");
   inertBackground(false);                         // F-08
   clearTrap();                                   // F-05/F-08
-  if(EXIT_PAUSED){
-    EXIT_PAUSED = false;
-    if(G && G.phase === "running"){ G.paused = false; G.endsAt = Date.now() + G.remaining*1000; setPauseIcon(false); renderTimer(); }
-    else if(G && G.phase === "countdown"){ startRound(); }   // F-02：重啟倒數
+  if(!G || !G.canResume()) return;                // 面板沒暫停過就無事可做
+  const wasCountdown = G.sm.state === State.PAUSED_COUNTDOWN;
+  if(!G.sm.resume()) return;                      // → PLAYING 或 COUNTDOWN
+  if(wasCountdown){
+    startRound();                                 // F-02：重啟倒數
+  } else {
+    G.endsAt = Date.now() + G.remaining*1000;
+    setPauseIcon(false);
+    renderTimer();
   }
 }
 
@@ -1622,8 +1415,12 @@ function setPauseIcon(p){
 }
 $("#btnPause").onclick = ()=>{
   if(!G || G.phase!=="running") return;
-  G.paused = !G.paused;
-  if(!G.paused) G.endsAt = Date.now() + G.remaining * 1000;
+  if(G.paused){
+    if(!G.sm.resume()) return;
+    G.endsAt = Date.now() + G.remaining * 1000;
+  } else {
+    if(!G.sm.pause()) return;
+  }
   setPauseIcon(G.paused);
   renderTimer();
 };
@@ -1664,42 +1461,9 @@ document.addEventListener("keydown", e=>{
 
 
 /* ================= 鍵盤快捷鍵（每部機自己記，唔跟帳號） ================= */
-const KEY_DEF  = { foul:"ArrowLeft", skip:"ArrowDown", ok:"ArrowRight", undo:"ArrowUp" };
-const KEY_WHAT = { foul:"犯規", skip:"跳過", ok:"正確", undo:"撤回" };
-const KEY_ORDER = ["foul","skip","ok","undo"];
-
-function loadKeys(){
-  const out = { ...KEY_DEF };
-  try{
-    const j = JSON.parse(localStorage.getItem("beasttv.keys") || "{}");
-    for(const k of KEY_ORDER) if(j && typeof j[k] === "string" && j[k]) out[k] = j[k];
-  }catch(e){}
-  return out;
-}
+/* 按鍵常數與純函式由 ./src/keys.js 提供；app.js 只保留 KKEYS 狀態與 UI 編排。 */
 const KKEYS = loadKeys();
 let ACT_BY_CODE = {};
-function saveKeys(){
-  try{ localStorage.setItem("beasttv.keys", JSON.stringify(KKEYS)); }catch(e){}
-}
-function keyLabel(code){
-  const m = { ArrowLeft:"←", ArrowRight:"→", ArrowUp:"↑", ArrowDown:"↓", Space:"空格",
-              Enter:"Enter", Backspace:"⌫", Delete:"Del", Home:"Home", End:"End",
-              PageUp:"PgUp", PageDown:"PgDn", Insert:"Ins", Escape:"Esc" };
-  if(m[code]) return m[code];
-  if(/^Key[A-Z]$/.test(code)) return code.slice(3);
-  if(/^Digit\d$/.test(code)) return code.slice(5);
-  if(/^Numpad\d$/.test(code)) return "Num" + code.slice(6);
-  return code.replace(/^Numpad/, "Num");
-}
-function codeOf(e){
-  if(e.code) return e.code;
-  const k = e.key || "";                       // 冇 code（合成事件）就用 key 反推
-  if(/^Arrow(Left|Right|Up|Down)$/.test(k)) return k;
-  if(k === " " || k === "Spacebar") return "Space";
-  if(/^[a-zA-Z]$/.test(k)) return "Key" + k.toUpperCase();
-  if(/^\d$/.test(k)) return "Digit" + k;
-  return k;
-}
 function applyKeys(){
   ACT_BY_CODE = {};
   for(const k of KEY_ORDER) ACT_BY_CODE[KKEYS[k]] = k;
@@ -1728,7 +1492,7 @@ function renderKeyRows(){
 }
 if($("#keysReset")) $("#keysReset").onclick = ()=>{
   for(const k of KEY_ORDER) KKEYS[k] = KEY_DEF[k];
-  KEY_LISTEN = null; saveKeys(); renderKeyRows(); applyKeys();
+  KEY_LISTEN = null; saveKeys(KKEYS); renderKeyRows(); applyKeys();
 };
 if($("#keyRows")) $("#keyRows").addEventListener("click", e=>{
   const b = e.target.closest(".key-chip"); if(!b) return;
@@ -1747,7 +1511,7 @@ document.addEventListener("keydown", e=>{
     if(other !== me && KKEYS[other] === code) KKEYS[other] = KKEYS[me];   // 撞鍵 → 兩者交換
   }
   KKEYS[me] = code;
-  KEY_LISTEN = null; saveKeys(); renderKeyRows(); applyKeys();
+  KEY_LISTEN = null; saveKeys(KKEYS); renderKeyRows(); applyKeys();
 }, true);
 
 /* 鍵盤控場 */
@@ -1760,14 +1524,14 @@ document.addEventListener("keydown", e=>{
   if(a === "ok"){
     e.preventDefault();
     if(G.phase === "ready") startRound();
-    else if(G.phase === "running") act("ok");
+    else if(G.canJudge()) act("ok");                        // 暫停時 act() 會自行拒絕
     else if(G.phase === "interstitial") closeTurnEnd();     // 結算卡：繼續
   }else if(a === "foul"){
     e.preventDefault();
-    if(G.phase === "running") act("foul");
+    if(G.canJudge()) act("foul");
   }else if(a === "skip"){
     e.preventDefault();
-    if(G.phase === "running") act("skip");
+    if(G.canJudge()) act("skip");
   }else if(a === "undo"){
     e.preventDefault();
     undoJudge();
@@ -1832,7 +1596,7 @@ function renderIdentity(){
     btn.type = "button"; btn.textContent = T("登出");
     btn.onclick = async ()=>{
       try{ await fetch("/api/logout", { method:"POST", headers:{ authorization:"Bearer " + TOKEN() } }); }catch(_){}
-      localStorage.removeItem("beasttv.token");
+      clearToken();
       location.href = "/";
     };
     el.append(btn);
@@ -1855,7 +1619,7 @@ async function boot(){
         ME = d;
         if(d.bank && d.bank.slug) BANK = d.bank.slug;
       }else{
-        localStorage.removeItem("beasttv.token");   // 過期／失效
+        clearToken();   // 過期／失效
       }
     }catch(_){}
   }
@@ -1864,11 +1628,11 @@ async function boot(){
 }
 
 document.body.dataset.view = "home";
-document.documentElement.lang = LANG === "en" ? "en" : "zh-Hant-HK";
-if(btnLang) btnLang.textContent = LANG === "en" ? "中文" : "English";
+document.documentElement.lang = isEn() ? "en" : "zh-Hant-HK";
+if(btnLang) btnLang.textContent = isEn() ? "中文" : "English";
 renderHome();
 boot();
 window.__bigtv = { get G(){return G}, get lines(){return lines}, get cfg(){return cfg},
   startGame, startRound, enterReady, judge, undoJudge, settleAdjust, endTurn, endGame,
-  reportProblem, get diag(){return DIAG},
+  reportProblem, get diag(){return getDiag()},
   renderHome, renderPlay, showView };

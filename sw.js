@@ -4,10 +4,15 @@
    - 圖片、音效：cache-first（檔名不變、內容少變）
    - /api/*：唔攔，永遠直上網絡（題庫唯一真相源在雲端）
 */
-const CACHE = "beast-v17";   // 每次改 styles.css／index.html 都要 bump：cache-first 下唔換版就派舊檔（本輪改 styles.css＋app.js，上線前 bump v16→v17）
+const CACHE = "beast-v18";   // 每次改 styles.css／index.html 都要 bump：cache-first 下唔換版就派舊檔（本輪改 styles.css＋app.js，上線前 bump v16→v17）
 const SHELL = [
   "/", "/edit", "/credits",
   "/styles.css", "/app.js",
+  /* styles.css 只是 8 條 @import 的聚合器；拆檔後 8 個分片要一併預快取，
+     否則 cache-first 下首次離線載入會 miss 掉分片、整個樣式失效。 */
+  "/css/01-base.css", "/css/02-home.css", "/css/03-setup.css",
+  "/css/04-buttons.css", "/css/05-play.css", "/css/06-screens.css",
+  "/css/07-result.css", "/css/08-responsive.css",
   "/manifest.json",
   "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/favicon.ico",
   "/art/team/turtle.webp", "/art/team/fox.webp", "/art/team/whale.webp", "/art/team/octopus.webp",

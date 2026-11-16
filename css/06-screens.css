@@ -1,0 +1,124 @@
+  /* ---------- ready ---------- */
+  .ready{position:fixed; inset:0; z-index:60; display:none; background:var(--surface)}
+  .ready[style*="flex"]{display:flex}
+  .readyCard{width:100%; height:100%; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; text-align:center; padding:clamp(24px,6vh,56px) clamp(20px,4vw,48px); gap:6px}
+  .readyRound{font-size:15px; color:var(--ink-2); letter-spacing:.02em}
+  .readyMark{font-size:clamp(54px,10vh,104px); line-height:1; color:var(--tc); margin-bottom:6px}
+  .readyMark svg,.readyMark .mark-img{display:block; width:1em; height:1em; margin:0 auto}
+  .readyTeam{font-family:var(--font-display); font-weight:700; font-size:clamp(52px,13vh,140px);
+    letter-spacing:-.03em; line-height:1.02; margin:10px 0 16px}
+  .readyScores{display:grid; grid-template-columns:repeat(var(--cols,4), minmax(0,1fr));
+    gap:10px; justify-content:center; margin-top:clamp(16px,2.8vh,28px); width:min(620px,100%)}
+  .readyScores.many .score-tile{padding:7px 8px}
+  .readyScores.many .pill-mark{width:18px; height:18px; font-size:18px}
+  .readyScores.many .score-name{font-size:12px}
+  .readyScores.many b{font-size:15px}
+  .readyScores .score-tile{display:flex; flex-direction:column; align-items:center; gap:2px;
+    min-width:0; padding:9px 10px; border-radius:var(--r-md);
+    background:var(--fill); box-shadow:inset 0 0 0 1px var(--sep)}
+  .readyScores .score-tile.cur{background:color-mix(in oklab, var(--tc) 18%, var(--surface));
+    box-shadow:inset 0 0 0 2.5px var(--tc)}
+  .readyScores .pill-mark{display:block; width:22px; height:22px; font-size:22px; color:var(--tc)}
+  .readyScores .pill-mark svg,.readyScores .pill-mark .mark-img{display:block; width:1em; height:1em}
+  .readyScores .score-name{font-size:13px; font-weight:600; color:var(--ink);
+    max-width:12ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .readyScores b{font-family:var(--font-display); font-size:17px; font-weight:600; color:var(--ink);
+    font-variant-numeric:tabular-nums}
+  .readyCard button{margin-top:clamp(24px,4vh,36px); min-height:56px; padding:0 40px;
+    background:var(--blue-fill); color:var(--on-accent); font-size:19px; font-weight:600; border-radius:var(--r-lg)}
+  /* 「準備好」唔再顯示 → ：鍵位可自訂，方向符號會誤導（同 HUD 三粒鍵一致） */
+  /* ---------- 倒數（獨立過場動畫） ---------- */
+  .countdown{position:fixed; inset:0; z-index:70; display:none; place-items:center;
+    background:var(--surface); overflow:hidden}
+  .countdown.on{display:grid}
+  .countdown::before{content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(58% 58% at 50% 50%,
+      color-mix(in oklab, var(--tc, var(--blue)) 15%, transparent), transparent 72%)}
+  .cd-inner{position:relative; display:grid; place-items:center; gap:clamp(10px,1.8vh,18px)}
+  .cd-dial{position:relative; display:grid; place-items:center;
+    width:clamp(216px,33vh,312px); height:clamp(216px,33vh,312px)}
+  .cd-dial svg{position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg)}
+  .cd-track{fill:none; stroke-width:4; stroke:color-mix(in oklab, var(--tc, var(--blue)) 16%, transparent)}
+  .cd-prog{fill:none; stroke-width:4; stroke-linecap:round; stroke:var(--tc, var(--blue));
+    stroke-dasharray:339.3; stroke-dashoffset:0; transition:stroke-dashoffset 1s linear}
+  .cd-num{font-family:var(--font-display); font-weight:700; color:var(--ink);
+    font-size:clamp(92px,19vh,184px); line-height:1; letter-spacing:-.04em;
+    font-variant-numeric:tabular-nums}
+  .cd-num.word{font-size:clamp(38px,8vh,72px); letter-spacing:.02em; text-align:center}
+  .cd-num.beat{animation:cdBeat .55s var(--ease)}
+  @keyframes cdBeat{0%{transform:scale(1.24); opacity:.3} 100%{transform:scale(1); opacity:1}}
+  .cd-team{display:flex; align-items:center; gap:12px; font-weight:600;
+    font-family:var(--font-display); letter-spacing:-.01em;
+    font-size:clamp(22px,3.2vh,32px); color:var(--tc, var(--blue))}
+  .cd-team .cd-mark{font-size:1.15em; line-height:1}
+  .cd-team .cd-mark svg,.cd-team .cd-mark .mark-img{display:block; width:1em; height:1em}
+
+  /* ---------- 落閘（重用開場幕布） ---------- */
+  .gate{position:fixed; inset:0; z-index:75; display:none; overflow:hidden; pointer-events:none}
+  .gate.on{display:block}
+  .gate-body{position:absolute; inset:0; display:grid; place-items:center;
+    color:var(--on-accent); opacity:0; transition:opacity .22s var(--ease)}
+  .js .gate-body{opacity:0}
+  .gate.text .gate-body{opacity:1}
+  .gate.settle{pointer-events:auto}
+  .gate.opening .gate-body{opacity:0; transition:none}
+  .js .gate.opening .te-card{opacity:0; transform:translateY(-12%) scale(.985);
+    transition:opacity .16s var(--ease), transform .3s var(--ease)}   /* 跟住開幕一齊滑走 */
+  .gate-hit{white-space:nowrap;position:absolute; text-align:center; font-family:var(--font-display);
+    font-weight:700; font-size:clamp(44px,8.4vh,88px); letter-spacing:-.02em;
+    transition:opacity .26s var(--ease), transform .3s var(--ease)}
+  .js .gate.settle .gate-hit{opacity:0; transform:scale(1.05)}
+
+  .te-card{display:grid; justify-items:center; gap:clamp(6px,1.2vh,12px); text-align:center;
+    padding:clamp(20px,4vh,40px) clamp(24px,4vw,56px); color:var(--on-accent);
+    transition:opacity .3s var(--ease), transform .34s var(--ease)}
+  .js .te-card{opacity:0; transform:scale(.97)}
+  .gate.settle .te-card{opacity:1; transform:none}
+  @keyframes teCard{from{transform:scale(.965)} to{transform:scale(1)}}
+  .te-mark{font-size:clamp(60px,10.4vh,96px); line-height:1; color:var(--on-accent)}
+  .te-mark svg{display:block; width:1em; height:1em}
+  .te-name{font-family:var(--font-display); font-weight:700; font-size:clamp(38px,7.6vh,68px);
+    letter-spacing:-.03em; line-height:1.06; color:var(--on-accent)}
+  .te-score{font-family:var(--font-display); font-weight:700; color:var(--on-accent);
+    font-size:clamp(60px,12vh,112px); line-height:1; letter-spacing:-.04em;
+    margin-top:clamp(2px,.4vh,4px); font-variant-numeric:tabular-nums}
+  .te-score em{font-style:normal; font-size:.32em; font-weight:600;
+    color:color-mix(in oklab, var(--on-accent) 74%, transparent);
+    margin-left:10px; letter-spacing:0}
+  .te-score.zero{color:color-mix(in oklab, var(--on-accent) 46%, transparent)}
+  .te-stats{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:clamp(2px,.8vh,8px)}
+  .stat{display:flex; align-items:center; gap:6px; padding:5px 8px 5px 12px; border-radius:999px;
+    background:color-mix(in oklab, var(--on-accent) 10%, transparent)}
+  .stat i{font-style:normal; font-size:13px; letter-spacing:.02em;
+    color:color-mix(in oklab, var(--on-accent) 62%, transparent)}
+  .stat b{min-width:15px; font-size:15px; font-variant-numeric:tabular-nums}
+  /* 命中區 44×44（iPad 手指都夠大），視覺圓點仍然 30px：用 ::before 畫圓，
+     負 margin 抵銷多出嘅尺寸，所以藥丸高度、字距、整體節奏一律不變 */
+  .stat button{position:relative; width:44px; height:44px; margin:-7px; min-height:0; padding:0; border:0;
+    border-radius:50%; display:grid; place-items:center; font-size:17px; line-height:1; color:var(--on-accent);
+    background:transparent; touch-action:manipulation}
+  .stat button::before{content:""; position:absolute; inset:7px; border-radius:50%;
+    background:color-mix(in oklab, var(--on-accent) 16%, transparent)}
+  .stat button:active::before{background:color-mix(in oklab, var(--on-accent) 32%, transparent)}
+  /* 矮視窗（手機橫屏）：結算卡連覆核列都要塞得入 */
+  @media (max-height:420px){
+    .te-card{gap:4px; padding:10px 18px}
+    .te-mark{font-size:34px}
+    .te-name{font-size:26px}
+    .te-score{font-size:44px; margin-top:0}
+    .te-stats{margin-top:2px; gap:6px}
+    .stat{padding:3px 6px 3px 9px; gap:4px}
+    .stat i{font-size:11px}
+    .stat b{font-size:13px; min-width:12px}
+    .stat button{width:44px; height:44px; margin:-10px; font-size:14px}
+    .stat button::before{inset:10px}
+    .te-next{margin-top:8px; min-height:38px; padding:0 22px; font-size:15px}
+  }
+  .te-next{margin-top:clamp(22px,3.6vh,36px); min-height:56px; padding:0 34px;
+    display:inline-flex; align-items:center; gap:12px;
+    background:var(--on-accent); color:var(--blue); font-size:19px; font-weight:600;
+    border-radius:var(--r-lg)}
+  .te-next:active{background:color-mix(in oklab, var(--on-accent) 84%, var(--blue))}
+  /* 結算卡「繼續」同樣唔顯示 → */
+

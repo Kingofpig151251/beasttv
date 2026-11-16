@@ -29,7 +29,8 @@ jobs:
           node-version: "22"
 
       - name: 3. 跑邏輯測試
-        run: node --test tests/logic.test.js tests/real-app.test.js tests/endgame.test.js tests/turn.test.js
+        # 用 glob 而非逐個列出：新增測試檔會自動納入，不會因為忘記加而漏測。
+        run: node --test "tests/*.test.js"
 
   check:
     name: 靜態檢查 + 冒煙測試

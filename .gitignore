@@ -39,3 +39,10 @@ _dbg*.html
 _probe_*/
 _probe_*
 _debug*.html
+
+# Vite build 產物與建置期暫存（唔入 repo）
+dist/
+.vite-public/
+.build-probe/
+*.probe.html
+vite.probe.config.js

@@ -1,0 +1,6 @@
+# pnpm 10+ 預設封鎖 dependency 嘅 postinstall script。
+# esbuild 要靠 postinstall 落平台二進位；唔批准嘅話 pnpm 會以
+# ERR_PNPM_IGNORED_BUILDS 直接 exit 1 —— 喺 Vercel 就等於 build 失敗。
+# pnpm 11 嘅鍵名係 allowBuilds（布林映射），唔再係 onlyBuiltDependencies。
+allowBuilds:
+  esbuild: true

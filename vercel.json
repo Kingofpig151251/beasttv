@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
+  "installCommand": "pnpm install --config.nodeLinker=hoisted",
   "cleanUrls": true,
   "functions": {
     "api/[...path].py": {

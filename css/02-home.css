@@ -1,0 +1,117 @@
+  /* ---------- 主頁（入口） ---------- */
+  #v-home{display:none}
+  /* 主頁永遠唔可以滾：用 svh（最細視窗，計埋 Safari 工具列），唔用 dvh；
+     再預留 24px 俾瀏覽器底部工具列，footer 唔會貼住／俾人切走 */
+  #v-home.active{display:flex; flex-direction:column;
+    min-height:calc(100vh - 50px);
+    min-height:calc(100svh - 74px)}
+  body[data-view="home"]{overflow:hidden}
+  #v-home.active{position:relative; overflow:hidden}
+  #v-home.active::before{content:""; position:absolute; width:min(120vh,900px); aspect-ratio:1;
+    border-radius:50%; pointer-events:none; z-index:0;
+    background:radial-gradient(circle, var(--spot) 0%, transparent 62%);
+    animation:breathe 7s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(.92); opacity:.75} 50%{transform:scale(1.06); opacity:1}}
+  .landing{position:relative; z-index:1; flex:1; display:grid; grid-template-rows:1fr auto auto;
+    justify-items:center; align-items:center; text-align:center}
+  /* 散佈群像：八隻全身動物浮喺標題四周，唔排隊、唔裁切 */
+  .landing-beasts{position:absolute; inset:0; pointer-events:none; z-index:0}
+  .beast{position:absolute; left:var(--x); top:var(--y);
+    width:calc(var(--k,1) * clamp(54px, 8.6vmin, 112px));
+    transform:translate(-50%,-50%) rotate(var(--r,0deg));
+    animation:beastFloat var(--d,8s) ease-in-out calc(var(--i,0s) + .5s) infinite alternate backwards}
+  .beast .sway{display:block; transform:rotate(var(--r,0deg));
+    animation:beastSway var(--d,8s) ease-in-out calc(var(--i,0s) + .5s) infinite alternate backwards}
+  .beast img{display:block; width:100%; height:auto; aspect-ratio:1;
+    animation:rise .62s .06s var(--ease) both}   /* 與標題同一條 rise、同一個延遲，唔再係貼圖先彈出 */
+  @keyframes beastSway{
+    from{transform:rotate(calc(var(--r,0deg) - 3.5deg))}
+    to{transform:rotate(calc(var(--r,0deg) + 3.5deg))}}
+  @keyframes beastFloat{
+    from{transform:translate(-50%,-50%) rotate(var(--r,0deg)) translateY(-7px)}
+    to{transform:translate(-50%,-50%) rotate(var(--r,0deg)) translateY(7px)}}
+  /* 橫向：動物退到左右兩側，中軸留給標題 */
+  @media (min-aspect-ratio: 1/1){
+    .beast{left:var(--xl,var(--x)); top:var(--yl,var(--y));
+      width:calc(var(--k,1) * clamp(50px, 10.5vmin, 104px))}
+  }
+  /* 手機：只留四角四隻動物，避免同大標題打架 */
+  @media (max-width:560px){
+    .beast{width:calc(var(--k,1) * clamp(44px, 12.5vw, 72px))}
+    .beast:nth-child(1){left:13%; top:11%}
+    .beast:nth-child(2){left:87%; top:9%}
+    .beast:nth-child(3){left:12%; top:84%}
+    .beast:nth-child(4){left:88%; top:82%}
+    .beast:nth-child(n+5){display:none}
+  }
+  /* 矮螢幕：最少留兩隻（左右上角），唔會全空 */
+  @media (max-height:600px){
+    .beast:nth-child(n+3){display:none}
+    .beast:nth-child(1){left:8%; top:11%; --k:.88}
+    .beast:nth-child(2){left:92%; top:9%; --k:.96}
+  }
+  .landing-main{display:flex; flex-direction:column; align-items:center}
+  html.brand-pending .landing-title,
+  html.brand-pending .landing-sub{visibility:hidden}   /* 等品牌到手先露，避免閃預設名 */
+  .landing-title{margin:14px 0 0; font-family:var(--font-display); font-weight:700;
+    font-size:clamp(76px,16vh,168px); letter-spacing:-.045em; line-height:.98; text-wrap:balance;
+    display:flex; align-items:center; justify-content:center;
+    min-height:calc(min(16vh, 168px) * .98);      /* 中英字階不同，但佔位一樣高 */
+    animation:rise .62s .06s var(--ease) both}
+  @media (max-width:560px){
+    .landing-go{margin-top:clamp(18px, 2.8vh, 32px)}
+    .landing-title{font-size:clamp(58px, 26vw, 116px); letter-spacing:-.03em;
+    min-height:calc(min(26vw, 116px) * .98)} }
+  /* 窄屏：版權行同品牌圖示分兩行，避免斷字成三欄 */
+  @media (max-width:560px){
+    #toast.multi{bottom:calc(124px + env(safe-area-inset-bottom))}
+    .landing-foot{gap:10px; row-gap:6px}          /* 只剩版權＋GitHub，一行過就夠 */
+  }
+  .landing-title[data-len="mid"]{font-size:clamp(52px, 11vh, 118px); letter-spacing:-.035em}
+  .landing-title[data-len="long"]{font-size:clamp(38px, 7.4vh, 82px); letter-spacing:-.025em; line-height:1.06}
+  @media (max-width:560px){ .landing-title[data-len="long"]{font-size:clamp(30px, 9.4vw, 46px); letter-spacing:-.02em} }
+  .landing-sub{margin:clamp(12px,1.9vh,18px) 0 0; font-size:clamp(17px,2.5vh,22px);
+    font-weight:500; color:var(--ink-2); letter-spacing:.02em;
+    animation:rise .62s .12s var(--ease) both}
+  /* 開始鍵同下面 設定＋語言 那一行等寬（132×2＋10＝274），三粒左中右邊緣齊 */
+  .landing-go{margin-top:clamp(28px,3.8vh,40px); width:274px; max-width:100%; min-height:60px; font-size:21px; border-radius:var(--pill);
+    animation:rise .62s .18s var(--ease) both}
+  .landing-foot{display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; row-gap:6px;
+    padding:0 0 4px; animation:rise .62s .3s var(--ease) both; line-height:1}
+  /* 設定同語言：同一行、同高、同寬，切語言時兩粒都唔會跳 */
+  .home-tools{display:flex; align-items:center; justify-content:center; gap:10px; margin-top:20px}
+  .home-tools .landing-link{margin-top:0; width:132px; min-width:132px; padding:0; gap:6px;
+    min-height:48px; font-size:17px; line-height:1; color:var(--ink)}
+  .lang-toggle{min-width:44px; min-height:44px; padding:0 14px; border:0; border-radius:999px; background:var(--fill);
+    color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:600; letter-spacing:.01em;
+    touch-action:manipulation; white-space:nowrap}
+  .lang-toggle:active{background:var(--fill-2)}
+  .my-bank{margin:10px 0 0; font-size:13px; color:var(--ink-2); display:flex; align-items:center; gap:8px; justify-content:center}
+  .my-bank b{font-weight:600; color:var(--ink)}
+  .my-bank button{font:inherit; font-size:12.5px; color:var(--blue-press); background:none; border:0; padding:2px 0; min-height:0}
+  .landing-credit{font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums;
+    display:inline-flex; align-items:center; gap:6px; white-space:nowrap; min-height:44px}
+  /* 觸控目標維持 44×44，但不撐高行盒：用 padding 上下撐開、行高收窄，視覺仍與旁邊對齊 */
+  .credit-link{font:inherit; font-size:13px; color:var(--ink-2); background:none; border:0;
+    padding:14px 2px; margin:-14px 0; cursor:pointer; font-variant-numeric:tabular-nums;
+    display:inline-flex; align-items:center; border-radius:6px}
+  .credit-link:hover{color:var(--ink)}
+  #toast.multi{text-align:left; white-space:pre-line; line-height:1.6; font-size:14px;
+    bottom:calc(104px + env(safe-area-inset-bottom));
+    border-radius:var(--r-lg); padding:14px 16px; width:min(560px, calc(100% - 40px))}
+  /* 頁腳：只剩版權 ＋ 一個明顯嘅 GitHub 膠囊；Hermes／OpenCode 品牌搬去 /credits */
+  .gh-link{display:inline-flex; align-items:center; gap:6px; height:44px; padding:0 13px;
+    border-radius:var(--r-lg); background:var(--fill); color:var(--ink);
+    font-size:13px; font-weight:600; letter-spacing:.01em; text-decoration:none;
+    transition:background-color .2s var(--ease)}
+  .gh-link svg{width:15px; height:15px; flex:none}
+  .gh-link:active{background:var(--fill-2)}
+  .landing-link{display:inline-flex; align-items:center; justify-content:center; margin-top:20px;
+    min-width:132px; min-height:48px; padding:0 26px; border-radius:var(--pill); background:var(--fill);
+    color:var(--ink); font-size:17px; font-weight:600; text-decoration:none;
+    animation:rise .62s .22s var(--ease) both}
+  .landing-link:active{background:var(--fill-2)}
+  @keyframes rise{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none}}
+  body.is-entering .landing{opacity:0; transform:scale(1.06);
+    transition:opacity .28s var(--ease), transform .42s var(--ease)}
+
