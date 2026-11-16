@@ -19,7 +19,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
-import { runnableAppCode, injectedGlobals } from "./helpers/load-app.js";
+import { legacyAppCode } from "./helpers/load-app.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const APP_JS = resolve(HERE, "..", "app.js");
 const noop = () => {};
@@ -156,10 +156,9 @@ function makeSandbox() {
 /** 載入一份全新的 app.js 沙箱（每次呼叫都是乾淨狀態） */
 function bootApp() {
   const { sandbox, store } = makeSandbox();
-  Object.assign(sandbox, injectedGlobals());
   const ctx = vm.createContext(sandbox);
   try {
-    new vm.Script(runnableAppCode(), { filename: "app.js" }).runInContext(ctx, {
+    new vm.Script(legacyAppCode(), { filename: "app.js" }).runInContext(ctx, {
       timeout: 10000,
     });
   } catch (e) {

@@ -14,6 +14,7 @@ import { State, GameStateMachine, StateError } from "./src/state.js";
 import { $, $$ } from "./src/dom.js";
 import { getLang, setLang as setI18nLang, isEn, T, translateTree } from "./src/i18n.js";
 import { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted } from "./src/sfx.js";
+import { KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf } from "./src/keys.js";
 
 /* 語言狀態與字典由 ./src/i18n.js 提供；app.js 只保留切語言時的畫面編排。 */
 function setLang(next){
@@ -1490,42 +1491,9 @@ document.addEventListener("keydown", e=>{
 
 
 /* ================= 鍵盤快捷鍵（每部機自己記，唔跟帳號） ================= */
-const KEY_DEF  = { foul:"ArrowLeft", skip:"ArrowDown", ok:"ArrowRight", undo:"ArrowUp" };
-const KEY_WHAT = { foul:"犯規", skip:"跳過", ok:"正確", undo:"撤回" };
-const KEY_ORDER = ["foul","skip","ok","undo"];
-
-function loadKeys(){
-  const out = { ...KEY_DEF };
-  try{
-    const j = JSON.parse(localStorage.getItem("beasttv.keys") || "{}");
-    for(const k of KEY_ORDER) if(j && typeof j[k] === "string" && j[k]) out[k] = j[k];
-  }catch(e){}
-  return out;
-}
+/* 按鍵常數與純函式由 ./src/keys.js 提供；app.js 只保留 KKEYS 狀態與 UI 編排。 */
 const KKEYS = loadKeys();
 let ACT_BY_CODE = {};
-function saveKeys(){
-  try{ localStorage.setItem("beasttv.keys", JSON.stringify(KKEYS)); }catch(e){}
-}
-function keyLabel(code){
-  const m = { ArrowLeft:"←", ArrowRight:"→", ArrowUp:"↑", ArrowDown:"↓", Space:"空格",
-              Enter:"Enter", Backspace:"⌫", Delete:"Del", Home:"Home", End:"End",
-              PageUp:"PgUp", PageDown:"PgDn", Insert:"Ins", Escape:"Esc" };
-  if(m[code]) return m[code];
-  if(/^Key[A-Z]$/.test(code)) return code.slice(3);
-  if(/^Digit\d$/.test(code)) return code.slice(5);
-  if(/^Numpad\d$/.test(code)) return "Num" + code.slice(6);
-  return code.replace(/^Numpad/, "Num");
-}
-function codeOf(e){
-  if(e.code) return e.code;
-  const k = e.key || "";                       // 冇 code（合成事件）就用 key 反推
-  if(/^Arrow(Left|Right|Up|Down)$/.test(k)) return k;
-  if(k === " " || k === "Spacebar") return "Space";
-  if(/^[a-zA-Z]$/.test(k)) return "Key" + k.toUpperCase();
-  if(/^\d$/.test(k)) return "Digit" + k;
-  return k;
-}
 function applyKeys(){
   ACT_BY_CODE = {};
   for(const k of KEY_ORDER) ACT_BY_CODE[KKEYS[k]] = k;
@@ -1554,7 +1522,7 @@ function renderKeyRows(){
 }
 if($("#keysReset")) $("#keysReset").onclick = ()=>{
   for(const k of KEY_ORDER) KKEYS[k] = KEY_DEF[k];
-  KEY_LISTEN = null; saveKeys(); renderKeyRows(); applyKeys();
+  KEY_LISTEN = null; saveKeys(KKEYS); renderKeyRows(); applyKeys();
 };
 if($("#keyRows")) $("#keyRows").addEventListener("click", e=>{
   const b = e.target.closest(".key-chip"); if(!b) return;
@@ -1573,7 +1541,7 @@ document.addEventListener("keydown", e=>{
     if(other !== me && KKEYS[other] === code) KKEYS[other] = KKEYS[me];   // 撞鍵 → 兩者交換
   }
   KKEYS[me] = code;
-  KEY_LISTEN = null; saveKeys(); renderKeyRows(); applyKeys();
+  KEY_LISTEN = null; saveKeys(KKEYS); renderKeyRows(); applyKeys();
 }, true);
 
 /* 鍵盤控場 */

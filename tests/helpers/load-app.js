@@ -33,6 +33,9 @@ import {
   loadSfx, sfx, bgm, stopBgm,
   SFX_CORE, SFX_REST, isBgmWanted,
 } from "../../src/sfx.js";
+import {
+  KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf,
+} from "../../src/keys.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const ROOT = resolve(HERE, "..", "..");
@@ -59,6 +62,7 @@ const IMPORT_BINDINGS = Object.freeze({
   "./src/dom.js": { $: null, $$: null }, // 佔位，實際由 SANDBOX_DEFS 產生
   "./src/sfx.js": { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted },
   "./src/i18n.js": { getLang, setLang: setI18nLang, isEn, T, translateTree },
+  "./src/keys.js": { KEY_DEF, KEY_WHAT, KEY_ORDER, loadKeys, saveKeys, keyLabel, codeOf },
 });
 
 /** 取出 app.js 源碼（含 import），供需要自行解析的測試使用 */
