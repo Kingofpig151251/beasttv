@@ -292,7 +292,7 @@
   <div class="vs" id="vsBoard"></div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="/app.js" defer></script>
+<script type="module" src="/app.js"></script>
 <script>
 if("serviceWorker" in navigator && location.protocol === "https:"){
   addEventListener("load", ()=>{ navigator.serviceWorker.register("/sw.js").catch(()=>{}); });

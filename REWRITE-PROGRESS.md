@@ -3,14 +3,39 @@
 > 這份文件記錄重寫的現況、執行指令、紅線與待辦。每次繼續工作前先讀這份。
 > 定時任務已於 2026-11-16 停用，改由團隊目標（group_goal）並行推進。
 
-## 目前狀態（2026-11-16 08:00）
+## 目前狀態（2026-11-16 09:35）
 
 - 工作目錄：`C:\Users\KingLEUNGTungLam\DS Bot\beasttv`
 - 分支：`rewrite/modular`（**不要動 main**，main 與線上服務要保持可用）
-- 最新 commit：`f0047cd`（三個純函式模組）
+- 最新 commit：見 `git log -1`
 - 測試：**358 個全過**
 - `static_check.py`：PASS
-- headless Chrome 完整一局實測：13/13 通過
+- Vite build：EXIT=0，`dist/` 完整驗證 13/13
+- 原始碼 module 載入（CI smoke 用）：6/6 通過
+- headless Chrome 打包版完整一局：13/13 通過
+
+### 已完成：Vite build 接線（尚未上線）
+
+`app.js` 已改成 ES module，`index.html` 的 script 改成 `type="module"`。
+新增 `vite.config.js`、`package.json`、`pnpm-workspace.yaml`，`.gitignore` 補上 build 產物。
+
+**vite.config.js 三個關鍵處理**（缺一上線就壞）：
+1. `publicDir`：PWA 靜態檔（sw.js / manifest / icons / art / sfx）原封不動複製到 dist 根目錄
+2. `app.js` 列為 rollup input，closeBundle 改寫三個 HTML 的 script src 為 hash 檔名
+3. `sw.js` SHELL 重寫：`/app.js`、`/styles.css`、8 個 CSS 分片 → 實際 hash 路徑；
+   8 個分片會被 Vite 合併成單一 CSS，所以收斂成一條；
+   **必須連 `main-*.js`（HTML entry wrapper）一起加入 SHELL**，否則離線首次載入缺 JS
+
+**驗證結果**：
+- `vite build` EXIT=0，9 個模組
+- `dist/sw.js` SHELL 22 個 URL 全部存在
+- 11 個 PWA 路徑全 200（含 cleanUrls）
+- 打包版完整一局 13/13：開局、倒數、判定、暫停、零錯誤
+- 原始碼狀態也能跑（module script 自動抓 `/src/format.js`），所以 CI smoke 不用改
+
+**尚未做（依用戶決定「先做但不上線」）**：
+- `vercel.json` 未動（仍需加 buildCommand / outputDirectory / installCommand 才會真的部署）
+- 未 push、未合回 main、線上服務完全不受影響
 
 ## 已完成的成果
 
@@ -160,12 +185,19 @@ Set-Location $d
 
 ## 待辦（按優先序）
 
-### 1. 決定何時把 `src/` 真正接進 app.js
-目前七個模組是契約哨兵，執行期沒被載入。要讓重寫真正落地，
-需改成 module + Vite build（spike 分支 `spike/vite-build` 已驗證可行）。
-這是**下一個大決策**，會動到部署方式，要用戶同意才做。
+### 1. ~~決定何時把 `src/` 真正接進 app.js~~（已完成第一步）
+`src/format.js` 已真正 import 進 app.js（`05c1e5e`）。
+其餘六個模組仍是契約哨兵，可逐步比照辦理：
+每次只接一個、接完跑 358 測試 + build + 瀏覽器實測。
 
-### 2. 其餘可獨立抽出的部分
+### 2. 上線決策（下一個大關卡）
+Vite build 已完整驗證可行，但 `vercel.json` 未動、未部署。
+要上線需：
+- `vercel.json` 加三行（buildCommand / outputDirectory / installCommand）
+- push 後確認 Vercel 部署成功、線上是新版
+- 這會動到正式站，**要用戶明確同意才做**
+
+### 3. 其餘可獨立抽出的部分
 - `src/audio-ui.js`：wakeOn / wakeOff（螢幕常亮，與音效不同職責）
 - `src/diag.js`：DIAG 環形緩衝與 diagPush
 
