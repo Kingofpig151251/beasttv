@@ -3,57 +3,46 @@
 > 這份文件記錄重寫的現況、執行指令、紅線與待辦。每次繼續工作前先讀這份。
 > 定時任務已於 2026-11-16 停用，改由團隊目標（group_goal）並行推進。
 
-## 目前狀態（2026-11-16 09:35）
+## 目前狀態（2026-11-16 更新）
 
 - 工作目錄：`C:\Users\KingLEUNGTungLam\DS Bot\beasttv`
 - 分支：`rewrite/modular`（**不要動 main**，main 與線上服務要保持可用）
-- 最新 commit：見 `git log -1`
-- 測試：**358 個全過**
-- `static_check.py`：PASS
-- Vite build：EXIT=0，`dist/` 完整驗證 13/13
-- 原始碼 module 載入（CI smoke 用）：6/6 通過
-- headless Chrome 打包版完整一局：13/13 通過
+- 最新 commit：`23fe2d5 refactor(app): 接線 storage.js 模組`
+- 測試：**364 個全過**（`node --test "tests/*.test.js"`）
+- `static_check.py`：PASS（3 項）
+- Vite build：EXIT=0，**15 modules transformed**（產出 `main-*.js` / `app-*.js` / `styles-*.css`，sw.js SHELL 自動改寫）
+- 真實瀏覽器雙版本驗證：**dist 11 項 + raw 11 項 = 22 項全 PASS**（無 JS 例外、可進 COUNTDOWN/PLAYING、判定生效、隱藏分頁暫停 phase 正確、無重複載入 JS）
 
-### 已完成：Vite build 接線（尚未上線）
+### 已完成：7 個 `src/` 模組全部接線（尚未上線）
 
-`app.js` 已改成 ES module，`index.html` 的 script 改成 `type="module"`。
-新增 `vite.config.js`、`package.json`、`pnpm-workspace.yaml`，`.gitignore` 補上 build 產物。
+`app.js` 已改成 ES module，`index.html` 已 `type="module"`。以下模組已真正 import 進 `app.js`，並由 `tests/helpers/load-app.js` 的 `IMPORT_BINDINGS` 注入沙箱測試：
+- `src/format.js`、`src/state.js`、`src/dom.js`、`src/sfx.js`、`src/i18n.js`、`src/keys.js`、`src/storage.js`
 
-**vite.config.js 三個關鍵處理**（缺一上線就壞）：
-1. `publicDir`：PWA 靜態檔（sw.js / manifest / icons / art / sfx）原封不動複製到 dist 根目錄
-2. `app.js` 列為 rollup input，closeBundle 改寫三個 HTML 的 script src 為 hash 檔名
-3. `sw.js` SHELL 重寫：`/app.js`、`/styles.css`、8 個 CSS 分片 → 實際 hash 路徑；
-   8 個分片會被 Vite 合併成單一 CSS，所以收斂成一條；
-   **必須連 `main-*.js`（HTML entry wrapper）一起加入 SHELL**，否則離線首次載入缺 JS
+接線提交：`d0b591f`（state+sfx）→ `e44744e`（i18n）→ `05c1e5e`（format）→ `876011c`（keys）→ `23fe2d5`（storage）。
 
-**驗證結果**：
-- `vite build` EXIT=0，9 個模組
-- `dist/sw.js` SHELL 22 個 URL 全部存在
-- 11 個 PWA 路徑全 200（含 cleanUrls）
-- 打包版完整一局 13/13：開局、倒數、判定、暫停、零錯誤
-- 原始碼狀態也能跑（module script 自動抓 `/src/format.js`），所以 CI smoke 不用改
+### 已完成：Vite build 設定（尚未上線）
+
+新增/調整 `vite.config.js`、`package.json`、`pnpm-workspace.yaml`，`.gitignore` 補上 build 產物。
+- PWA 靜態檔原封不動複製到 dist；HTML entry + app.js 打包並改寫 hash 引用；`sw.js` SHELL 自動改寫為實際 hash 資產（含 main/app/css）。
 
 **尚未做（依用戶決定「先做但不上線」）**：
-- `vercel.json` 未動（仍需加 buildCommand / outputDirectory / installCommand 才會真的部署）
-- 未 push、未合回 main、線上服務完全不受影響
+- `vercel.json` 未動（未加 buildCommand / outputDirectory / installCommand），未 push、未合回 main、線上正式站維持現狀
 
 ## 已完成的成果
 
-### src/ 模組（7 個）
+### src/ 模組（7 個，全部已接線）
 
-| 檔案 | 內容 | 測試數 |
+| 檔案 | 內容 | 測試數（約） |
 |---|---|---|
-| `src/state.js` | 遊戲狀態機 | 25 |
-| `src/i18n.js` | 國際化，110 條字典 | 14 |
+| `src/state.js` | 遊戲狀態機 | 30 |
+| `src/i18n.js` | 國際化 | 14 |
 | `src/dom.js` | 103 個元素 id 常數（契約哨兵） | 13 |
 | `src/sfx.js` | 音效模組 | 19 |
 | `src/format.js` | esc / fmtScore / statLine | 32 |
-| `src/keys.js` | KEY_DEF / loadKeys / keyLabel / codeOf 等 | 見下表 |
-| `src/storage.js` | 五個 localStorage 鍵讀寫封裝 | 82 |
+| `src/keys.js` | KEY_DEF / loadKeys / keyLabel / codeOf 等 | 45 |
+| `src/storage.js` | 五個 localStorage 鍵讀寫封裝 | 42 |
 
-後三個由團隊目標並行抽出：施工A/B/C 施工、驗證A/B/C 交叉驗證、
-Chief 收尾兩處行為分歧後統一提交（`f0047cd`）。三名驗證者都做了突變測試
-（改壞模組看測試能否抓到），證明測試不是空殼。
+後三個由團隊目標並行抽出並經交叉驗證後提交（`f0047cd`）。三名驗證者做了突變測試。
 
 ### 兩處行為分歧（已收尾，重要）
 
@@ -95,7 +84,7 @@ Chief 收尾兩處行為分歧後統一提交（`f0047cd`）。三名驗證者�
 - 判定路徑全部收斂到 `G.canJudge()` / `G.canUndo()`
 - F-01（暫停時仍可判定）、F-02（倒數偷跑）已從結構上修好
 
-### 測試總覽（358）
+### 測試總覽（364）
 
 | 測試檔 | 數量 |
 |---|---|
@@ -103,16 +92,16 @@ Chief 收尾兩處行為分歧後統一提交（`f0047cd`）。三名驗證者�
 | `real-app.test.js` | 9 |
 | `endgame.test.js` | 7 |
 | `turn.test.js` | 13 |
-| `state.test.js` | 25 |
+| `state.test.js` | 30 |
 | `i18n.test.js` | 14 |
 | `dom.test.js` | 13 |
 | `app-state.test.js` | 9 |
 | `sfx.test.js` | 19 |
 | `utils.test.js` | 62 |
 | `format.test.js` | 32 |
-| `keys.test.js` | 約 60 |
-| `storage.test.js` | 82 |
-| **合計** | **358** |
+| `keys.test.js` | 45 |
+| `storage.test.js` | 42 |
+| **合計** | **364** |
 
 CI 已用 glob（`node --test "tests/*.test.js"`），新增測試檔自動納入。
 
@@ -133,12 +122,9 @@ Set-Location $d
    `sfx` 被 11 個呼叫、`renderHome` 8 個、`showView` 8 個、`esc` 7 個、`toast` 7 個。
    硬拆只是把耦合搬家。
 
-2. **`src/` 七個模組目前是「契約哨兵」而非執行期依賴**。`app.js` 是 classic script，
-   自己第 344–345 行定義 `$` / `$$`，**執行期沒有載入任何 `src/` 檔案**。
-   模組的價值在於測試把關。要真正載入需改成 module + Vite build，
-   那是另一件事，不要混著做。
+2. **`src/` 七個模組已真正接線**：`app.js` 已是 ES module，執行期由 import 載入各模組；Vite build 也已驗證可行，原始碼狀態與 dist 都可跑。
 
-3. **`app.js` 是 classic script**，`<script src="/app.js" defer>` 沒有 `type="module"`。
+3. **`app.js` 現為 ES module**（`index.html` 使用 `type="module"`）；Vite build 會打包並改寫 hash 引用，原始碼狀態下瀏覽器也能直接載入模組。
 
 4. **既存死路徑**：`app.js` 查 `#qCount` / `#qHint`，但 HTML 沒有這兩個元素。
    因有 `if()` 判空故不報錯、只是靜默失效。已標記 `DEAD_IDS`。**不要修**。
@@ -185,10 +171,8 @@ Set-Location $d
 
 ## 待辦（按優先序）
 
-### 1. ~~決定何時把 `src/` 真正接進 app.js~~（已完成第一步）
-`src/format.js` 已真正 import 進 app.js（`05c1e5e`）。
-其餘六個模組仍是契約哨兵，可逐步比照辦理：
-每次只接一個、接完跑 358 測試 + build + 瀏覽器實測。
+### 1. ~~把 `src/` 模組真正接進 app.js~~（已完成）
+7 個模組（format/state/dom/sfx/i18n/keys/storage）已全部 import 進 app.js，並通過 364 測試、static check、vite build（15 modules）與 22 項雙版本瀏覽器驗證。
 
 ### 2. 上線決策（下一個大關卡）
 Vite build 已完整驗證可行，但 `vercel.json` 未動、未部署。
