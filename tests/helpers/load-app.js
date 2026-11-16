@@ -26,14 +26,37 @@ import { execFileSync } from "node:child_process";
 import vm from "node:vm";
 
 import { esc, fmtScore, statLine } from "../../src/format.js";
+import { State, GameStateMachine, StateError } from "../../src/state.js";
+import { $, $$ } from "../../src/dom.js";
+import {
+  loadSfx, sfx, bgm, stopBgm,
+  SFX_CORE, SFX_REST, isBgmWanted,
+} from "../../src/sfx.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const ROOT = resolve(HERE, "..", "..");
 export const APP_JS = resolve(ROOT, "app.js");
 
-/** import 規格 → 要注入沙箱的函式對照 */
+/**
+ * 需在「沙箱內」重新定義的函式，而不是直接注入模組函式。
+ *
+ * 原因：`src/dom.js` 的 `$` 內部用到自由變數 `document`。若把該函式直接
+ * 從模組注入 vm sandbox，它保留的是 Node 模組作用域，找不到 sandbox 的
+ * `document`，會拋 "document is not defined"。
+ * 原本 app.js 內的 `const $ = s => document.querySelector(s)` 是在沙箱內
+ * 編譯的，`document` 自然指向沙箱。這裡用等價的字串在沙箱內重建。
+ */
+const SANDBOX_DEFS = Object.freeze({
+  "$": `(sel, root) => (root || document).querySelector(sel)`,
+  "$$": `(sel, root) => Array.from((root || document).querySelectorAll(sel))`,
+});
+
+/** import 規格 → 要注入沙箱的函式對照（$ / $$ 不走這條，見 SANDBOX_DEFS） */
 const IMPORT_BINDINGS = Object.freeze({
   "./src/format.js": { esc, fmtScore, statLine },
+  "./src/state.js": { State, GameStateMachine, StateError },
+  "./src/dom.js": { $: null, $$: null }, // 佔位，實際由 SANDBOX_DEFS 產生
+  "./src/sfx.js": { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted },
 });
 
 /** 取出 app.js 源碼（含 import），供需要自行解析的測試使用 */
@@ -79,10 +102,11 @@ export function prepareAppCode() {
         throw new Error(`load-app: 未登錄的 import 來源「${m[2]}」，請在 IMPORT_BINDINGS 補上`);
       }
       for (const n of names) {
-        if (typeof bindings[n] !== "function") {
-          throw new Error(`load-app: ${m[2]} 沒有 export 函式「${n}」`);
+        if (bindings[n] === undefined) {
+          throw new Error(`load-app: ${m[2]} 沒有 export「${n}」`);
         }
-        injected[n] = bindings[n];
+        // $ / $$ 不能在 Node 模組作用域注入，改由 SANDBOX_DEFS 在沙箱內定義
+        if (bindings[n] !== null) injected[n] = bindings[n];
       }
       continue; // 丟掉 import 行
     }
@@ -92,7 +116,12 @@ export function prepareAppCode() {
     lines.push(line);
   }
 
-  return { code: lines.join("\n"), injected };
+  // 在沙箱作用域內重建 $ / $$（等價於 src/dom.js，但用沙箱的 document）
+  const defs = Object.entries(SANDBOX_DEFS)
+    .map(([name, expr]) => `const ${name} = ${expr};`)
+    .join("\n");
+
+  return { code: defs + "\n" + lines.join("\n"), injected };
 }
 
 /** 需注入沙箱的函式（供呼叫方 Object.assign 到 sandbox） */

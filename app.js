@@ -3,108 +3,16 @@
 /* ================= 模組引入 =================
  * app.js 原本是 classic script，所有函式都擠在同一個檔案。
  * 現在逐步改成 module：把已抽出、並經「與原版逐項比對」測試驗證過的
- * 純函式，改由 src/ 提供。
+ * 純函式與狀態機，改由 src/ 提供。
  *
  * 注意（重要）：一旦加上 import，index.html 的 script 標籤必須改成
  * type="module"，且必須經過 Vite 打包（見 vite.config.js）。
  * 這一步只在 rewrite/modular 分支做，尚未上線。
  */
 import { esc, fmtScore, statLine } from "./src/format.js";
-
-/* ================= 遊戲狀態機 =================
- * 舊版把「階段」(G.phase) 與「暫停」(G.paused) 當成兩個獨立變數，
- * 兩者正交組合出多種狀態，每個守門函式都要自己記得同時檢查兩者，
- * F-01（暫停時仍可判定）與 F-02（倒數中背景偷跑）就是這樣漏掉的。
- *
- * 新版把「暫停」也變成狀態：paused-playing / paused-countdown。
- * 判定守門收斂到單一 canJudge()，只看 state === "playing"，
- * 「忘記檢查某一個變數」在結構上就不可能發生。
- *
- * 與 src/state.js 的轉移表完全一致（該檔有 25 個測試把關）。
- * app.js 是 classic script（非 module），所以這裡內嵌同一份邏輯；
- * 兩邊若有出入，tests/state.test.js 與 tests/app-state.test.js 都會失敗。
- */
-const State = Object.freeze({
-  IDLE: "idle",
-  READY: "ready",
-  COUNTDOWN: "countdown",
-  PLAYING: "playing",
-  PAUSED_PLAYING: "paused-playing",
-  PAUSED_COUNTDOWN: "paused-countdown",
-  INTERSTITIAL: "interstitial",
-  DONE: "done",
-});
-
-/* 舊程式用的是 "running"，對外顯示的 phase 仍維持這個字串以減少改動面 */
-const PHASE_OF = Object.freeze({
-  [State.IDLE]: "idle",
-  [State.READY]: "ready",
-  [State.COUNTDOWN]: "countdown",
-  [State.PLAYING]: "running",
-  [State.PAUSED_PLAYING]: "running",
-  [State.PAUSED_COUNTDOWN]: "countdown",
-  [State.INTERSTITIAL]: "interstitial",
-  [State.DONE]: "done",
-});
-
-const TRANSITIONS = Object.freeze({
-  [State.IDLE]: new Set([State.READY]),
-  [State.READY]: new Set([State.COUNTDOWN, State.IDLE]),
-  [State.COUNTDOWN]: new Set([State.PLAYING, State.PAUSED_COUNTDOWN, State.IDLE]),
-  [State.PLAYING]: new Set([State.PAUSED_PLAYING, State.INTERSTITIAL, State.IDLE]),
-  [State.PAUSED_PLAYING]: new Set([State.PLAYING, State.INTERSTITIAL, State.IDLE]),
-  [State.PAUSED_COUNTDOWN]: new Set([State.COUNTDOWN, State.IDLE]),
-  [State.INTERSTITIAL]: new Set([State.READY, State.DONE, State.IDLE]),
-  [State.DONE]: new Set([State.IDLE, State.READY]),
-});
-
-const JUDGEABLE = new Set([State.PLAYING]);
-const UNDOABLE = new Set([State.PLAYING]);
-const PAUSABLE = new Set([State.PLAYING, State.COUNTDOWN]);
-const RESUMABLE = new Set([State.PAUSED_PLAYING, State.PAUSED_COUNTDOWN]);
-const RESUME_TARGET = Object.freeze({
-  [State.PAUSED_PLAYING]: State.PLAYING,
-  [State.PAUSED_COUNTDOWN]: State.COUNTDOWN,
-});
-
-class GameStateMachine {
-  constructor() {
-    this.state = State.IDLE;
-    this.history = [State.IDLE];
-  }
-  get phase() { return PHASE_OF[this.state]; }
-  get paused() { return RESUMABLE.has(this.state); }
-  canJudge() { return JUDGEABLE.has(this.state); }
-  canUndo() { return UNDOABLE.has(this.state); }
-  canPause() { return PAUSABLE.has(this.state); }
-  canResume() { return RESUMABLE.has(this.state); }
-  isTimerActive() { return this.state === State.PLAYING; }
-
-  go(to) {
-    const allowed = TRANSITIONS[this.state];
-    if (!allowed || !allowed.has(to)) return false;
-    this.state = to;
-    this.history.push(to);
-    return true;
-  }
-  /* 直接設定（供測試與舊呼叫點過渡用），不檢查轉移表 */
-  force(to) {
-    if (!TRANSITIONS[to] && to !== State.IDLE) return false;
-    this.state = to;
-    this.history.push(to);
-    return true;
-  }
-  start() { return this.go(State.READY); }
-  goCountdown() { return this.go(State.COUNTDOWN); }
-  begin() { return this.go(State.PLAYING); }
-  pause() { return this.canPause() ? this.go(this.state === State.PLAYING ? State.PAUSED_PLAYING : State.PAUSED_COUNTDOWN) : false; }
-  resume() { const t = RESUME_TARGET[this.state]; return t ? this.go(t) : false; }
-  turnEnd() { return this.go(State.INTERSTITIAL); }
-  nextTurn() { return this.go(State.READY); }
-  finish() { return this.go(State.DONE); }
-  abort() { return this.state === State.IDLE ? true : this.go(State.IDLE); }
-  reset() { this.state = State.IDLE; this.history = [State.IDLE]; }
-}
+import { State, GameStateMachine, StateError } from "./src/state.js";
+import { $, $$ } from "./src/dom.js";
+import { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted } from "./src/sfx.js";
 
 /* ================= 語言 ================= */
 const LANG_KEY = "beasttv.lang";
@@ -352,8 +260,7 @@ ensureUniqueAnimals();
 let G = null;
 let REMOTE = { ok:false };
 
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
+/* $ / $$ 由 ./src/dom.js 提供（簽名與原本完全一致） */
 
 /* esc 由 ./src/format.js 提供（已與原版逐項比對） */
 
@@ -869,83 +776,8 @@ function hideReady(){
   document.body.classList.remove("is-ready");
 }
 
-/* 音效：WebAudio 直接合成，唔使音檔 */
-let AC = null;
-function audioCtx(){
-  const C = window.AudioContext || window.webkitAudioContext;
-  if(!C) return null;
-  if(!AC) AC = new C();
-  if(AC.state === "suspended") AC.resume();
-  return AC;
-}
-/* 音檔：判定用真音源（門鐘／子彈），其餘場合仍用合成音 */
-const SFX_SRC = { ding: "/sfx/dingdong.mp3", whoosh: "/sfx/whoosh.mp3", heart: "/sfx/hb3.mp3",
-                   countdown: "/sfx/countdown.mp3", whistle: "/sfx/whistle.mp3",
-                   settle: "/sfx/settle.mp3", champion: "/sfx/champion.mp3",
-                   tick: "/sfx/tick.mp3", drums: "/sfx/drums.mp3", snare: "/sfx/snare.mp3",
-                   foul: "/sfx/foul.mp3", tap: "/sfx/tap.mp3" };
-const SFX = {};
-let SFX_LOADING = false;
-/* 分層載入：頁面一開就備好判定用的四聲（26KB），其餘等第一次觸碰才拉。
-   全部一次過拉會令第一下按掣冇聲——loadSfx 同 pointerdown 同時開始，buffer 未 decode 完。 */
-const SFX_CORE = ["tap","ding","whoosh","tick"];
-const SFX_REST = ["countdown","whistle","settle","champion","drums","snare","foul","heart"];
-async function loadSfx(keys){
-  const c = audioCtx(); if(!c || !keys) return;
-  const todo = keys.filter(k => !SFX[k]);
-  if(!todo.length) return;
-  SFX_LOADING = true;
-  await Promise.all(todo.map(async (k)=>{
-    try{
-      const r = await fetch(SFX_SRC[k], {cache:"force-cache"});
-      SFX[k] = await c.decodeAudioData(await r.arrayBuffer());
-    }catch(e){ /* 音檔拿不到就靜靜留空，唔影響流程 */ }
-  }));
-  SFX_LOADING = false;
-}
-function sfx(name, vol=0.85, rate=1, delay=0){
-  const c = audioCtx(), buf = SFX[name];
-  if(!c || !buf) return false;
-  const src = c.createBufferSource(), g = c.createGain();
-  src.buffer = buf; src.playbackRate.value = rate; g.gain.value = vol;
-  src.connect(g).connect(c.destination);
-  src.start(c.currentTime + Math.max(0, delay)/1000);
-  return true;
-}
-
-/* 冠軍頁背景音樂：無縫 loop，離開結果頁／重開一局即停
-   loop = true 之外再加一層保險：ended 即重新接上，
-   並喺頁面返前景／context 被暫停時自動 resume，避免個別瀏覽器中斷 */
-let BGM = null, BGM_WANT = null;
-function bgm(name, vol=0.42){
-  stopBgm();
-  if(!SFX[name]) return;
-  BGM_WANT = { name, vol };
-  startBgm();
-}
-function startBgm(){
-  if(!BGM_WANT) return;
-  const c = audioCtx(), buf = SFX[BGM_WANT.name];
-  if(!c || !buf) return;
-  const src = c.createBufferSource(), g = c.createGain();
-  src.buffer = buf; src.loop = true;
-  src.loopStart = 0; src.loopEnd = buf.duration;
-  g.gain.value = BGM_WANT.vol;
-  src.connect(g).connect(c.destination);
-  src.onended = ()=>{ if(BGM_WANT){ BGM = null; setTimeout(startBgm, 0); } };
-  src.start();
-  BGM = src;
-}
-function stopBgm(){
-  BGM_WANT = null;
-  if(BGM){ try{ BGM.onended = null; BGM.stop(); }catch(e){} BGM = null; }
-}
-document.addEventListener("visibilitychange", ()=>{
-  if(document.hidden || !BGM_WANT) return;
-  const c = audioCtx();
-  if(c && c.state === "suspended") c.resume();
-  if(!BGM) startBgm();
-});
+/* 音效由 ./src/sfx.js 提供。
+   visibilitychange 的 BGM resume 邏輯也已搬進模組，app.js 不再碰私有狀態。 */
 loadSfx(SFX_CORE);                                    // 判定四聲即刻備好（唔需要手勢都 decode 得）
 document.addEventListener("pointerdown", ()=>loadSfx(SFX_REST), {once:true});
 document.addEventListener("keydown", ()=>loadSfx(SFX_REST), {once:true});
@@ -1536,7 +1368,7 @@ function finishReveal(){
   });
   RES.rows.forEach(r=>r.classList.add("in"));
   burstConfetti();
-  if(!BGM_WANT) bgm("champion", 0.42);   // 已經喺 flip 時起咗就唔重播
+  if(!isBgmWanted()) bgm("champion", 0.42);   // 已經喺 flip 時起咗就唔重播
   const acts = $("#v-result .result-actions");
   if(acts) acts.classList.add("on");
 }

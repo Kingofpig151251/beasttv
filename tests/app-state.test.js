@@ -1,8 +1,12 @@
 /**
  * app.js 狀態機接線測試
  *
- * src/state.js 有 25 個測試把關，但 app.js 是 classic script，用的是內嵌的同一份邏輯。
- * 這支測試確保兩邊規則完全一致：任何一邊改了轉移表而另一邊沒跟上，這裡就會失敗。
+ * app.js 原本內嵌一份與 src/state.js 規則相同的狀態機（classic script 不能 import）。
+ * 現在已改成 `import { State, GameStateMachine } from "./src/state.js"`，
+ * 兩邊是同一份程式碼，不再有「分叉」風險。
+ *
+ * 這支測試現在驗證的是：沙箱裡載入的 app.js 用的確實是 src/state.js 的匯出，
+ * 且 state 常數、轉移表、守門結果、phase 映射都與 src/state.js 一致。
  *
  * 執行：node --test tests/app-state.test.js
  */
@@ -121,7 +125,7 @@ before(() => {
   }
 });
 
-describe("app.js 內嵌狀態機與 src/state.js 一致", () => {
+describe("app.js 使用的狀態機與 src/state.js 同一份", () => {
   test("State 常數完全相同", () => {
     const appState = JSON.parse(boot("JSON.stringify(State)"));
     assert.deepEqual(Object.keys(appState).sort(), Object.keys(State).sort(), "狀態列舉應相同");

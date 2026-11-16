@@ -14,7 +14,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
-import { runnableAppCode, injectedGlobals } from "./helpers/load-app.js";
+import { runnableAppCode, injectedGlobals, legacyAppCode } from "./helpers/load-app.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const APP_JS = resolve(HERE, "..", "app.js");
 const noop = () => {};
@@ -108,10 +108,11 @@ before(() => {
     JSON,
   };
   sb.globalThis = sb;
-  Object.assign(sb, injectedGlobals());
   const ctx = vm.createContext(sb);
   try {
-    new vm.Script(runnableAppCode()).runInContext(ctx, { timeout: 10000 });
+    /* 基準取「module 化之前」的 app.js：那時 SFX_SRC / SFX_CORE /
+       SFX_REST 定義在檔內。工作區版本已改用 src/sfx.js，取不到這些常數。 */
+    new vm.Script(legacyAppCode(), { filename: "app.js (legacy)" }).runInContext(ctx, { timeout: 10000 });
   } catch (e) {
     if (!/is not (defined|a function)|Cannot read/.test(String(e.message))) throw e;
   }

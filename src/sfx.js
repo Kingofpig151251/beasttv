@@ -47,9 +47,12 @@ let SFX_LOADING = false;
 let BGM = null;
 let BGM_WANT = null;
 
-/** 取得（並視需要建立／恢復）AudioContext。瀏覽器不支援時回 null。 */
+/** 取得（並視需要建立／恢復）AudioContext。瀏覽器不支援或無 window 時回 null。 */
 export function audioCtx() {
-  const C = window.AudioContext || window.webkitAudioContext;
+  /* 在 Node / SSR / vm 沙箱裡沒有 window，直接存取會拋 ReferenceError。
+     這不只是為了測試：任何非瀏覽器環境載到這個模組都該靜默降級。 */
+  const W = typeof window !== "undefined" ? window : globalThis;
+  const C = W.AudioContext || W.webkitAudioContext;
   if (!C) return null;
   if (!AC) AC = new C();
   if (AC.state === "suspended") AC.resume();
@@ -160,8 +163,35 @@ export function isBgmPlaying() {
   return !!BGM;
 }
 
+/** 是否「想播」BGM（供 UI 判斷要不要重播） */
+export function isBgmWanted() {
+  return !!BGM_WANT;
+}
+
+/**
+ * 頁面回到前景時，若 BGM 想播但被瀏覽器暫停，就 resume AudioContext
+ * 並視需要重新接上 loop。
+ *
+ * 原本這段邏輯寫在 app.js 裡，直接讀模組私有的 BGM_WANT / BGM。
+ * 接線後改由模組自己負責，避免私有狀態外洩。
+ */
+export function resumeBgmIfNeeded() {
+  if (!BGM_WANT) return;
+  const c = audioCtx();
+  if (c && c.state === "suspended") c.resume();
+  if (!BGM) startBgm();
+}
+
+/* 瀏覽器把頁面切到背景時常會 suspend AudioContext；回到前景自動補回。 */
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) return;
+    resumeBgmIfNeeded();
+  });
+}
+
 export default {
   SFX_SRC, SFX_CORE, SFX_REST,
   audioCtx, loadSfx, sfx, bgm, startBgm, stopBgm,
-  isSfxLoading, hasSfx, isBgmPlaying,
+  isSfxLoading, hasSfx, isBgmPlaying, isBgmWanted, resumeBgmIfNeeded,
 };

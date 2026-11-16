@@ -45,6 +45,25 @@ export const State = Object.freeze({
   DONE: "done",
 });
 
+/**
+ * 對外顯示的舊版 phase 字串。
+ *
+ * 舊程式用 G.phase（"ready" / "countdown" / "running" / "interstitial" / "done"），
+ * 但暫停在新版是獨立狀態。為了讓既有呼叫點（含 app.js 的唯讀鏡像）
+ * 不必全面改寫，PAUSED_PLAYING 仍映射回 "running"、
+ * PAUSED_COUNTDOWN 映射回 "countdown"。
+ */
+export const PHASE_OF = Object.freeze({
+  [State.IDLE]: "idle",
+  [State.READY]: "ready",
+  [State.COUNTDOWN]: "countdown",
+  [State.PLAYING]: "running",
+  [State.PAUSED_PLAYING]: "running",
+  [State.PAUSED_COUNTDOWN]: "countdown",
+  [State.INTERSTITIAL]: "interstitial",
+  [State.DONE]: "done",
+});
+
 const ALL_STATES = new Set(Object.values(State));
 
 /** 可判定的狀態集合：只有一個成員，就是「正在玩且未暫停」 */
@@ -101,6 +120,11 @@ export class GameStateMachine {
 
   // ── 查詢 ──────────────────────────────────────────────
 
+  /** 舊版對外顯示的 phase 字串（PAUSED_* 映射回原階段） */
+  get phase() {
+    return PHASE_OF[this.state];
+  }
+
   get paused() {
     return RESUMABLE.has(this.state);
   }
@@ -150,6 +174,23 @@ export class GameStateMachine {
       if (this.strict) throw new StateError(this.state, to);
       return false;
     }
+    this.state = to;
+    this.history.push(to);
+    return true;
+  }
+
+  /**
+   * 直接設定狀態，不檢查轉移表。
+   *
+   * 存在的理由：app.js 有兩個呼叫點需要「無論現在是什麼狀態，直接回到 READY」
+   * —— 開局建立 G 時（`sm.force(State.READY)`）與 enterReady 的 fallback。
+   * 這是刻意的逃逸閥，僅供初始化與測試使用；一般流程應走 go()。
+   *
+   * @param {string} to 目標狀態（必須是合法狀態）
+   * @returns {boolean} 是否設定成功
+   */
+  force(to) {
+    if (!ALL_STATES.has(to)) return false;
     this.state = to;
     this.history.push(to);
     return true;

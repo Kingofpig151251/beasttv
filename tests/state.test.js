@@ -8,7 +8,7 @@
  */
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { GameStateMachine, State, StateError } from "../src/state.js";
+import { GameStateMachine, State, StateError, PHASE_OF } from "../src/state.js";
 
 const sm = () => new GameStateMachine({ strict: true });
 
@@ -200,8 +200,60 @@ describe("paused getter", () => {
   });
 });
 
-describe("中止與重設", () => {
-  test("任何活動狀態都可 abort 回 IDLE", () => {
+describe("phase getter（舊版字串相容）", () => {
+  const expected = {
+    idle: "idle",
+    ready: "ready",
+    countdown: "countdown",
+    playing: "running",
+    "paused-playing": "running",
+    "paused-countdown": "countdown",
+    interstitial: "interstitial",
+    done: "done",
+  };
+  test("PHASE_OF 映射正確", () => {
+    assert.deepEqual({ ...PHASE_OF }, expected);
+  });
+
+  test("每個狀態的 sm.phase 都等於 PHASE_OF[state]", () => {
+    for (const s of Object.values(State)) {
+      const m = sm();
+      m.state = s;
+      assert.equal(m.phase, expected[s], `狀態 ${s} 的 phase 應為 ${expected[s]}`);
+    }
+  });
+
+  test("PAUSED_* 的 phase 仍與原階段相同（不相容會令舊呼叫點壞掉）", () => {
+    const a = sm(); a.state = State.PLAYING;
+    const b = sm(); b.state = State.PAUSED_PLAYING;
+    assert.equal(a.phase, b.phase, "暫停不應改變 phase 字串");
+  });
+});
+
+describe("force()：不檢查轉移表的初始化逃逸閥", () => {
+  test("可從任意狀態直接設到 READY", () => {
+    for (const from of Object.values(State)) {
+      const m = sm();
+      m.state = from;
+      assert.equal(m.force(State.READY), true, `從 ${from} force(READY) 應成功`);
+      assert.equal(m.state, State.READY);
+    }
+  });
+
+  test("非法狀態值回 false 且不改變狀態", () => {
+    const m = playing();
+    assert.equal(m.force("bogus"), false);
+    assert.equal(m.state, State.PLAYING);
+  });
+
+  test("force 會記進 history", () => {
+    const m = sm();
+    m.force(State.READY);
+    assert.deepEqual(m.history, [State.IDLE, State.READY]);
+  });
+});
+
+describe("中止與重設", () => {  test("任何活動狀態都可 abort 回 IDLE", () => {
     for (const setup of [
       () => sm(),
       () => {
