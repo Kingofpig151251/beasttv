@@ -16,11 +16,13 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
-import { runnableAppCode, injectedGlobals } from "./helpers/load-app.js";
+import { runnableAppCode, legacyAppCode, injectedGlobals } from "./helpers/load-app.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..");
 const APP_JS = resolve(ROOT, "app.js");
-const APP_SRC = runnableAppCode();
+/* 基準取 module 化之前的 app.js：那時 LANG_KEY / LANG 還定義在檔內。
+   工作區版本已把語言狀態抽到 src/i18n.js，取不到這些常數。 */
+const APP_SRC = legacyAppCode();
 const noop = () => {};
 
 const storage = await import("../src/storage.js");

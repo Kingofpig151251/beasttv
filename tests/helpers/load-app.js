@@ -28,6 +28,7 @@ import vm from "node:vm";
 import { esc, fmtScore, statLine } from "../../src/format.js";
 import { State, GameStateMachine, StateError } from "../../src/state.js";
 import { $, $$ } from "../../src/dom.js";
+import { getLang, setLang as setI18nLang, isEn, T, translateTree } from "../../src/i18n.js";
 import {
   loadSfx, sfx, bgm, stopBgm,
   SFX_CORE, SFX_REST, isBgmWanted,
@@ -57,6 +58,7 @@ const IMPORT_BINDINGS = Object.freeze({
   "./src/state.js": { State, GameStateMachine, StateError },
   "./src/dom.js": { $: null, $$: null }, // 佔位，實際由 SANDBOX_DEFS 產生
   "./src/sfx.js": { loadSfx, sfx, bgm, stopBgm, SFX_CORE, SFX_REST, isBgmWanted },
+  "./src/i18n.js": { getLang, setLang: setI18nLang, isEn, T, translateTree },
 });
 
 /** 取出 app.js 源碼（含 import），供需要自行解析的測試使用 */
@@ -101,12 +103,17 @@ export function prepareAppCode() {
       if (!bindings) {
         throw new Error(`load-app: 未登錄的 import 來源「${m[2]}」，請在 IMPORT_BINDINGS 補上`);
       }
-      for (const n of names) {
-        if (bindings[n] === undefined) {
-          throw new Error(`load-app: ${m[2]} 沒有 export「${n}」`);
+      for (const rawName of names) {
+        // 支援 `import { setLang as setI18nLang }`：查 binding 用原名，
+        // 注入沙箱用別名（app.js 已有自己的 setLang，必須避開撞名）。
+        const parts = rawName.split(/\s+as\s+/);
+        const exportName = parts[0].trim();
+        const localName = (parts[1] || parts[0]).trim();
+        if (bindings[exportName] === undefined) {
+          throw new Error(`load-app: ${m[2]} 沒有 export「${exportName}」`);
         }
         // $ / $$ 不能在 Node 模組作用域注入，改由 SANDBOX_DEFS 在沙箱內定義
-        if (bindings[n] !== null) injected[n] = bindings[n];
+        if (bindings[exportName] !== null) injected[localName] = bindings[exportName];
       }
       continue; // 丟掉 import 行
     }
